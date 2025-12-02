@@ -51,25 +51,28 @@
             <!-- Filters -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900">
-                    <form method="GET" action="{{ route('admin.questions.index') }}" class="flex gap-4 items-end">
+                    <form method="GET" action="{{ route('admin.questions.index') }}" class="flex gap-4 items-end" x-data>
                         <div class="flex-1">
                             <label for="search" class="block text-sm font-medium text-gray-700">Search Question</label>
-                            <input type="text" name="search" id="search" value="{{ request('search') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Search by text...">
+                            <input type="text" name="search" id="search" value="{{ request('search') }}" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                                placeholder="Search by text..."
+                                @input.debounce.500ms="$el.form.submit()"
+                                onfocus="var val=this.value; this.value=''; this.value=val;" autofocus>
                         </div>
                         <div class="w-48">
                             <label for="level" class="block text-sm font-medium text-gray-700">Level</label>
-                            <select name="level" id="level" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <select name="level" id="level" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                @change="$el.form.submit()">
                                 <option value="">All Levels</option>
                                 <option value="Easy" {{ request('level') == 'Easy' ? 'selected' : '' }}>Easy</option>
                                 <option value="Medium" {{ request('level') == 'Medium' ? 'selected' : '' }}>Medium</option>
                                 <option value="Hard" {{ request('level') == 'Hard' ? 'selected' : '' }}>Hard</option>
                             </select>
                         </div>
-                        <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            Filter
-                        </button>
                         @if(request()->has('search') || request()->has('level'))
-                            <a href="{{ route('admin.questions.index') }}" class="text-gray-600 hover:text-gray-900 underline ml-2">Clear</a>
+                            <a href="{{ route('admin.questions.index') }}" class="text-gray-600 hover:text-gray-900 underline ml-2 mb-2">Clear</a>
                         @endif
                     </form>
                 </div>

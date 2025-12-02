@@ -12,7 +12,7 @@ class SoloRaidController extends Controller
         $raids = SoloRaid::where('status', 'active')
             ->whereDate('tanggal_mulai', '<=', now())
             ->whereDate('tanggal_selesai', '>=', now())
-            ->get();
+            ->paginate(6);
             
         return view('solo.index', compact('raids'));
     }

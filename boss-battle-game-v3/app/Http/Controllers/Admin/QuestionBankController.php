@@ -15,8 +15,21 @@ class QuestionBankController extends Controller
     {
         $query = QuestionBank::query();
 
-        // Get bank configuration and counts
-        $bankConfig = config('question_banks.banks', []);
+        // Get bank metadata from database (group by bank_group, get first question's metadata)
+        $bankConfig = QuestionBank::select('bank_group', 'bank_name', 'bank_icon', 'bank_description')
+            ->groupBy('bank_group', 'bank_name', 'bank_icon', 'bank_description')
+            ->get()
+            ->keyBy('bank_group')
+            ->map(function ($item) {
+                return [
+                    'name' => $item->bank_name,
+                    'icon' => $item->bank_icon ?? 'quiz',
+                    'description' => $item->bank_description ?? '',
+                ];
+            })
+            ->toArray();
+
+        // Get question counts per bank
         $bankCounts = QuestionBank::select('bank_group', \DB::raw('COUNT(*) as count'))
             ->groupBy('bank_group')
             ->pluck('count', 'bank_group');
@@ -54,7 +67,10 @@ class QuestionBankController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bank_group' => 'sometimes|integer|in:1,2,3',
+            'bank_group' => 'sometimes|integer|in:1,2,3,4,5,6,7,8,9',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_icon' => 'nullable|string|max:50',
+            'bank_description' => 'nullable|string',
             'level' => 'required|in:Easy,Medium,Hard',
             'soal_text' => 'required|string',
             'tipe' => 'required|in:multiple_choice,short_answer',
@@ -68,6 +84,16 @@ class QuestionBankController extends Controller
 
         // Default to Bank 1 if not provided
         $validated['bank_group'] = $validated['bank_group'] ?? 1;
+
+        // If no metadata provided, get from existing question in same bank
+        if (empty($validated['bank_name'])) {
+            $existingBank = QuestionBank::where('bank_group', $validated['bank_group'])->first();
+            if ($existingBank) {
+                $validated['bank_name'] = $existingBank->bank_name;
+                $validated['bank_icon'] = $existingBank->bank_icon;
+                $validated['bank_description'] = $existingBank->bank_description;
+            }
+        }
 
         QuestionBank::create($validated);
 
@@ -183,38 +209,42 @@ class QuestionBankController extends Controller
 
             // Check if new format with bank metadata or old format (array of questions)
             $bankName = $data['bank_name'] ?? null;
-            $bankIcon = $data['bank_icon'] ?? config('question_banks.default_icon');
+            $bankIcon = $data['bank_icon'] ?? 'quiz';
             $bankDescription = $data['bank_description'] ?? '';
             $questions = $data['questions'] ?? $data; // Support both formats
 
-            // Determine bank_group
-            $bankConfig = config('question_banks.banks', []);
+            // Determine bank_group - search in DATABASE instead of config
             $targetBankGroup = null;
+            $isNewBank = false;
 
             if ($bankName) {
-                // Search for existing bank by name
-                foreach ($bankConfig as $bankId => $bank) {
-                    if (strcasecmp($bank['name'], $bankName) === 0) {
-                        $targetBankGroup = $bankId;
-                        break;
-                    }
-                }
+                // Search for existing bank by name in database
+                $existingBank = QuestionBank::where('bank_name', 'LIKE', $bankName)
+                    ->first();
 
-                // If not found, create new bank_group
-                if ($targetBankGroup === null) {
+                if ($existingBank) {
+                    $targetBankGroup = $existingBank->bank_group;
+                    // Use existing metadata
+                    $bankIcon = $existingBank->bank_icon;
+                    $bankDescription = $existingBank->bank_description;
+                    $isNewBank = false;
+                } else {
+                    // Create new bank_group
                     $maxBankGroup = QuestionBank::max('bank_group') ?? 0;
                     $targetBankGroup = $maxBankGroup + 1;
                     $isNewBank = true;
-                } else {
-                    $isNewBank = false;
                 }
             } else {
                 // Old format without bank_name, use Bank 1 as default
+                $existingBank = QuestionBank::where('bank_group', 1)->first();
                 $targetBankGroup = 1;
+                $bankName = $existingBank->bank_name ?? 'Default Bank';
+                $bankIcon = $existingBank->bank_icon ?? 'quiz';
+                $bankDescription = $existingBank->bank_description ?? '';
                 $isNewBank = false;
             }
 
-            // Insert questions
+            // Insert questions with metadata
             $count = 0;
             foreach ($questions as $q) {
                 // Basic validation
@@ -224,6 +254,9 @@ class QuestionBankController extends Controller
 
                 QuestionBank::create([
                     'bank_group' => $targetBankGroup,
+                    'bank_name' => $bankName,
+                    'bank_icon' => $bankIcon,
+                    'bank_description' => $bankDescription,
                     'level' => $q['level'],
                     'soal_text' => $q['soal_text'],
                     'tipe' => $q['tipe'],
@@ -232,7 +265,12 @@ class QuestionBankController extends Controller
                     'pilihan_c' => $q['pilihan_c'] ?? null,
                     'pilihan_d' => $q['pilihan_d'] ?? null,
                     'jawaban_benar' => $q['jawaban_benar'],
-                    'bobot_xp' => $q['bobot_xp'] ?? config("question_banks.default_xp.{$q['level']}", 10),
+                    'bobot_xp' => $q['bobot_xp'] ?? match($q['level']) {
+                        'Easy' => 10,
+                        'Medium' => 15,
+                        'Hard' => 20,
+                        default => 10
+                    },
                 ]);
                 $count++;
             }
@@ -241,8 +279,7 @@ class QuestionBankController extends Controller
             $message = "Successfully imported $count questions";
             if ($isNewBank && $bankName) {
                 $message .= " to NEW bank: \"$bankName\" (Bank Group $targetBankGroup)";
-                $message .= "\n\n⚠️ IMPORTANT: Add this bank to config/question_banks.php:";
-                $message .= "\n$targetBankGroup => ['name' => '$bankName', 'icon' => '$bankIcon', 'description' => '$bankDescription']";
+                $message .= "\n\n✅ Bank akan otomatis muncul di tabs! Refresh halaman untuk melihat.";
             } elseif ($bankName) {
                 $message .= " to existing bank: \"$bankName\"";
             }

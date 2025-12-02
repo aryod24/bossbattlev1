@@ -8,7 +8,10 @@ class QuestionBank extends Model
 {
     protected $table = 'question_bank';
     protected $fillable = [
-        'bank_group',  // NEW: for multi-bank support
+        'bank_group',
+        'bank_name',      // NEW: Bank metadata
+        'bank_icon',      // NEW: Bank metadata
+        'bank_description', // NEW: Bank metadata
         'level', 'soal_text', 'tipe',
         'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d',
         'jawaban_benar', 'bobot_xp'

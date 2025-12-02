@@ -1,16 +1,51 @@
-<x-app-layout>
+<x-app-layout x-data="{ showUpload: false }">
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Question Bank') }}
             </h2>
-            <a href="{{ route('admin.questions.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Add New Question
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.questions.template') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm">
+                    Download Template
+                </a>
+                <button @click="showUpload = !showUpload" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm">
+                    Bulk Upload
+                </button>
+                <a href="{{ route('admin.questions.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                    Add New
+                </a>
+            </div>
         </div>
     </x-slot>
 
     <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            <!-- Bulk Upload Form -->
+            <div x-show="showUpload" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6" style="display: none;">
+                <div class="p-6 text-gray-900 border-l-4 border-indigo-500">
+                    <h3 class="font-bold text-lg mb-4">Bulk Upload Questions (JSON)</h3>
+                    <form action="{{ route('admin.questions.bulk-upload') }}" method="POST" enctype="multipart/form-data" class="flex items-end gap-4">
+                        @csrf
+                        <div class="flex-1">
+                            <label for="file" class="block text-sm font-medium text-gray-700">Select JSON File</label>
+                            <input type="file" name="file" id="file" accept=".json,.txt" class="mt-1 block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-indigo-50 file:text-indigo-700
+                                hover:file:bg-indigo-100
+                            " required>
+                        </div>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded">
+                            Upload Questions
+                        </button>
+                    </form>
+                    <p class="text-xs text-gray-500 mt-2">Make sure your JSON matches the template format.</p>
+                </div>
+            </div>
+        </div>
+        
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Filters -->

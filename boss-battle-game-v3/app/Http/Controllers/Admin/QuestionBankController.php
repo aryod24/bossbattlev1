@@ -108,4 +108,86 @@ class QuestionBankController extends Controller
         return redirect()->route('admin.questions.index')
             ->with('success', 'Question deleted successfully.');
     }
+
+    /**
+     * Download JSON template for bulk upload.
+     */
+    public function downloadTemplate()
+    {
+        $template = [
+            [
+                'level' => 'Easy',
+                'soal_text' => 'Contoh Pertanyaan Pilihan Ganda?',
+                'tipe' => 'multiple_choice',
+                'pilihan_a' => 'Opsi A',
+                'pilihan_b' => 'Opsi B',
+                'pilihan_c' => 'Opsi C',
+                'pilihan_d' => 'Opsi D',
+                'jawaban_benar' => 'Opsi A',
+                'bobot_xp' => 10
+            ],
+            [
+                'level' => 'Medium',
+                'soal_text' => 'Contoh Pertanyaan Isian Singkat?',
+                'tipe' => 'short_answer',
+                'pilihan_a' => null,
+                'pilihan_b' => null,
+                'pilihan_c' => null,
+                'pilihan_d' => null,
+                'jawaban_benar' => 'Jawaban Singkat',
+                'bobot_xp' => 20
+            ]
+        ];
+
+        return response()->json($template, 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="question_bank_template.json"',
+        ]);
+    }
+
+    /**
+     * Handle bulk upload of questions via JSON.
+     */
+    public function bulkUpload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:json,txt',
+        ]);
+
+        try {
+            $jsonContent = file_get_contents($request->file('file')->getRealPath());
+            $questions = json_decode($jsonContent, true);
+
+            if (!is_array($questions)) {
+                return back()->withErrors(['file' => 'Invalid JSON format.']);
+            }
+
+            $count = 0;
+            foreach ($questions as $q) {
+                // Basic validation for each item
+                if (empty($q['level']) || empty($q['soal_text']) || empty($q['tipe']) || empty($q['jawaban_benar'])) {
+                    continue; // Skip invalid items
+                }
+
+                QuestionBank::create([
+                    'level' => $q['level'],
+                    'soal_text' => $q['soal_text'],
+                    'tipe' => $q['tipe'],
+                    'pilihan_a' => $q['pilihan_a'] ?? null,
+                    'pilihan_b' => $q['pilihan_b'] ?? null,
+                    'pilihan_c' => $q['pilihan_c'] ?? null,
+                    'pilihan_d' => $q['pilihan_d'] ?? null,
+                    'jawaban_benar' => $q['jawaban_benar'],
+                    'bobot_xp' => $q['bobot_xp'] ?? 10,
+                ]);
+                $count++;
+            }
+
+            return redirect()->route('admin.questions.index')
+                ->with('success', "Successfully imported $count questions.");
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
+        }
+    }
 }

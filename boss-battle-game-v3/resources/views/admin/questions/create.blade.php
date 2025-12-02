@@ -1,9 +1,8 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Create New Question') }}
-        </h2>
-    </x-slot>
+<x-admin-layout>
+    <!-- PageHeading -->
+    <header class="mb-6">
+        <h1 class="text-4xl font-black tracking-tight">Tambah Soal Baru</h1>
+    </header>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -88,4 +87,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-admin-layout>

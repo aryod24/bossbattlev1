@@ -72,6 +72,9 @@
                         <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.solo-raids.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.solo-raids.index') }}">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>Manajemen Event
                         </a>
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.questions.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.questions.index') }}">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">quiz</span>Bank Soal
+                        </a>
                         <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="#">
                             <span class="material-symbols-outlined">group</span>Manajemen User
                         </a>

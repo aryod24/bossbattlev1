@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html class="light" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Laravel') }} - Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9d406",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23200f",
+                        "text-light-primary": "#1c1a0d",
+                        "text-dark-primary": "#f8f8f5",
+                        "text-light-secondary": "#9e9147",
+                        "text-dark-secondary": "#a9a277",
+                        "surface-light": "#fcfbf8",
+                        "surface-dark": "#2a2712",
+                        "border-light": "#e9e5ce",
+                        "border-dark": "#3f3a1d",
+                        "status-green-bg": "rgb(56 161 105 / 0.1)",
+                        "status-green-text": "#38a169",
+                        "status-red-bg": "rgb(229 62 62 / 0.1)",
+                        "status-red-text": "#e53e3e",
+                        "status-gray-bg": "rgb(128 128 128 / 0.1)",
+                        "status-gray-text": "#808080"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light-primary dark:text-text-dark-primary">
+    <div class="flex min-h-screen w-full">
+        <!-- SideNavBar -->
+        <aside class="flex h-screen w-64 flex-col border-r border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0">
+            <div class="flex h-full flex-col justify-between p-4">
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->nama) }}&background=random");'></div>
+                        <div class="flex flex-col">
+                            <h1 class="font-medium">{{ auth()->user()->nama }}</h1>
+                            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Admin</p>
+                        </div>
+                    </div>
+                    <nav class="flex flex-col gap-2">
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="{{ route('dashboard') }}">
+                            <span class="material-symbols-outlined">dashboard</span>Dashboard
+                        </a>
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.solo-raids.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.solo-raids.index') }}">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>Manajemen Event
+                        </a>
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="#">
+                            <span class="material-symbols-outlined">group</span>Manajemen User
+                        </a>
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="#">
+                            <span class="material-symbols-outlined">book</span>Konten
+                        </a>
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="#">
+                            <span class="material-symbols-outlined">monitoring</span>Laporan
+                        </a>
+                    </nav>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="{{ route('profile.edit') }}">
+                        <span class="material-symbols-outlined">settings</span>Pengaturan
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20 text-left">
+                            <span class="material-symbols-outlined">logout</span>Keluar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex flex-1 flex-col p-6 lg:p-8">
+            <div class="w-full max-w-7xl mx-auto">
+                @if(session('success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <span class="block sm:inline">{{ session('success') }}</span>
+                    </div>
+                @endif
+                
+                {{ $slot }}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

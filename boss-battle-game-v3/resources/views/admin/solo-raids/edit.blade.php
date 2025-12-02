@@ -24,8 +24,9 @@
                                 <div>
                                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                                     <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <option value="draft" {{ $soloRaid->status === 'draft' ? 'selected' : '' }}>Draft</option>
                                         <option value="active" {{ $soloRaid->status === 'active' ? 'selected' : '' }}>Active</option>
-                                        <option value="inactive" {{ $soloRaid->status === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                        <option value="selesai" {{ $soloRaid->status === 'selesai' ? 'selected' : '' }}>Finished</option>
                                     </select>
                                 </div>
                                 <div>
@@ -35,11 +36,11 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label for="tanggal_mulai" class="block text-sm font-medium text-gray-700">Start Date</label>
-                                        <input type="date" name="tanggal_mulai" id="tanggal_mulai" value="{{ $soloRaid->tanggal_mulai }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                        <input type="date" name="tanggal_mulai" id="tanggal_mulai" value="{{ $soloRaid->tanggal_mulai ? $soloRaid->tanggal_mulai->format('Y-m-d') : '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                                     </div>
                                     <div>
                                         <label for="tanggal_selesai" class="block text-sm font-medium text-gray-700">End Date</label>
-                                        <input type="date" name="tanggal_selesai" id="tanggal_selesai" value="{{ $soloRaid->tanggal_selesai }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                        <input type="date" name="tanggal_selesai" id="tanggal_selesai" value="{{ $soloRaid->tanggal_selesai ? $soloRaid->tanggal_selesai->format('Y-m-d') : '' }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                                     </div>
                                 </div>
                             </div>

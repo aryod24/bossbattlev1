@@ -21,6 +21,14 @@
                                     <input type="text" name="nama" id="nama" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                                 </div>
                                 <div>
+                                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                    <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <option value="draft" selected>Draft</option>
+                                        <option value="active">Active</option>
+                                        <option value="selesai">Finished</option>
+                                    </select>
+                                </div>
+                                <div>
                                     <label for="deskripsi" class="block text-sm font-medium text-gray-700">Description</label>
                                     <textarea name="deskripsi" id="deskripsi" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required></textarea>
                                 </div>

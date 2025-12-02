@@ -35,6 +35,7 @@ class SoloRaidAdminController extends Controller
             'easy_enabled' => 'boolean',
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
+            'status' => 'required|in:draft,active,selesai',
         ]);
 
         $validated['created_by'] = auth()->id();
@@ -68,7 +69,7 @@ class SoloRaidAdminController extends Controller
             'easy_enabled' => 'boolean',
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:draft,active,selesai',
         ]);
 
         $validated['easy_enabled'] = $request->has('easy_enabled');
@@ -90,7 +91,7 @@ class SoloRaidAdminController extends Controller
     {
         $newRaid = $soloRaid->replicate();
         $newRaid->nama = $newRaid->nama . ' (Copy)';
-        $newRaid->status = 'inactive';
+        $newRaid->status = 'draft';
         $newRaid->created_by = auth()->id();
         $newRaid->save();
 

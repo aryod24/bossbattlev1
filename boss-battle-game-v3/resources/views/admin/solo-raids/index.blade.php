@@ -38,7 +38,14 @@
                                         {{ $raid->tanggal_mulai }} - {{ $raid->tanggal_selesai }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $raid->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        @php
+                                            $statusColors = [
+                                                'draft' => 'bg-gray-100 text-gray-800',
+                                                'active' => 'bg-green-100 text-green-800',
+                                                'selesai' => 'bg-blue-100 text-blue-800',
+                                            ];
+                                        @endphp
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$raid->status] ?? 'bg-gray-100 text-gray-800' }}">
                                             {{ ucfirst($raid->status) }}
                                         </span>
                                     </td>
@@ -67,7 +74,7 @@
                                             <button type="submit" class="text-blue-600 hover:text-blue-900" onclick="return confirm('Duplicate this raid?')">Copy</button>
                                         </form>
 
-                                        @if($raid->status === 'inactive')
+                                        @if($raid->status !== 'active')
                                             <form action="{{ route('admin.solo-raids.destroy', $raid) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')

@@ -29,7 +29,6 @@
                     <th class="px-4 py-3 text-sm font-medium">Level</th>
                     <th class="px-4 py-3 text-sm font-medium">Tanggal & Waktu</th>
                     <th class="px-4 py-3 text-sm font-medium">Status</th>
-                    <th class="px-4 py-3 text-sm font-medium">Peserta</th>
                     <th class="px-4 py-3 text-sm font-medium text-right">Aksi</th>
                 </tr>
             </thead>
@@ -38,13 +37,23 @@
                     <tr class="border-b border-border-light dark:border-border-dark hover:bg-primary/10">
                         <td class="px-4 py-3 text-sm font-medium">{{ $raid->nama }}</td>
                         <td class="px-4 py-3 text-sm">
-                            @if($raid->hard_enabled)
-                                <span class="inline-flex items-center rounded-md bg-red-500/10 px-2 py-1 text-xs font-medium text-red-400 ring-1 ring-inset ring-red-500/20">Hard</span>
-                            @elseif($raid->medium_enabled)
-                                <span class="inline-flex items-center rounded-md bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-500 ring-1 ring-inset ring-yellow-500/20">Medium</span>
-                            @else
-                                <span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">Easy</span>
-                            @endif
+                            <div class="flex gap-1">
+                                <form action="{{ route('admin.solo-raids.toggle-level', $raid) }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="level" value="easy">
+                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->easy_enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400' }}" title="Toggle Easy">E</button>
+                                </form>
+                                <form action="{{ route('admin.solo-raids.toggle-level', $raid) }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="level" value="medium">
+                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->medium_enabled ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-400' }}" title="Toggle Medium">M</button>
+                                </form>
+                                <form action="{{ route('admin.solo-raids.toggle-level', $raid) }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="level" value="hard">
+                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->hard_enabled ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400' }}" title="Toggle Hard">H</button>
+                                </form>
+                            </div>
                         </td>
                         <td class="px-4 py-3 text-sm text-text-light-secondary dark:text-text-dark-secondary">
                             {{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y, H:i') }}
@@ -56,16 +65,13 @@
                                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                         <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                     </span>
-                                    Ongoing
+                                    Active
                                 </span>
                             @elseif($raid->status === 'selesai')
                                 <span class="inline-flex items-center rounded-md bg-status-green-bg px-2 py-1 text-xs font-medium text-status-green-text ring-1 ring-inset ring-green-600/20">Selesai</span>
                             @else
                                 <span class="inline-flex items-center rounded-md bg-status-gray-bg px-2 py-1 text-xs font-medium text-status-gray-text ring-1 ring-inset ring-gray-500/20">Draft</span>
                             @endif
-                        </td>
-                        <td class="px-4 py-3 text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                            {{ $raid->sessions->count() }}/100 <!-- Placeholder for max participants -->
                         </td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex items-center justify-end gap-2">

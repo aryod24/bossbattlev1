@@ -58,13 +58,13 @@
         <aside class="flex h-screen w-64 flex-col border-r border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0">
             <div class="flex h-full flex-col justify-between p-4">
                 <div class="flex flex-col gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->nama) }}&background=random");'></div>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 hover:bg-primary/10 p-2 -ml-2 rounded-lg transition-colors group">
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 group-hover:ring-2 group-hover:ring-primary transition-all" style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->nama) }}&background=random");'></div>
                         <div class="flex flex-col">
-                            <h1 class="font-medium">{{ auth()->user()->nama }}</h1>
+                            <h1 class="font-medium group-hover:text-primary transition-colors">{{ auth()->user()->nama }}</h1>
                             <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Admin</p>
                         </div>
-                    </div>
+                    </a>
                     <nav class="flex flex-col gap-2">
                         <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="{{ route('dashboard') }}">
                             <span class="material-symbols-outlined">dashboard</span>Dashboard

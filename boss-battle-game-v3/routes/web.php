@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('solo-raids', SoloRaidAdminController::class);
     Route::post('solo-raids/{soloRaid}/duplicate', [SoloRaidAdminController::class, 'duplicate'])->name('solo-raids.duplicate');
     Route::post('solo-raids/{soloRaid}/toggle-level', [SoloRaidAdminController::class, 'toggleLevel'])->name('solo-raids.toggle-level');
+    
+    Route::resource('questions', \App\Http\Controllers\Admin\QuestionBankController::class);
 });
 
 require __DIR__.'/auth.php';

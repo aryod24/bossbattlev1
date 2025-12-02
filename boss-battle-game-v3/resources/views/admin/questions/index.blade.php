@@ -1,0 +1,114 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Question Bank') }}
+            </h2>
+            <a href="{{ route('admin.questions.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Add New Question
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            <!-- Filters -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <form method="GET" action="{{ route('admin.questions.index') }}" class="flex gap-4 items-end">
+                        <div class="flex-1">
+                            <label for="search" class="block text-sm font-medium text-gray-700">Search Question</label>
+                            <input type="text" name="search" id="search" value="{{ request('search') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Search by text...">
+                        </div>
+                        <div class="w-48">
+                            <label for="level" class="block text-sm font-medium text-gray-700">Level</label>
+                            <select name="level" id="level" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="">All Levels</option>
+                                <option value="Easy" {{ request('level') == 'Easy' ? 'selected' : '' }}>Easy</option>
+                                <option value="Medium" {{ request('level') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                                <option value="Hard" {{ request('level') == 'Hard' ? 'selected' : '' }}>Hard</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Filter
+                        </button>
+                        @if(request()->has('search') || request()->has('level'))
+                            <a href="{{ route('admin.questions.index') }}" class="text-gray-600 hover:text-gray-900 underline ml-2">Clear</a>
+                        @endif
+                    </form>
+                </div>
+            </div>
+
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Answer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">XP</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @forelse($questions as $question)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {{ $question->level === 'Easy' ? 'bg-green-100 text-green-800' : '' }}
+                                            {{ $question->level === 'Medium' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                            {{ $question->level === 'Hard' ? 'bg-red-100 text-red-800' : '' }}">
+                                            {{ $question->level }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $question->soal_text }}">
+                                            {{ $question->soal_text }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $question->tipe == 'multiple_choice' ? 'Multiple Choice' : 'Short Answer' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $question->jawaban_benar }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $question->bobot_xp }} XP
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="{{ route('admin.questions.edit', $question) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        
+                                        <form action="{{ route('admin.questions.destroy', $question) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this question?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                        No questions found.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        {{ $questions->withQueryString()->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

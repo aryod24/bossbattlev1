@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\QuestionBank;
+use Illuminate\Http\Request;
+
+class QuestionBankController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $query = QuestionBank::query();
+
+        if ($request->has('level') && $request->level != '') {
+            $query->where('level', $request->level);
+        }
+
+        if ($request->has('search') && $request->search != '') {
+            $query->where('soal_text', 'like', '%' . $request->search . '%');
+        }
+
+        $questions = $query->latest()->paginate(10);
+
+        return view('admin.questions.index', compact('questions'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.questions.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'level' => 'required|in:Easy,Medium,Hard',
+            'soal_text' => 'required|string',
+            'tipe' => 'required|in:multiple_choice,short_answer',
+            'pilihan_a' => 'nullable|required_if:tipe,multiple_choice|string',
+            'pilihan_b' => 'nullable|required_if:tipe,multiple_choice|string',
+            'pilihan_c' => 'nullable|required_if:tipe,multiple_choice|string',
+            'pilihan_d' => 'nullable|required_if:tipe,multiple_choice|string',
+            'jawaban_benar' => 'required|string',
+            'bobot_xp' => 'required|integer|min:1',
+        ]);
+
+        QuestionBank::create($validated);
+
+        return redirect()->route('admin.questions.index')
+            ->with('success', 'Question created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(QuestionBank $question)
+    {
+        return view('admin.questions.edit', compact('question'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, QuestionBank $question)
+    {
+        $validated = $request->validate([
+            'level' => 'required|in:Easy,Medium,Hard',
+            'soal_text' => 'required|string',
+            'tipe' => 'required|in:multiple_choice,short_answer',
+            'pilihan_a' => 'nullable|required_if:tipe,multiple_choice|string',
+            'pilihan_b' => 'nullable|required_if:tipe,multiple_choice|string',
+            'pilihan_c' => 'nullable|required_if:tipe,multiple_choice|string',
+            'pilihan_d' => 'nullable|required_if:tipe,multiple_choice|string',
+            'jawaban_benar' => 'required|string',
+            'bobot_xp' => 'required|integer|min:1',
+        ]);
+
+        $question->update($validated);
+
+        return redirect()->route('admin.questions.index')
+            ->with('success', 'Question updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(QuestionBank $question)
+    {
+        $question->delete();
+
+        return redirect()->route('admin.questions.index')
+            ->with('success', 'Question deleted successfully.');
+    }
+}

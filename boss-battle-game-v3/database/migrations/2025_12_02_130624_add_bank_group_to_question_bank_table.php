@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('question_bank', function (Blueprint $table) {
+            $table->unsignedTinyInteger('bank_group')->default(1)->after('id');
+            $table->index('bank_group');
+        });
+        
+        // Assign all existing questions to Bank 1 (PHP Basics)
+        DB::table('question_bank')->update(['bank_group' => 1]);
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('question_bank', function (Blueprint $table) {
+            $table->dropIndex(['bank_group']);
+            $table->dropColumn('bank_group');
+        });
+    }
+};

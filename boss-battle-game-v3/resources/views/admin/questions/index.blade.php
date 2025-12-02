@@ -18,6 +18,18 @@
         </div>
     </header>
 
+    <!-- Bank Tabs (Dynamic) -->
+    <div class="flex gap-2 p-1 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg mb-4 overflow-x-auto">
+        @foreach($bankConfig as $bankId => $bank)
+            <a href="{{ route('admin.questions.index', ['bank' => $bankId, 'search' => request('search'), 'level' => request('level')]) }}" 
+               class="flex h-10 shrink-0 items-center justify-center gap-2 px-4 rounded-lg {{ $currentBank == $bankId ? 'bg-primary text-black font-bold shadow-sm' : 'hover:bg-primary/20' }} transition-colors">
+                <span class="material-symbols-outlined text-sm">{{ $bank['icon'] ?? 'quiz' }}</span>
+                <span class="text-sm">{{ $bank['name'] }}</span>
+                <span class="text-xs opacity-75">({{ $bankCounts[$bankId] ?? 0 }})</span>
+            </a>
+        @endforeach
+    </div>
+
     <!-- SearchBar & Filter -->
     <div class="flex gap-4 mb-4">
         <!-- Search Bar -->
@@ -199,7 +211,8 @@
             searchTimeout = setTimeout(() => {
                 const searchValue = input.value;
                 const currentLevel = '{{ request("level") }}';
-                let url = '{{ route("admin.questions.index") }}?search=' + encodeURIComponent(searchValue);
+                const currentBank = '{{ $currentBank }}';
+                let url = '{{ route("admin.questions.index") }}?bank=' + currentBank + '&search=' + encodeURIComponent(searchValue);
                 if (currentLevel) {
                     url += '&level=' + encodeURIComponent(currentLevel);
                 }
@@ -211,7 +224,8 @@
         function filterByLevel(select) {
             const levelValue = select.value;
             const currentSearch = '{{ request("search") }}';
-            let url = '{{ route("admin.questions.index") }}?level=' + encodeURIComponent(levelValue);
+            const currentBank = '{{ $currentBank }}';
+            let url = '{{ route("admin.questions.index") }}?bank=' + currentBank + '&level=' + encodeURIComponent(levelValue);
             if (currentSearch) {
                 url += '&search=' + encodeURIComponent(currentSearch);
             }

@@ -15,17 +15,29 @@ class QuestionBankController extends Controller
     {
         $query = QuestionBank::query();
 
+        // Get bank configuration and counts
+        $bankConfig = config('question_banks.banks', []);
+        $bankCounts = QuestionBank::select('bank_group', \DB::raw('COUNT(*) as count'))
+            ->groupBy('bank_group')
+            ->pluck('count', 'bank_group');
+
+        // Filter by bank group (default to first available bank or Bank 1)
+        $currentBank = $request->get('bank', array_key_first($bankConfig) ?? 1);
+        $query->where('bank_group', $currentBank);
+
+        // Filter by level
         if ($request->has('level') && $request->level != '') {
             $query->where('level', $request->level);
         }
 
+        // Search by question text
         if ($request->has('search') && $request->search != '') {
             $query->where('soal_text', 'like', '%' . $request->search . '%');
         }
 
-        $questions = $query->latest()->paginate(10);
+        $questions = $query->latest()->paginate(10)->withQueryString();
 
-        return view('admin.questions.index', compact('questions'));
+        return view('admin.questions.index', compact('questions', 'currentBank', 'bankConfig', 'bankCounts'));
     }
 
     /**
@@ -42,6 +54,7 @@ class QuestionBankController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'bank_group' => 'sometimes|integer|in:1,2,3',
             'level' => 'required|in:Easy,Medium,Hard',
             'soal_text' => 'required|string',
             'tipe' => 'required|in:multiple_choice,short_answer',
@@ -53,9 +66,12 @@ class QuestionBankController extends Controller
             'bobot_xp' => 'required|integer|min:1',
         ]);
 
+        // Default to Bank 1 if not provided
+        $validated['bank_group'] = $validated['bank_group'] ?? 1;
+
         QuestionBank::create($validated);
 
-        return redirect()->route('admin.questions.index')
+        return redirect()->route('admin.questions.index', ['bank' => $validated['bank_group']])
             ->with('success', 'Question created successfully.');
     }
 
@@ -81,6 +97,7 @@ class QuestionBankController extends Controller
     public function update(Request $request, QuestionBank $question)
     {
         $validated = $request->validate([
+            'bank_group' => 'sometimes|integer|in:1,2,3',
             'level' => 'required|in:Easy,Medium,Hard',
             'soal_text' => 'required|string',
             'tipe' => 'required|in:multiple_choice,short_answer',
@@ -94,7 +111,9 @@ class QuestionBankController extends Controller
 
         $question->update($validated);
 
-        return redirect()->route('admin.questions.index')
+        $bankGroup = $validated['bank_group'] ?? $question->bank_group;
+
+        return redirect()->route('admin.questions.index', ['bank' => $bankGroup])
             ->with('success', 'Question updated successfully.');
     }
 
@@ -156,20 +175,55 @@ class QuestionBankController extends Controller
 
         try {
             $jsonContent = file_get_contents($request->file('file')->getRealPath());
-            $questions = json_decode($jsonContent, true);
+            $data = json_decode($jsonContent, true);
 
-            if (!is_array($questions)) {
+            if (!is_array($data)) {
                 return back()->withErrors(['file' => 'Invalid JSON format.']);
             }
 
+            // Check if new format with bank metadata or old format (array of questions)
+            $bankName = $data['bank_name'] ?? null;
+            $bankIcon = $data['bank_icon'] ?? config('question_banks.default_icon');
+            $bankDescription = $data['bank_description'] ?? '';
+            $questions = $data['questions'] ?? $data; // Support both formats
+
+            // Determine bank_group
+            $bankConfig = config('question_banks.banks', []);
+            $targetBankGroup = null;
+
+            if ($bankName) {
+                // Search for existing bank by name
+                foreach ($bankConfig as $bankId => $bank) {
+                    if (strcasecmp($bank['name'], $bankName) === 0) {
+                        $targetBankGroup = $bankId;
+                        break;
+                    }
+                }
+
+                // If not found, create new bank_group
+                if ($targetBankGroup === null) {
+                    $maxBankGroup = QuestionBank::max('bank_group') ?? 0;
+                    $targetBankGroup = $maxBankGroup + 1;
+                    $isNewBank = true;
+                } else {
+                    $isNewBank = false;
+                }
+            } else {
+                // Old format without bank_name, use Bank 1 as default
+                $targetBankGroup = 1;
+                $isNewBank = false;
+            }
+
+            // Insert questions
             $count = 0;
             foreach ($questions as $q) {
-                // Basic validation for each item
+                // Basic validation
                 if (empty($q['level']) || empty($q['soal_text']) || empty($q['tipe']) || empty($q['jawaban_benar'])) {
-                    continue; // Skip invalid items
+                    continue;
                 }
 
                 QuestionBank::create([
+                    'bank_group' => $targetBankGroup,
                     'level' => $q['level'],
                     'soal_text' => $q['soal_text'],
                     'tipe' => $q['tipe'],
@@ -178,13 +232,23 @@ class QuestionBankController extends Controller
                     'pilihan_c' => $q['pilihan_c'] ?? null,
                     'pilihan_d' => $q['pilihan_d'] ?? null,
                     'jawaban_benar' => $q['jawaban_benar'],
-                    'bobot_xp' => $q['bobot_xp'] ?? 10,
+                    'bobot_xp' => $q['bobot_xp'] ?? config("question_banks.default_xp.{$q['level']}", 10),
                 ]);
                 $count++;
             }
 
-            return redirect()->route('admin.questions.index')
-                ->with('success', "Successfully imported $count questions.");
+            // Build success message
+            $message = "Successfully imported $count questions";
+            if ($isNewBank && $bankName) {
+                $message .= " to NEW bank: \"$bankName\" (Bank Group $targetBankGroup)";
+                $message .= "\n\n⚠️ IMPORTANT: Add this bank to config/question_banks.php:";
+                $message .= "\n$targetBankGroup => ['name' => '$bankName', 'icon' => '$bankIcon', 'description' => '$bankDescription']";
+            } elseif ($bankName) {
+                $message .= " to existing bank: \"$bankName\"";
+            }
+
+            return redirect()->route('admin.questions.index', ['bank' => $targetBankGroup])
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);

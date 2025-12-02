@@ -8,6 +8,7 @@ class QuestionBank extends Model
 {
     protected $table = 'question_bank';
     protected $fillable = [
+        'bank_group',  // NEW: for multi-bank support
         'level', 'soal_text', 'tipe',
         'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d',
         'jawaban_benar', 'bobot_xp'
@@ -16,6 +17,10 @@ class QuestionBank extends Model
     // Scopes
     public function scopeByLevel($query, $level) {
         return $query->where('level', $level);
+    }
+
+    public function scopeInBank($query, $bankGroup) {
+        return $query->where('bank_group', $bankGroup);
     }
 
     // Methods

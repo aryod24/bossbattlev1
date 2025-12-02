@@ -11,6 +11,19 @@
                     <form method="POST" action="{{ route('admin.questions.store') }}" x-data="{ type: 'multiple_choice' }">
                         @csrf
 
+                        <!-- Bank Group -->
+                        <div class="mb-4">
+                            <label for="bank_group" class="block text-sm font-medium text-gray-700">Question Bank</label>
+                            <select id="bank_group" name="bank_group" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required>
+                                @foreach(config('question_banks.banks', []) as $bankId => $bank)
+                                    <option value="{{ $bankId }}" {{ old('bank_group', 1) == $bankId ? 'selected' : '' }}>
+                                        {{ $bank['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('bank_group')" class="mt-2" />
+                        </div>
+
                         <!-- Level -->
                         <div class="mb-4">
                             <label for="level" class="block text-sm font-medium text-gray-700">Level</label>

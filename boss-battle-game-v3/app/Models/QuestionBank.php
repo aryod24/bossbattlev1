@@ -6,15 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class QuestionBank extends Model
 {
-    protected $guarded = ['id'];
+    protected $table = 'question_bank';
+    protected $fillable = [
+        'level', 'soal_text', 'tipe',
+        'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d',
+        'jawaban_benar', 'bobot_xp'
+    ];
 
-    public function scopeByLevel($query, $level)
-    {
+    // Scopes
+    public function scopeByLevel($query, $level) {
         return $query->where('level', $level);
     }
 
-    public static function getRandomByLevel($level, $count)
-    {
-        return self::byLevel($level)->inRandomOrder()->take($count)->get();
+    // Methods
+    public static function getRandomByLevel($level, $count) {
+        return self::where('level', $level)
+            ->inRandomOrder()
+            ->limit($count)
+            ->get();
     }
 }

@@ -11,30 +11,42 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('solo_raids', function (Blueprint $table) {
+        Schema::create('solo_raid', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
+            $table->string('nama', 100);
             $table->text('deskripsi');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->foreignId('created_by')->constrained('users');
+            $table->enum('status', ['draft', 'active', 'selesai'])->default('draft');
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            
+            // Info nodes
             $table->text('info_node_1')->nullable();
             $table->text('info_node_2')->nullable();
             $table->text('info_node_3')->nullable();
-            $table->string('boss_easy_name')->default('Goblin King');
-            $table->string('boss_medium_name')->default('Orc Warlord');
-            $table->string('boss_hard_name')->default('Dragon Lord');
+            
+            // Boss names
+            $table->string('boss_easy_name', 50)->default('Goblin King');
+            $table->string('boss_medium_name', 50)->default('Dragon Lord');
+            $table->string('boss_hard_name', 50)->default('Demon Emperor');
+            
+            // Level toggles
             $table->boolean('easy_enabled')->default(true);
-            $table->boolean('medium_enabled')->default(false);
-            $table->boolean('hard_enabled')->default(false);
-            $table->date('easy_start_date')->nullable();
-            $table->date('easy_end_date')->nullable();
-            $table->date('medium_start_date')->nullable();
-            $table->date('medium_end_date')->nullable();
-            $table->date('hard_start_date')->nullable();
-            $table->date('hard_end_date')->nullable();
+            $table->boolean('medium_enabled')->default(true);
+            $table->boolean('hard_enabled')->default(true);
+            
+            // Optional: different dates per level
+            $table->date('easy_date_start')->nullable();
+            $table->date('easy_date_end')->nullable();
+            $table->date('medium_date_start')->nullable();
+            $table->date('medium_date_end')->nullable();
+            $table->date('hard_date_start')->nullable();
+            $table->date('hard_date_end')->nullable();
+            
             $table->timestamps();
+            
+            // Indexes
+            $table->index(['status', 'tanggal_mulai']);
         });
     }
 
@@ -43,6 +55,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('solo_raids');
+        Schema::dropIfExists('solo_raid');
     }
 };

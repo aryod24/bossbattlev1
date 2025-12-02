@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserBadge extends Model
 {
-    protected $guarded = ['id'];
+    protected $table = 'user_badge';
+    protected $fillable = ['user_id', 'badge_id', 'unlock_date'];
+    protected $casts = [
+        'unlock_date' => 'date',
+    ];
 
-    public function user()
-    {
+    // Relationships
+    public function user() {
         return $this->belongsTo(User::class);
     }
 }

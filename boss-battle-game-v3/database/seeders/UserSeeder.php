@@ -13,20 +13,53 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 5 admins
-        User::factory()->count(5)->sequence(fn ($sequence) => [
-            'name' => 'Admin ' . ($sequence->index + 1),
-            'email' => 'admin' . ($sequence->index + 1) . '@example.com',
+        // 5 Admin users
+        User::create([
+            'nim' => '2241760001',
+            'nama' => 'Admin Utama',
+            'email' => 'admin@coba.ac.id',
+            'kelas' => null,
             'role' => 'admin',
-        ])->create();
+            'total_xp' => 0,
+            'level' => 1,
+            'password' => bcrypt('password')
+        ]);
+        User::create([
+            'nim' => '2241760002',
+            'nama' => 'Admin Dosen',
+            'email' => 'dosen@coba.ac.id',
+            'kelas' => null,
+            'role' => 'admin',
+            'total_xp' => 0,
+            'level' => 1,
+            'password' => bcrypt('password')
+        ]);
 
-        // Create 10 students
-        User::factory()->count(10)->sequence(fn ($sequence) => [
-            'name' => 'Student ' . ($sequence->index + 1),
-            'email' => 'student' . ($sequence->index + 1) . '@example.com',
-            'role' => 'student',
-            'nim' => '22417200' . str_pad($sequence->index + 1, 2, '0', STR_PAD_LEFT),
-            'kelas' => 'TI-3A',
-        ])->create();
+        // 10 Student users
+        $students = [
+            ['nim' => '2241760101', 'nama' => 'Ahmad Fauzi', 'kelas' => 'TI-3A'],
+            ['nim' => '2241760102', 'nama' => 'Siti Nurhaliza', 'kelas' => 'TI-3A'],
+            ['nim' => '2241760103', 'nama' => 'Budi Santoso', 'kelas' => 'TI-3B'],
+            ['nim' => '2241760104', 'nama' => 'Dewi Lestari', 'kelas' => 'TI-3B'],
+            ['nim' => '2241760105', 'nama' => 'Eko Prasetyo', 'kelas' => 'SIB-2A'],
+            ['nim' => '2241760106', 'nama' => 'Fitri Rahmawati', 'kelas' => 'SIB-2A'],
+            ['nim' => '2241760107', 'nama' => 'Gilang Ramadhan', 'kelas' => 'SIB-2B'],
+            ['nim' => '2241760108', 'nama' => 'Hana Pertiwi', 'kelas' => 'SIB-2B'],
+            ['nim' => '2241760109', 'nama' => 'Indra Wijaya', 'kelas' => 'TI-3A'],
+            ['nim' => '2241760110', 'nama' => 'Joko Susilo', 'kelas' => 'TI-3B'],
+        ];
+
+        foreach ($students as $student) {
+            User::create([
+                'nim' => $student['nim'],
+                'nama' => $student['nama'],
+                'email' => strtolower(str_replace(' ', '.', $student['nama'])) . '@student.coba.ac.id',
+                'kelas' => $student['kelas'],
+                'role' => 'student',
+                'total_xp' => 0,
+                'level' => 1,
+                'password' => bcrypt('password')
+            ]);
+        }
     }
 }

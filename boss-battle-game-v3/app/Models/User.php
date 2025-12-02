@@ -18,20 +18,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'nim',
-        'kelas',
-        'role',
-        'total_xp',
-        'level',
+        'nim', 'nama', 'email', 'kelas', 'role',
+        'total_xp', 'level', 'password'
     ];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
@@ -41,8 +32,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function soloRaids()
-    {
+    // Relationships
+    public function soloRaidsCreated() {
         return $this->hasMany(SoloRaid::class, 'created_by');
     }
 

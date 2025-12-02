@@ -11,18 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('question_banks', function (Blueprint $table) {
+        Schema::create('question_bank', function (Blueprint $table) {
             $table->id();
             $table->enum('level', ['Easy', 'Medium', 'Hard']);
             $table->text('soal_text');
             $table->enum('tipe', ['multiple_choice', 'short_answer']);
-            $table->string('pilihan_a')->nullable();
-            $table->string('pilihan_b')->nullable();
-            $table->string('pilihan_c')->nullable();
-            $table->string('pilihan_d')->nullable();
-            $table->string('jawaban_benar');
-            $table->integer('bobot_xp')->default(10);
+            
+            // For multiple choice (nullable for short answer)
+            $table->string('pilihan_a', 255)->nullable();
+            $table->string('pilihan_b', 255)->nullable();
+            $table->string('pilihan_c', 255)->nullable();
+            $table->string('pilihan_d', 255)->nullable();
+            
+            $table->string('jawaban_benar', 255);  // 'A'/'B'/'C'/'D' or text
+            $table->integer('bobot_xp')->default(10);  // 10/15/20 per level
             $table->timestamps();
+            
+            // Indexes
+            $table->index(['level', 'tipe']);
         });
     }
 
@@ -31,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('question_banks');
+        Schema::dropIfExists('question_bank');
     }
 };

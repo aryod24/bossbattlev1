@@ -11,21 +11,41 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('event_participants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('event_id')->constrained('events');
-            $table->foreignId('user_id')->constrained('users');
-            $table->timestamp('waktu_mulai')->nullable();
-            $table->timestamp('waktu_selesai')->nullable();
-            $table->integer('durasi_detik')->default(0);
-            $table->integer('jumlah_soal')->default(0);
+        Schema::create('event_participant', function (Blueprint $table) {
+            $table->id('event_participant_id');
+            $table->foreignId('event_id')->references('event_id')->on('events')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            
+            // Timing
+            $table->datetime('waktu_mulai')->nullable();
+            $table->datetime('waktu_selesai')->nullable();
+            $table->integer('durasi_detik')->nullable();
+            
+            // Quiz results
+            $table->integer('jumlah_soal');
             $table->integer('jumlah_benar')->default(0);
             $table->integer('jumlah_salah')->default(0);
+            
+            // Boss battle
+            $table->integer('boss_hp_awal');
+            $table->integer('boss_hp_akhir');
             $table->boolean('boss_kalah')->default(false);
-            $table->integer('skor_akhir')->default(0);
+            
+            // Scoring
+            $table->decimal('skor_akhir', 5, 2)->nullable();
             $table->integer('xp_diperoleh')->default(0);
             $table->integer('peringkat_leaderboard')->nullable();
+            
+            // Status
+            $table->enum('status', ['joined', 'in_progress', 'finished'])->default('joined');
+            
             $table->timestamps();
+            
+            // Unique constraint
+            $table->unique(['event_id', 'user_id']);
+            
+            // Indexes
+            $table->index(['event_id', 'peringkat_leaderboard']);
         });
     }
 
@@ -34,6 +54,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('event_participants');
+        Schema::dropIfExists('event_participant');
     }
 };

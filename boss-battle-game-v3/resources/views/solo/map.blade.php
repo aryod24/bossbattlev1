@@ -374,7 +374,7 @@
 
                 checkLevel(level) {
                     if (this.levels[level].available) {
-                        alert(`Starting ${level} level... (Gameplay implementation in next prompt)`);
+                        window.location.href = `/solo/${this.raidId}/battle/init/${level}`;
                     } else {
                         alert('This level is currently locked or unavailable.');
                     }

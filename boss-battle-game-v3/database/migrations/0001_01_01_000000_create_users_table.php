@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('nim', 20)->unique()->nullable(); // Nullable for admins
+            $table->string('nama', 100);
             $table->string('email')->unique();
-            $table->string('nim')->nullable()->unique();
-            $table->string('kelas')->nullable();
+            $table->string('kelas', 50)->nullable();
             $table->enum('role', ['admin', 'student'])->default('student');
             $table->integer('total_xp')->default(0);
             $table->integer('level')->default(1);
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            
+            // Indexes
+            $table->index('role');
+            $table->index('total_xp');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

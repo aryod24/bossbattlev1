@@ -23,6 +23,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/solo/{soloRaid}/map', [SoloRaidController::class, 'map'])->name('solo.map');
     Route::get('/solo/{soloRaid}/info/{nodeId}', [SoloRaidController::class, 'info'])->name('solo.info');
     Route::get('/solo/{soloRaid}/level-select', [SoloRaidController::class, 'levelSelect'])->name('solo.level-select');
+    
+    // Battle Routes
+    Route::get('/solo/{soloRaid}/battle/init/{level}', [\App\Http\Controllers\SoloBattleController::class, 'init'])->name('solo.battle.init');
+    Route::get('/solo/{soloRaid}/battle', [\App\Http\Controllers\SoloBattleController::class, 'index'])->name('solo.battle');
+    Route::post('/solo/{soloRaid}/battle/action', [\App\Http\Controllers\SoloBattleController::class, 'action'])->name('solo.battle.action');
+    Route::get('/solo/{soloRaid}/battle/question', [\App\Http\Controllers\SoloBattleController::class, 'getQuestion'])->name('solo.battle.question');
 });
 
 // Admin Routes

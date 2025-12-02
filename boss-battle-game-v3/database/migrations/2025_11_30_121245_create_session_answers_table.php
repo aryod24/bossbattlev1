@@ -11,19 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('session_answers', function (Blueprint $table) {
+        Schema::create('session_answer', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('session_id');
-            $table->string('session_type'); // 'solo' or 'event'
-            $table->foreignId('question_id')->constrained('question_banks');
-            $table->integer('urutan_soal');
-            $table->string('jawaban_user')->nullable();
+            $table->unsignedBigInteger('session_id');  // Could be session_solo.id or event_participant_id
+            $table->enum('session_type', ['solo', 'event']);
+            $table->foreignId('question_id')->constrained('question_bank')->onDelete('cascade');
+            
+            $table->integer('urutan_soal');  // 1, 2, 3, ...
+            $table->text('jawaban_user')->nullable();
             $table->boolean('is_correct')->default(false);
-            $table->integer('waktu_jawab_detik')->default(0);
-            $table->integer('attempt_number')->default(1);
+            $table->integer('waktu_jawab_detik')->nullable();  // time spent on this question
+            
+            // Research tracking
+            $table->integer('attempt_number')->nullable();
             $table->boolean('is_counted_research')->default(false);
-            $table->timestamp('answered_at')->useCurrent();
+            
+            $table->datetime('answered_at');
             $table->timestamps();
+            
+            // Indexes
+            $table->index(['session_id', 'session_type']);
+            $table->index('is_counted_research');
         });
     }
 
@@ -32,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('session_answers');
+        Schema::dropIfExists('session_answer');
     }
 };

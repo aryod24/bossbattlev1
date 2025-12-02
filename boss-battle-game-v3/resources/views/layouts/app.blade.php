@@ -21,7 +21,12 @@
                   'boss': '#8B0000',
                   'damage': '#FF6B6B',
                   'heal': '#51CF66',
-                  'ui': '#6366F1'
+                  'ui': '#6366F1',
+                  'info': '#22D3EE',
+                  'warning': '#F59E0B',
+                },
+                fontFamily: {
+                    'game': ['"Press Start 2P"', 'cursive'],
                 }
               }
             }

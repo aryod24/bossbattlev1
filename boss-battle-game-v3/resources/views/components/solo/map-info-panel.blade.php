@@ -4,12 +4,12 @@
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-background-dark rounded-lg flex items-center justify-center">
-                <span class="text-text-primary font-bold">▲</span>
+            <div class="w-10 h-10">
+                <img src="{{ asset('build/assets/logo.png') }}" alt="CodeBossArena Logo" class="w-full h-full object-contain">
             </div>
             <h2 class="text-xl font-bold text-text-primary">CodeBossArena</h2>
         </div>
-        <a href="{{ route('solo.index') }}" class="inline-block bg-primary hover:bg-accent-hover px-6 py-2 rounded-full font-semibold transition-colors text-white">
+        <a href="{{ route('solo.index') }}" class="inline-block bg-primary hover:bg-accent-hover px-6 py-2 rounded-lg font-semibold transition-colors text-white">
             ← Back to List
         </a>
     </div>
@@ -39,7 +39,7 @@
     <div class="bg-surface-light rounded-2xl p-6 border-2 border-border">
         <h3 class="text-text-muted font-semibold mb-4">Your Next Challenge</h3>
         <div class="flex items-center gap-4 mb-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-game-teal to-teal-500 rounded-xl flex items-center justify-center">
+            <div class="w-14 h-14 bg-gradient-to-br from-info to-blue-500 rounded-xl flex items-center justify-center">
                 <span class="material-symbols-outlined text-white text-3xl">menu_book</span>
             </div>
             <div>
@@ -47,7 +47,7 @@
                 <p class="text-text-muted text-sm">Click to read study material</p>
             </div>
         </div>
-        <button @click="openInfo(1)" class="w-full bg-primary hover:bg-accent-hover text-white font-bold py-3 rounded-xl transition-colors">
+        <button @click="openInfo(1)" class="w-full bg-primary hover:bg-accent-hover text-white font-bold py-3 rounded-lg transition-colors">
             Read Material
         </button>
     </div>

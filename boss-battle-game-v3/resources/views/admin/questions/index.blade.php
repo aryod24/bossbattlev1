@@ -3,15 +3,15 @@
     <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 class="text-4xl font-black tracking-tight">Bank Soal</h1>
         <div class="flex gap-2">
-            <a href="{{ route('admin.questions.template') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-green-500 hover:bg-green-700 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
+            <a href="{{ route('admin.questions.template') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-success hover:brightness-110 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
                 <span class="material-symbols-outlined">download</span>
                 <span class="truncate">Download Template</span>
             </a>
-            <button onclick="toggleBulkUpload()" id="btnBulkUpload" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
+            <button onclick="toggleBulkUpload()" id="btnBulkUpload" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-info hover:brightness-110 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
                 <span class="material-symbols-outlined">upload_file</span>
                 <span class="truncate">Bulk Upload</span>
             </button>
-            <a href="{{ route('admin.questions.create') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-black text-sm font-bold leading-normal tracking-wide shadow-sm hover:brightness-90">
+            <a href="{{ route('admin.questions.create') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-accent-hover">
                 <span class="material-symbols-outlined">add_circle</span>
                 <span class="truncate">Tambah Soal</span>
             </a>
@@ -19,10 +19,10 @@
     </header>
 
     <!-- Bank Tabs (Dynamic) -->
-    <div class="flex gap-2 p-1 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg mb-4 overflow-x-auto">
+    <div class="flex gap-2 p-1 bg-card border border-border rounded-lg mb-4 overflow-x-auto">
         @foreach($bankConfig as $bankId => $bank)
             <a href="{{ route('admin.questions.index', ['bank' => $bankId, 'search' => request('search'), 'level' => request('level')]) }}" 
-               class="flex h-10 shrink-0 items-center justify-center gap-2 px-4 rounded-lg {{ $currentBank == $bankId ? 'bg-primary text-black font-bold shadow-sm' : 'hover:bg-primary/20' }} transition-colors">
+               class="flex h-10 shrink-0 items-center justify-center gap-2 px-4 rounded-lg {{ $currentBank == $bankId ? 'bg-primary text-white font-bold shadow-sm' : 'hover:bg-primary/20' }} transition-colors">
                 <span class="material-symbols-outlined text-sm">{{ $bank['icon'] ?? 'quiz' }}</span>
                 <span class="text-sm">{{ $bank['name'] }}</span>
                 <span class="text-xs opacity-75">({{ $bankCounts[$bankId] ?? 0 }})</span>
@@ -35,15 +35,15 @@
         <!-- Search Bar -->
         <div class="flex-1">
             <label class="flex flex-col h-12 w-full">
-                <div class="flex w-full flex-1 items-stretch rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark focus-within:ring-2 focus-within:ring-primary">
+                <div class="flex w-full flex-1 items-stretch rounded-lg bg-card border border-border focus-within:ring-2 focus-within:ring-primary">
                     <div class="flex items-center justify-center pl-4">
-                        <span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary">search</span>
+                        <span class="material-symbols-outlined text-text-muted">search</span>
                     </div>
                     <input 
                         type="text" 
                         name="search" 
                         id="search-questions"
-                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-base font-normal h-full placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary px-4 pl-2 focus:outline-none focus:ring-0 border-none bg-transparent" 
+                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-base font-normal h-full placeholder:text-text-muted px-4 pl-2 focus:outline-none focus:ring-0 border-none bg-transparent text-text-primary" 
                         placeholder="Cari soal..." 
                         value="{{ request('search') }}"
                         oninput="debounceSearch(this)"
@@ -57,7 +57,7 @@
             <select 
                 name="level" 
                 id="level-filter"
-                class="form-select w-full h-12 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-base font-normal px-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                class="form-select w-full h-12 rounded-lg bg-card border border-border text-base font-normal px-4 focus:outline-none focus:ring-2 focus:ring-primary text-text-primary"
                 onchange="filterByLevel(this)"
             >
                 <option value="" {{ !request('level') ? 'selected' : '' }}>Semua Level</option>
@@ -70,7 +70,7 @@
 
     <!-- Bulk Upload Section (collapsible) -->
     <div id="bulkUploadSection" class="mb-4" style="display: none;">
-        <div class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-5">
+        <div class="bg-card border border-border rounded-lg p-5">
             <h3 class="text-lg font-bold mb-4">Bulk Upload Questions (JSON)</h3>
             <form action="{{ route('admin.questions.bulk-upload') }}" method="POST" enctype="multipart/form-data" class="flex items-end gap-4">
                 @csrf
@@ -80,22 +80,22 @@
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-lg file:border-0
                         file:text-sm file:font-semibold
-                        file:bg-primary file:text-black
-                        hover:file:brightness-95
+                        file:bg-primary file:text-white
+                        hover:file:bg-accent-hover
                     " required>
                 </div>
-                <button type="submit" class="flex items-center justify-center rounded-lg h-10 px-5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-colors">
+                <button type="submit" class="flex items-center justify-center rounded-lg h-10 px-5 bg-info hover:brightness-110 text-white text-sm font-bold transition-colors">
                     Upload Questions
                 </button>
             </form>
-            <p class="text-xs text-text-light-secondary dark:text-text-dark-secondary mt-2">Make sure your JSON matches the template format.</p>
+            <p class="text-xs text-text-muted mt-2">Make sure your JSON matches the template format.</p>
         </div>
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+    <div class="overflow-x-auto rounded-lg border border-border bg-card">
         <table class="w-full min-w-[1000px] text-left">
-            <thead class="border-b border-border-light dark:border-border-dark">
+            <thead class="border-b border-border">
                 <tr>
                     <th class="px-4 py-3 text-sm font-medium">Level</th>
                     <th class="px-4 py-3 text-sm font-medium">Pertanyaan</th>
@@ -107,11 +107,11 @@
             </thead>
             <tbody>
                 @forelse($questions as $question)
-                    <tr class="border-b border-border-light dark:border-border-dark hover:bg-primary/10 transition-colors">
+                    <tr class="border-b border-border hover:bg-primary/10 transition-colors">
                         <td class="px-4 py-3 text-sm">
                             <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset
                                 {{ $question->level === 'Easy' ? 'bg-status-green-bg text-status-green-text ring-green-600/20' : '' }}
-                                {{ $question->level === 'Medium' ? 'bg-yellow-500/10 text-yellow-700 ring-yellow-600/20' : '' }}
+                                {{ $question->level === 'Medium' ? 'bg-warning/10 text-warning ring-yellow-600/20' : '' }}
                                 {{ $question->level === 'Hard' ? 'bg-status-red-bg text-status-red-text ring-red-500/20' : '' }}">
                                 {{ $question->level }}
                             </span>
@@ -121,7 +121,7 @@
                                 {{ $question->soal_text }}
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                        <td class="px-4 py-3 text-sm text-text-muted">
                             {{ $question->tipe == 'multiple_choice' ? 'Pilihan Ganda' : 'Isian Singkat' }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium">
@@ -129,7 +129,7 @@
                                 {{ $question->jawaban_benar }}
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                        <td class="px-4 py-3 text-sm text-text-muted">
                             {{ $question->bobot_xp }} XP
                         </td>
                         <td class="px-4 py-3 text-sm">
@@ -140,7 +140,7 @@
                                 <form action="{{ route('admin.questions.destroy', $question) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="flex items-center justify-center size-8 rounded-md hover:bg-red-500/20 text-red-500 transition-colors" title="Delete" onclick="return confirm('Yakin ingin menghapus soal ini?')">
+                                    <button type="submit" class="flex items-center justify-center size-8 rounded-md hover:bg-error/20 text-error transition-colors" title="Delete" onclick="return confirm('Yakin ingin menghapus soal ini?')">
                                         <span class="material-symbols-outlined text-base">delete</span>
                                     </button>
                                 </form>
@@ -149,7 +149,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-8 text-center text-text-light-secondary dark:text-text-dark-secondary">
+                        <td colspan="6" class="px-4 py-8 text-center text-text-muted">
                             Tidak ada soal ditemukan.
                         </td>
                     </tr>
@@ -162,7 +162,7 @@
     @if($questions->hasPages())
         <nav class="flex items-center justify-center p-4 mt-4">
             @if($questions->onFirstPage())
-                <span class="flex size-10 items-center justify-center text-text-light-secondary dark:text-text-dark-secondary cursor-not-allowed">
+                <span class="flex size-10 items-center justify-center text-text-muted cursor-not-allowed">
                     <span class="material-symbols-outlined">chevron_left</span>
                 </span>
             @else
@@ -186,7 +186,7 @@
                     <span class="material-symbols-outlined">chevron_right</span>
                 </a>
             @else
-                <span class="flex size-10 items-center justify-center text-text-light-secondary dark:text-text-dark-secondary cursor-not-allowed">
+                <span class="flex size-10 items-center justify-center text-text-muted cursor-not-allowed">
                     <span class="material-symbols-outlined">chevron_right</span>
                 </span>
             @endif

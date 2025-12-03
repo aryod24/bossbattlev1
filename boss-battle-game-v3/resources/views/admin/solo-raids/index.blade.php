@@ -2,7 +2,7 @@
     <!-- PageHeading -->
     <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 class="text-4xl font-black tracking-tight">Manajemen Event</h1>
-        <a href="{{ route('admin.solo-raids.create') }}" class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-black text-sm font-bold leading-normal tracking-wide shadow-sm hover:brightness-90">
+        <a href="{{ route('admin.solo-raids.create') }}" class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-accent-hover">
             <span class="material-symbols-outlined">add_circle</span>
             <span class="truncate">Buat Event Baru</span>
         </a>
@@ -11,19 +11,19 @@
     <!-- SearchBar -->
     <div class="mb-4">
         <label class="flex flex-col h-12 w-full">
-            <div class="flex w-full flex-1 items-stretch rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark focus-within:ring-2 focus-within:ring-primary">
+            <div class="flex w-full flex-1 items-stretch rounded-lg bg-card border border-border focus-within:ring-2 focus-within:ring-primary">
                 <div class="flex items-center justify-center pl-4">
-                    <span class="material-symbols-outlined text-text-light-secondary dark:text-text-dark-secondary">search</span>
+                    <span class="material-symbols-outlined text-text-muted">search</span>
                 </div>
-                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-base font-normal h-full placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary px-4 pl-2 focus:outline-none focus:ring-0 border-none bg-transparent" placeholder="Cari event..." value=""/>
+                <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-base font-normal h-full placeholder:text-text-muted px-4 pl-2 focus:outline-none focus:ring-0 border-none bg-transparent text-text-primary" placeholder="Cari event..." value=""/>
             </div>
         </label>
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+    <div class="overflow-x-auto rounded-lg border border-border bg-card">
         <table class="w-full min-w-[1000px] text-left">
-            <thead class="border-b border-border-light dark:border-border-dark">
+            <thead class="border-b border-border">
                 <tr>
                     <th class="px-4 py-3 text-sm font-medium">Nama Event</th>
                     <th class="px-4 py-3 text-sm font-medium">Level</th>
@@ -34,28 +34,28 @@
             </thead>
             <tbody>
                 @foreach($raids as $raid)
-                    <tr class="border-b border-border-light dark:border-border-dark hover:bg-primary/10">
+                    <tr class="border-b border-border hover:bg-primary/10">
                         <td class="px-4 py-3 text-sm font-medium">{{ $raid->nama }}</td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex gap-1">
                                 <form action="{{ route('admin.solo-raids.toggle-level', $raid) }}" method="POST" class="inline">
                                     @csrf
                                     <input type="hidden" name="level" value="easy">
-                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->easy_enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400' }}" title="Toggle Easy">E</button>
+                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->easy_enabled ? 'bg-success/20 text-success' : 'bg-border text-text-muted' }}" title="Toggle Easy">E</button>
                                 </form>
                                 <form action="{{ route('admin.solo-raids.toggle-level', $raid) }}" method="POST" class="inline">
                                     @csrf
                                     <input type="hidden" name="level" value="medium">
-                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->medium_enabled ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-400' }}" title="Toggle Medium">M</button>
+                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->medium_enabled ? 'bg-warning/20 text-warning' : 'bg-border text-text-muted' }}" title="Toggle Medium">M</button>
                                 </form>
                                 <form action="{{ route('admin.solo-raids.toggle-level', $raid) }}" method="POST" class="inline">
                                     @csrf
                                     <input type="hidden" name="level" value="hard">
-                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->hard_enabled ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400' }}" title="Toggle Hard">H</button>
+                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->hard_enabled ? 'bg-error/20 text-error' : 'bg-border text-text-muted' }}" title="Toggle Hard">H</button>
                                 </form>
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                        <td class="px-4 py-3 text-sm text-text-muted">
                             {{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y, H:i') }}
                         </td>
                         <td class="px-4 py-3 text-sm">
@@ -88,7 +88,7 @@
                                     <form action="{{ route('admin.solo-raids.destroy', $raid) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="flex items-center justify-center size-8 rounded-md hover:bg-red-500/20 text-red-500" title="Delete" onclick="return confirm('Are you sure?')">
+                                        <button type="submit" class="flex items-center justify-center size-8 rounded-md hover:bg-error/20 text-error" title="Delete" onclick="return confirm('Are you sure?')">
                                             <span class="material-symbols-outlined text-base">delete</span>
                                         </button>
                                     </form>

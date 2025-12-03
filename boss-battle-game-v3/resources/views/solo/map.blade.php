@@ -10,6 +10,57 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Primary Colors (VS Code Dark Theme)
+                        "primary": "#007acc",
+                        
+                        // Background Colors
+                        "background": "#1e1e1e",
+                        "background-light": "#252526",
+                        "background-dark": "#1e1e1e",
+                        
+                        // Card/Surface Colors
+                        "card": "#252526",
+                        "surface": "#252526",
+                        "surface-light": "#2d2d2d",
+                        "surface-dark": "#252526",
+                        
+                        // Text Colors
+                        "text-primary": "#d4d4d4",
+                        "text-muted": "#858585",
+                        
+                        // Border Colors
+                        "border": "#333333",
+                        "border-light": "#404040",
+                        
+                        // Status Colors
+                        "success": "#4ec9b0",
+                        "warning": "#dcdcaa",
+                        "error": "#f44747",
+                        "info": "#9cdcfe",
+                        
+                        // Accent Colors
+                        "accent": "#007acc",
+                        "accent-hover": "#1a8ad4",
+                        
+                        // Game/Legacy Colors (untuk map visual)
+                        "game": {
+                            "darker": "#0d1117",
+                            "panel": "#161b22",
+                            "gold": "#fbbf24",
+                            "green": "#22c55e",
+                            "red": "#ef4444",
+                            "teal": "#14b8a6",
+                        },
+                    },
+                },
+            },
+        }
+    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <style>
@@ -54,26 +105,6 @@
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        game: {
-                            dark: '#0f172a',
-                            darker: '#020617',
-                            panel: '#1e293b',
-                            gold: '#f59e0b',
-                            green: '#10b981',
-                            red: '#ef4444',
-                            teal: '#14b8a6',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 <body x-data="dungeonMap({{ $soloRaid->id }})">
     <div class="flex flex-col md:flex-row min-h-screen">
@@ -87,27 +118,27 @@
     <div x-show="showInfoModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="showInfoModal" @click="showInfoModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+                <div class="absolute inset-0 bg-black opacity-75"></div>
             </div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div x-show="showInfoModal" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div x-show="showInfoModal" class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
+                <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-teal-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <span class="material-symbols-outlined text-teal-600">menu_book</span>
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 sm:mx-0 sm:h-10 sm:w-10">
+                            <span class="material-symbols-outlined text-primary">menu_book</span>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-bold text-gray-900" x-text="infoTitle"></h3>
+                            <h3 class="text-lg leading-6 font-bold text-text-primary" x-text="infoTitle"></h3>
                             <div class="mt-2">
-                                <p class="text-sm text-gray-500 whitespace-pre-line" x-text="infoContent"></p>
+                                <p class="text-sm text-text-muted whitespace-pre-line" x-text="infoContent"></p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" @click="showInfoModal = false" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <div class="bg-background-dark px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" @click="showInfoModal = false" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
                         Got it
                     </button>
                 </div>

@@ -19,23 +19,35 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#f9d406",
-                        "background-light": "#f8f8f5",
-                        "background-dark": "#23200f",
-                        "text-light-primary": "#1c1a0d",
-                        "text-dark-primary": "#f8f8f5",
-                        "text-light-secondary": "#9e9147",
-                        "text-dark-secondary": "#a9a277",
-                        "surface-light": "#fcfbf8",
-                        "surface-dark": "#2a2712",
-                        "border-light": "#e9e5ce",
-                        "border-dark": "#3f3a1d",
+                        "primary": "#007acc",
+                        "background": "#1e1e1e",
+                        "background-light": "#252526",
+                        "background-dark": "#1e1e1e",
+                        "card": "#252526",
+                        "surface": "#252526",
+                        "surface-light": "#2d2d2d",
+                        "surface-dark": "#252526",
+                        "text-primary": "#d4d4d4",
+                        "text-light-primary": "#d4d4d4",
+                        "text-dark-primary": "#d4d4d4",
+                        "text-muted": "#858585",
+                        "text-light-secondary": "#858585",
+                        "text-dark-secondary": "#9d9d9d",
+                        "border": "#333333",
+                        "border-light": "#404040",
+                        "border-dark": "#333333",
                         "status-green-bg": "rgb(56 161 105 / 0.1)",
                         "status-green-text": "#38a169",
                         "status-red-bg": "rgb(229 62 62 / 0.1)",
                         "status-red-text": "#e53e3e",
                         "status-gray-bg": "rgb(128 128 128 / 0.1)",
-                        "status-gray-text": "#808080"
+                        "status-gray-text": "#808080",
+                        "accent": "#007acc",
+                        "accent-hover": "#1a8ad4",
+                        "success": "#4ec9b0",
+                        "warning": "#dcdcaa",
+                        "error": "#f44747",
+                        "info": "#9cdcfe"
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
@@ -52,17 +64,17 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-text-light-primary dark:text-text-dark-primary">
+<body class="bg-background-dark font-display text-text-primary">
     <div class="flex min-h-screen w-full">
         <!-- SideNavBar -->
-        <aside class="flex h-screen w-64 flex-col border-r border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0">
+        <aside class="flex h-screen w-64 flex-col border-r border-border bg-card sticky top-0">
             <div class="flex h-full flex-col justify-between p-4">
                 <div class="flex flex-col gap-4">
                     <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 hover:bg-primary/10 p-2 -ml-2 rounded-lg transition-colors group">
                         <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 group-hover:ring-2 group-hover:ring-primary transition-all" style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->nama) }}&background=random");'></div>
                         <div class="flex flex-col">
                             <h1 class="font-medium group-hover:text-primary transition-colors">{{ auth()->user()->nama }}</h1>
-                            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Admin</p>
+                            <p class="text-sm text-text-muted">Admin</p>
                         </div>
                     </a>
                     <nav class="flex flex-col gap-2">

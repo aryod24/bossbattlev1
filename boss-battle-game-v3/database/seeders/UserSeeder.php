@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         User::create([
             'nim' => '2241760001',
             'nama' => 'Admin Utama',
-            'email' => 'admin@coba.ac.id',
+            'email' => 'admin@gmail.com',
             'kelas' => null,
             'role' => 'admin',
             'total_xp' => 0,
@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
         User::create([
             'nim' => '2241760002',
             'nama' => 'Admin Dosen',
-            'email' => 'dosen@coba.ac.id',
+            'email' => 'dosen@gmail.com',
             'kelas' => null,
             'role' => 'admin',
             'total_xp' => 0,
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
 
         // 10 Student users
         $students = [
-            ['nim' => '2241760101', 'nama' => 'Ahmad Fauzi', 'kelas' => 'TI-3A'],
+            ['nim' => '2241760101', 'nama' => 'aryod', 'kelas' => 'TI-3A'],
             ['nim' => '2241760102', 'nama' => 'Siti Nurhaliza', 'kelas' => 'TI-3A'],
             ['nim' => '2241760103', 'nama' => 'Budi Santoso', 'kelas' => 'TI-3B'],
             ['nim' => '2241760104', 'nama' => 'Dewi Lestari', 'kelas' => 'TI-3B'],
@@ -53,7 +53,7 @@ class UserSeeder extends Seeder
             User::create([
                 'nim' => $student['nim'],
                 'nama' => $student['nama'],
-                'email' => strtolower(str_replace(' ', '.', $student['nama'])) . '@student.coba.ac.id',
+                'email' => strtolower(str_replace(' ', '.', $student['nama'])) . '@gmail.com',
                 'kelas' => $student['kelas'],
                 'role' => 'student',
                 'total_xp' => 0,

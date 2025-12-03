@@ -5,7 +5,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
-    <link rel="icon" href="{{ asset('build/assets/logo.png') }}" type="image/png"/>
     <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
     <style>
@@ -27,16 +26,16 @@
                 <h2 class="text-text-primary text-lg font-bold leading-tight tracking-[-0.015em]">CodeBossArena</h2>
             </div>
             <div class="flex flex-1 justify-end gap-8">
-                <div class="hidden md:flex items-center gap-9">
-                    <a class="text-sm font-medium leading-normal {{ request()->routeIs('dashboard') ? 'text-primary font-bold' : 'text-text-muted hover:text-text-primary' }}" href="{{ route('dashboard') }}">Dashboard</a>
-                    <a class="text-sm font-medium leading-normal {{ request()->routeIs('leaderboard*') ? 'text-primary font-bold' : 'text-text-muted hover:text-text-primary' }}" href="#">Leaderboard</a>
-                    <a class="text-sm font-medium leading-normal {{ request()->routeIs('solo.*') ? 'text-primary font-bold' : 'text-text-muted hover:text-text-primary' }}" href="{{ route('solo.index') }}">Events</a>
-                    <a class="text-sm font-medium leading-normal {{ request()->routeIs('profile.*') ? 'text-primary font-bold' : 'text-text-muted hover:text-text-primary' }}" href="{{ route('profile.edit') }}">Profile</a>
+                <div class="hidden md:flex items-center gap-4">
+                    <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('dashboard') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('dashboard') }}">Dashboard</a>
+                    <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('leaderboard*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="#">Leaderboard</a>
+                    <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('solo.*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('solo.index') }}">Events</a>
+                    <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('profile.*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('profile.edit') }}">Profile</a>
                 </div>
                 <div class="flex items-center gap-4">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-accent-hover">
+                        <button type="submit" class="flex items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-bold px-5 shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:-translate-y-0.5">
                             <span class="truncate">Log Out</span>
                         </button>
                     </form>

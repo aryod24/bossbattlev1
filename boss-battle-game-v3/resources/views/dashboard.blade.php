@@ -6,10 +6,10 @@
             <p class="text-text-muted">Ready to conquer the code? Check out the latest events and boost your rank.</p>
             
             <div class="mt-6 flex gap-4">
-                <a href="{{ route('solo.index') }}" class="inline-flex items-center justify-center h-10 px-6 rounded-full bg-primary text-white font-bold hover:bg-accent-hover transition-all">
+                <a href="{{ route('solo.index') }}" class="flex items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-bold px-5 shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:-translate-y-0.5">
                     Browse Events
                 </a>
-                <a href="#" class="inline-flex items-center justify-center h-10 px-6 rounded-full bg-surface-light text-text-primary font-medium hover:bg-border transition-all">
+                <a href="#" class="flex items-center justify-center rounded-lg h-10 bg-surface-light text-text-primary gap-2 text-sm font-bold px-5 border border-border shadow-sm hover:bg-border transition-transform duration-200 hover:-translate-y-0.5">
                     View Leaderboard
                 </a>
             </div>

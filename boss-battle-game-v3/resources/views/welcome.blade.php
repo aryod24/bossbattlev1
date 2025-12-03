@@ -70,7 +70,7 @@
     <div class="text-center">
         <h3 class="text-3xl font-bold text-white mb-6">Welcome Back!</h3>
         <p class="text-vsc-light-gray mb-8">You are already logged in.</p>
-        <a href="{{ route('dashboard') }}" class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-md h-11 px-4 bg-vsc-green text-white text-base font-bold leading-normal tracking-wide transition-all duration-200 ease-in-out hover:bg-vsc-green/90 hover:shadow-button-glow focus:outline-none focus:ring-2 focus:ring-vsc-green focus:ring-offset-2 focus:ring-offset-vsc-bg">
+        <a href="{{ route('dashboard') }}" class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-4 bg-primary text-white text-base font-bold leading-normal tracking-wide transition-all duration-200 ease-in-out hover:bg-accent-hover hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark">
             Go to Dashboard
         </a>
     </div>
@@ -102,7 +102,7 @@
             </div>
         </div>
         <div>
-            <button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-md h-11 px-4 bg-vsc-green text-white text-base font-bold leading-normal tracking-wide transition-all duration-200 ease-in-out hover:bg-vsc-green/90 hover:shadow-button-glow focus:outline-none focus:ring-2 focus:ring-vsc-green focus:ring-offset-2 focus:ring-offset-vsc-bg" type="submit">
+            <button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-4 bg-primary text-white text-base font-bold leading-normal tracking-wide transition-all duration-200 ease-in-out hover:bg-accent-hover hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark" type="submit">
                 <span class="truncate">Masuk</span>
             </button>
         </div>

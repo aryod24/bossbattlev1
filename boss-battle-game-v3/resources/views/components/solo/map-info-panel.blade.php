@@ -5,7 +5,7 @@
     <div class="mb-8">
         <div class="flex items-center gap-3 mb-6">
             <div class="w-10 h-10">
-                <img src="{{ asset('build/assets/logo.png') }}" alt="CodeBossArena Logo" class="w-full h-full object-contain">
+                <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="w-full h-full object-contain">
             </div>
             <h2 class="text-xl font-bold text-text-primary">CodeBossArena</h2>
         </div>

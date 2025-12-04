@@ -1,1 +1,1 @@
-<img src="{{ asset('build/assets/logo.png') }}" alt="CodeBossArena Logo" {{ $attributes }} class="object-contain">
+<img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" {{ $attributes }} class="object-contain">

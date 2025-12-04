@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>CodeBossArena Login &amp; Landing</title>
-    <link rel="icon" href="{{ asset('build/assets/logo.png') }}" type="image/png"/>
+    <link rel="icon" href="{{ asset('assets/logo.png') }}" type="image/png"/>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
@@ -57,7 +57,7 @@
                             </div>
                         @else
                             <div class="flex flex-col items-center justify-center mb-8 gap-3">
-                                <img src="{{ asset('build/assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain">
+                                <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain">
                                 <h2 class="text-2xl font-bold tracking-wider text-text-primary">CodeBossArena</h2>
                             </div>
                             <h3 class="text-3xl font-bold text-center text-text-primary mb-8">Masuk</h3>

@@ -21,7 +21,7 @@
         <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border px-6 sm:px-10 lg:px-20 py-3 bg-card/80 backdrop-blur-sm sticky top-0 z-10">
             <div class="flex items-center gap-4 text-text-primary">
                 <div class="size-8">
-                    <img src="{{ asset('build/assets/logo.png') }}" alt="CodeBossArena Logo" class="w-full h-full object-contain">
+                    <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="w-full h-full object-contain">
                 </div>
                 <h2 class="text-text-primary text-lg font-bold leading-tight tracking-[-0.015em]">CodeBossArena</h2>
             </div>

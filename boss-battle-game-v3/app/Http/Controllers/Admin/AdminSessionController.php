@@ -9,8 +9,18 @@ use Illuminate\Support\Facades\Schema;
 
 class AdminSessionController extends Controller
 {
+    protected $soloBattleService;
+
+    public function __construct(\App\Services\SoloBattleService $soloBattleService)
+    {
+        $this->soloBattleService = $soloBattleService;
+    }
+
     public function index()
     {
+        // Auto-finish expired sessions before displaying
+        $this->soloBattleService->autoFinishExpiredSessions();
+
         $stats = [
             'session_solo' => DB::table('session_solo')->count(),
             'session_answer' => DB::table('session_answer')->count(),
@@ -88,5 +98,17 @@ class AdminSessionController extends Controller
         }
 
         return back()->with('error', "Table {$realTable} not found.");
+    }
+
+    public function checkExpired()
+    {
+        // We can reuse the service method, but maybe we want a count?
+        // The service's autoFinishExpiredSessions doesn't return count currently.
+        // Let's modify the service slightly or just run it and say "Done".
+        // Actually, let's just run it.
+        
+        $this->soloBattleService->autoFinishExpiredSessions();
+        
+        return back()->with('success', 'Expired sessions check completed.');
     }
 }

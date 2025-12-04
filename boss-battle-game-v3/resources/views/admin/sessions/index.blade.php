@@ -54,6 +54,13 @@
                             Clear Solo Sessions
                         </button>
                     </form>
+
+                    <form action="{{ route('admin.sessions.check-expired') }}" method="POST" class="mt-2">
+                        @csrf
+                        <button type="submit" class="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/50 font-bold py-2 px-4 rounded transition-colors">
+                            Check Expired Sessions
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Session Answers -->

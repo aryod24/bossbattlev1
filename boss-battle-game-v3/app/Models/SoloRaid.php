@@ -11,7 +11,7 @@ class SoloRaid extends Model
     protected $table = 'solo_raid';
     protected $fillable = [
         'nama', 'deskripsi', 'tanggal_mulai', 'tanggal_selesai', 
-        'status', 'created_by', 'info_node_1', 'info_node_2', 'info_node_3',
+        'status', 'created_by', 'question_bank_id', 'info_node_1', 'info_node_2', 'info_node_3',
         'boss_easy_name', 'boss_medium_name', 'boss_hard_name',
         'easy_enabled', 'medium_enabled', 'hard_enabled',
         'easy_date_start', 'easy_date_end',
@@ -30,6 +30,11 @@ class SoloRaid extends Model
     public function creator() {
         return $this->belongsTo(User::class, 'created_by');
     }
+    
+    public function questionBank() {
+        return $this->belongsTo(QuestionBank::class, 'question_bank_id');
+    }
+
     public function sessions() {
         return $this->hasMany(SessionSolo::class);
     }

@@ -26,9 +26,12 @@ Route::middleware('auth')->group(function () {
     
     // Battle Routes
     Route::get('/solo/{soloRaid}/battle/init/{level}', [\App\Http\Controllers\SoloBattleController::class, 'init'])->name('solo.battle.init');
-    Route::get('/solo/{soloRaid}/battle', [\App\Http\Controllers\SoloBattleController::class, 'index'])->name('solo.battle');
+    Route::get('/solo/{soloRaid}/battle/{session?}', [\App\Http\Controllers\SoloBattleController::class, 'index'])->name('solo.battle');
     Route::post('/solo/{soloRaid}/battle/action', [\App\Http\Controllers\SoloBattleController::class, 'action'])->name('solo.battle.action');
+    Route::post('/solo/{soloRaid}/battle/finish/{session}', [\App\Http\Controllers\SoloBattleController::class, 'finish'])->name('solo.battle.finish');
+    Route::get('/solo/result/{session}', [\App\Http\Controllers\SoloBattleController::class, 'result'])->name('solo.result');
     Route::get('/solo/{soloRaid}/battle/question', [\App\Http\Controllers\SoloBattleController::class, 'getQuestion'])->name('solo.battle.question');
+    Route::post('/solo/check-expired', [\App\Http\Controllers\SoloBattleController::class, 'checkExpired'])->name('solo.check-expired');
 });
 
 // Admin Routes
@@ -48,6 +51,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('questions/template', [\App\Http\Controllers\Admin\QuestionBankController::class, 'downloadTemplate'])->name('questions.template');
     Route::post('questions/bulk-upload', [\App\Http\Controllers\Admin\QuestionBankController::class, 'bulkUpload'])->name('questions.bulk-upload');
     Route::resource('questions', \App\Http\Controllers\Admin\QuestionBankController::class);
+
+    // Session Monitor
+    Route::get('sessions', [\App\Http\Controllers\Admin\AdminSessionController::class, 'index'])->name('sessions.index');
+    Route::get('sessions/{id}', [\App\Http\Controllers\Admin\AdminSessionController::class, 'show'])->name('sessions.show');
+    Route::post('sessions/destroy', [\App\Http\Controllers\Admin\AdminSessionController::class, 'destroy'])->name('sessions.destroy');
+    Route::post('sessions/clear', [\App\Http\Controllers\Admin\AdminSessionController::class, 'clear'])->name('sessions.clear');
+    Route::post('sessions/check-expired', [\App\Http\Controllers\Admin\AdminSessionController::class, 'checkExpired'])->name('sessions.check-expired');
 });
 
 require __DIR__.'/auth.php';

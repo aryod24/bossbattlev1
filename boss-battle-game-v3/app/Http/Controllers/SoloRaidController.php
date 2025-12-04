@@ -24,7 +24,80 @@ class SoloRaidController extends Controller
             return redirect()->route('solo.index')->with('error', 'Periode raid ini belum dimulai atau sudah berakhir.');
         }
 
-        return view('solo.map', compact('soloRaid'));
+        // Check for active session (any raid)
+        $activeSession = \App\Models\SessionSolo::where('user_id', auth()->id())
+            ->whereNull('waktu_selesai')
+            ->with('soloRaid')
+            ->first();
+
+        // Fetch User Stats
+        $userStats = [
+            'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                ->where('solo_raid_id', $soloRaid->id)
+                ->count(),
+            'best_score' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                ->where('solo_raid_id', $soloRaid->id)
+                ->max('skor_akhir') ?? 0,
+            'total_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                ->where('solo_raid_id', $soloRaid->id)
+                ->sum('xp_diperoleh') ?? 0,
+            'completed_levels' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                ->where('solo_raid_id', $soloRaid->id)
+                ->where('boss_kalah', true)
+                ->distinct('level')
+                ->count('level'),
+            'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                ->where('solo_raid_id', $soloRaid->id)
+                ->max('xp_diperoleh') ?? 0,
+        ];
+
+        // Fetch Session History
+        $sessionHistory = \App\Models\SessionSolo::where('user_id', auth()->id())
+            ->where('solo_raid_id', $soloRaid->id)
+            ->orderBy('waktu_mulai', 'desc')
+            ->get();
+
+        // Per-level stats for modal
+        $levelStats = [
+            'easy' => [
+                'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('level', 'Easy')
+                    ->whereNotNull('waktu_selesai')
+                    ->count(),
+                'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('level', 'Easy')
+                    ->whereNotNull('waktu_selesai')
+                    ->max('xp_diperoleh') ?? 0,
+            ],
+            'medium' => [
+                'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('level', 'Medium')
+                    ->whereNotNull('waktu_selesai')
+                    ->count(),
+                'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('level', 'Medium')
+                    ->whereNotNull('waktu_selesai')
+                    ->max('xp_diperoleh') ?? 0,
+            ],
+            'hard' => [
+                'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('level', 'Hard')
+                    ->whereNotNull('waktu_selesai')
+                    ->count(),
+                'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('level', 'Hard')
+                    ->whereNotNull('waktu_selesai')
+                    ->max('xp_diperoleh') ?? 0,
+            ],
+        ];
+
+        return view('solo.map', compact('soloRaid', 'userStats', 'sessionHistory', 'levelStats', 'activeSession'));
     }
 
     public function info(SoloRaid $soloRaid, $nodeId)

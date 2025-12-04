@@ -119,4 +119,26 @@
             {{ $raids->links() }}
         </div>
     </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('{{ route("solo.check-expired") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.processed > 0) {
+                    console.log('Processed ' + data.processed + ' expired sessions.');
+                    // Optional: Reload page if sessions were updated to reflect status changes
+                    window.location.reload();
+                }
+            })
+            .catch(error => console.error('Error checking expired sessions:', error));
+        });
+    </script>
 </x-app-layout>

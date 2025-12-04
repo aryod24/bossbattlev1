@@ -110,7 +110,7 @@
     <div class="flex flex-col md:flex-row min-h-screen">
         
         <!-- Left Section: Info Panel (Light Theme) -->
-        <x-solo.map-info-panel :solo-raid="$soloRaid" />
+        <x-solo.map-info-panel :solo-raid="$soloRaid" :stats="$userStats" :sessions="$sessionHistory" :active-session="$activeSession" />
         <x-solo.map-visual :solo-raid="$soloRaid" />
     </div>
 
@@ -146,6 +146,106 @@
         </div>
     </div>
 
+    <!-- Start Battle Confirmation Modal -->
+    <div x-show="showStartModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showStartModal" @click="showStartModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-black opacity-75"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div x-show="showStartModal" class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
+                <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                            <span class="material-symbols-outlined text-yellow-500">swords</span>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-bold text-text-primary">Start Battle?</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-text-muted">
+                                    Are you sure you want to start the <span class="font-bold text-primary" x-text="selectedLevel.toUpperCase()"></span> level?
+                                </p>
+                                
+                                <!-- Battle Stats -->
+                                <div class="mt-4 p-3 bg-surface-light rounded-lg border border-border">
+                                    <div class="grid grid-cols-2 gap-3 text-xs">
+                                        <div>
+                                            <p class="text-text-muted mb-1">This will be</p>
+                                            <p class="font-bold text-text-primary" x-text="`Attempt #${(levelStats[selectedLevel]?.attempts || 0) + 1}`"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-text-muted mb-1">Max XP Possible</p>
+                                            <p class="font-bold text-primary" x-text="(() => {
+                                                const attempt = (levelStats[selectedLevel]?.attempts || 0) + 1;
+                                                const maxXP = selectedLevel === 'easy' ? 150 : selectedLevel === 'medium' ? 200 : 220;
+                                                const penalty = attempt === 1 ? 1.0 : attempt === 2 ? 0.5 : 0.0;
+                                                return Math.floor(maxXP * penalty) + ' XP';
+                                            })()"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs text-text-muted mt-3">
+                                    ⏱️ Timer starts immediately after confirmation
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-background-dark px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="button" @click="startBattle()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:w-auto sm:text-sm">
+                        Start Battle
+                    </button>
+                    <button type="button" @click="showStartModal = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-border shadow-sm px-4 py-2 bg-card text-base font-medium text-text-primary hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Session Warning Modal -->
+    <div x-show="showActiveSessionModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showActiveSessionModal" @click="showActiveSessionModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-black opacity-75"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div x-show="showActiveSessionModal" class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
+                <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                            <span class="material-symbols-outlined text-yellow-500">warning</span>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-bold text-text-primary">Active Session Detected</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-text-muted">
+                                    You have an active session on <span class="font-bold text-primary" x-text="activeSession?.level"></span> level.
+                                </p>
+                                <p class="text-sm text-text-muted mt-2">
+                                    Please complete your current session before starting a new level.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-background-dark px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="button" @click="continueActiveSession()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:w-auto sm:text-sm">
+                        Continue Session
+                    </button>
+                    <button type="button" @click="showActiveSessionModal = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-border shadow-sm px-4 py-2 bg-card text-base font-medium text-text-primary hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('dungeonMap', (raidId) => ({
@@ -158,6 +258,12 @@
                 showInfoModal: false,
                 infoTitle: '',
                 infoContent: '',
+                showStartModal: false,
+                showActiveSessionModal: false,
+                selectedLevel: '',
+                levelStats: @json($levelStats),
+                activeSession: @json($activeSession),
+                currentRaidId: {{ $soloRaid->id }},
 
                 init() {
                     this.fetchLevels();
@@ -182,10 +288,35 @@
                 },
 
                 checkLevel(level) {
+                    // Check if active session exists in SAME raid
+                    if (this.activeSession && this.activeSession.solo_raid_id === this.currentRaidId) {
+                        // If clicking the same level as active session, continue it
+                        if (this.activeSession.level.toLowerCase() === level.toLowerCase()) {
+                            this.continueActiveSession();
+                            return;
+                        }
+                        // Otherwise, show warning modal
+                        this.showActiveSessionModal = true;
+                        return;
+                    }
+                    
                     if (this.levels[level].available) {
-                        window.location.href = `/solo/${this.raidId}/battle/init/${level}`;
+                        this.selectedLevel = level;
+                        this.showStartModal = true;
                     } else {
                         alert('This level is currently locked or unavailable.');
+                    }
+                },
+
+                startBattle() {
+                    if (this.selectedLevel) {
+                        window.location.href = `/solo/${this.raidId}/battle/init/${this.selectedLevel}`;
+                    }
+                },
+
+                continueActiveSession() {
+                    if (this.activeSession) {
+                        window.location.href = `/solo/${this.activeSession.solo_raid_id}/battle/${this.activeSession.id}`;
                     }
                 }
             }))

@@ -29,6 +29,14 @@
                                     </select>
                                 </div>
                                 <div>
+                                    <label for="question_bank_id" class="block text-sm font-medium text-text-muted">Question Bank</label>
+                                    <select name="question_bank_id" id="question_bank_id" class="mt-1 block w-full rounded-md bg-background-dark border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary" required>
+                                        @foreach($banks as $bank)
+                                            <option value="{{ $bank->bank_group }}">{{ $bank->bank_name ?? 'Bank #' . $bank->bank_group }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
                                     <label for="deskripsi" class="block text-sm font-medium text-text-muted">Description</label>
                                     <textarea name="deskripsi" id="deskripsi" rows="3" class="mt-1 block w-full rounded-md bg-background-dark border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary" required></textarea>
                                 </div>

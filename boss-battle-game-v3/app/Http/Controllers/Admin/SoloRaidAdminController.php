@@ -16,7 +16,11 @@ class SoloRaidAdminController extends Controller
 
     public function create()
     {
-        return view('admin.solo-raids.create');
+        $banks = \App\Models\QuestionBank::select('bank_group', 'bank_name')
+            ->distinct()
+            ->orderBy('bank_group')
+            ->get();
+        return view('admin.solo-raids.create', compact('banks'));
     }
 
     public function store(Request $request)
@@ -26,6 +30,7 @@ class SoloRaidAdminController extends Controller
             'deskripsi' => 'required|string',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'question_bank_id' => 'required|integer',
             'info_node_1' => 'nullable|string',
             'info_node_2' => 'nullable|string',
             'info_node_3' => 'nullable|string',
@@ -50,7 +55,11 @@ class SoloRaidAdminController extends Controller
 
     public function edit(SoloRaid $soloRaid)
     {
-        return view('admin.solo-raids.edit', compact('soloRaid'));
+        $banks = \App\Models\QuestionBank::select('bank_group', 'bank_name')
+            ->distinct()
+            ->orderBy('bank_group')
+            ->get();
+        return view('admin.solo-raids.edit', compact('soloRaid', 'banks'));
     }
 
     public function update(Request $request, SoloRaid $soloRaid)
@@ -60,6 +69,7 @@ class SoloRaidAdminController extends Controller
             'deskripsi' => 'required|string',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'question_bank_id' => 'required|integer',
             'info_node_1' => 'nullable|string',
             'info_node_2' => 'nullable|string',
             'info_node_3' => 'nullable|string',

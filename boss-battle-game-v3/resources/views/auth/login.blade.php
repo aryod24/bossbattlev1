@@ -34,18 +34,18 @@
         </div>
 
         <div class="relative flex h-full min-h-screen grow flex-col z-10">
-            <div class="flex h-full min-h-screen flex-1">
+            <div class="flex min-h-screen flex-col md:flex-row">
                 <!-- Left Section (Hero) -->
-                <div class="w-full lg:w-3/5 flex flex-col justify-center items-start p-8 sm:p-12 md:p-24 relative">
+                <div class="hidden md:flex w-full md:w-3/5 flex-col justify-center items-start p-8 sm:p-12 md:p-24 relative min-h-[50vh] md:min-h-screen">
 
                     <main class="w-full max-w-2xl relative z-10">
-                        <h1 class="text-5xl font-bold leading-tight tracking-tighter md:text-7xl lg:text-8xl text-text-primary">CodeBossArena</h1>
-                        <h2 class="mt-4 text-lg font-normal leading-normal text-text-muted md:text-2xl">Platform Pembelajaran Pemrograman Berbasis Gamifikasi</h2>
+                        <h1 class="text-4xl sm:text-5xl font-bold leading-tight tracking-tighter md:text-7xl lg:text-8xl text-text-primary">CodeBossArena</h1>
+                        <h2 class="mt-4 text-base sm:text-lg font-normal leading-normal text-text-muted md:text-2xl">Platform Pembelajaran Pemrograman Berbasis Gamifikasi</h2>
                     </main>
                 </div>
 
                 <!-- Right Section (Login Form) -->
-                <div class="w-full lg:w-2/5 flex items-center justify-center p-8 bg-card/50 backdrop-blur-sm border-l border-border">
+                <div class="w-full md:w-2/5 flex items-center justify-center p-8 bg-card/50 backdrop-blur-sm border-t md:border-t-0 md:border-l border-border min-h-screen">
                     <div class="w-full max-w-sm">
                         <div class="flex flex-col items-center justify-center mb-8 gap-3">
                             <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain">

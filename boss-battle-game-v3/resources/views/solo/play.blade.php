@@ -401,6 +401,17 @@
                     })
                     .then(res => res.json())
                     .then(data => {
+                        // Handle Errors (e.g. Time Expired)
+                        if (data.error) {
+                            if (data.error === 'Time expired') {
+                                this.finishQuiz();
+                                return;
+                            }
+                            alert(data.error);
+                            this.isSubmitting = false;
+                            return;
+                        }
+
                         this.feedbackCorrect = data.is_correct;
                         this.feedbackMessage = data.feedback_message;
                         

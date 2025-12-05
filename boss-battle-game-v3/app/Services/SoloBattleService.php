@@ -94,27 +94,49 @@ class SoloBattleService
             return ['error' => 'Session already finished'];
         }
 
-        // 2. Get question & validate answer
+        // 2. Security: Check Deadline (Prevent Infinite Time Exploit)
+        $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
+        $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
+        
+        // Add small buffer (e.g. 5 seconds) for network latency
+        if (now()->greaterThan($deadline->addSeconds(5))) {
+             return ['error' => 'Time expired'];
+        }
+
+        // 3. Idempotency: Check if already answered (Prevent Double Scoring)
+        $existingAnswer = SessionAnswer::where('session_id', $sessionId)
+            ->where('question_id', $data['question_id'])
+            ->first();
+
+        if ($existingAnswer && $existingAnswer->jawaban_user) {
+            // Already answered! Return existing result without re-processing damage.
+            return [
+                'is_correct' => $existingAnswer->is_correct,
+                'damage' => 0, // No new damage
+                'boss_hp_current' => $session->boss_hp_akhir,
+                'boss_hp_max' => $session->boss_hp_awal,
+                'feedback_message' => $existingAnswer->is_correct
+                    ? "Jawaban sudah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+                    : "Jawaban salah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+            ];
+        }
+
+        // 4. Get question & validate answer
         $question = QuestionBank::findOrFail($data['question_id']);
         $isCorrect = $this->validateAnswer($question, $data['jawaban_user']);
 
-        // 3. Calculate damage
+        // 5. Calculate damage
         $damage = $isCorrect ? 1 : 0;
 
-        // 4. Update boss HP
+        // 6. Update boss HP
         $session->boss_hp_akhir = max(0, $session->boss_hp_akhir - $damage);
         $session->jumlah_benar += $isCorrect ? 1 : 0;
         $session->jumlah_salah += $isCorrect ? 0 : 1;
         $session->save();
 
-        // 5. Save answer to session_answer
-        // We update the existing row created in initSession
-        $sessionAnswer = SessionAnswer::where('session_id', $sessionId)
-            ->where('question_id', $question->id)
-            ->first();
-
-        if ($sessionAnswer) {
-            $sessionAnswer->update([
+        // 7. Save answer to session_answer
+        if ($existingAnswer) {
+            $existingAnswer->update([
                 'jawaban_user' => $data['jawaban_user'],
                 'is_correct' => $isCorrect,
                 'waktu_jawab_detik' => $data['waktu_jawab_detik'] ?? 0,
@@ -136,7 +158,7 @@ class SoloBattleService
             ]);
         }
 
-        // 6. Return response
+        // 8. Return response
         return [
             'is_correct' => $isCorrect,
             'damage' => $damage,

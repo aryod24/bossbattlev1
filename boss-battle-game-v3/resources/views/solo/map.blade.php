@@ -266,6 +266,13 @@
                 currentRaidId: {{ $soloRaid->id }},
 
                 init() {
+                    // Force reload on back navigation to update session state
+                    window.addEventListener('pageshow', (event) => {
+                        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                            window.location.reload();
+                        }
+                    });
+                    
                     this.fetchLevels();
                 },
 
@@ -288,18 +295,20 @@
                 },
 
                 checkLevel(level) {
-                    // Check if active session exists in SAME raid
-                    if (this.activeSession && this.activeSession.solo_raid_id === this.currentRaidId) {
-                        // If clicking the same level as active session, continue it
+                    // 1. Check for ANY active session
+                    if (this.activeSession) {
+                        // If clicking the SAME level as active session -> Continue
                         if (this.activeSession.level.toLowerCase() === level.toLowerCase()) {
                             this.continueActiveSession();
                             return;
                         }
-                        // Otherwise, show warning modal
+                        
+                        // If clicking a DIFFERENT level -> Block with Warning
                         this.showActiveSessionModal = true;
                         return;
                     }
                     
+                    // 2. Normal Flow (No active session)
                     if (this.levels[level].available) {
                         this.selectedLevel = level;
                         this.showStartModal = true;

@@ -281,6 +281,34 @@
         </div>
     </div>
 
+    <!-- Error Modal -->
+    <div x-show="showErrorModal" 
+         style="display: none;"
+         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="bg-vscode-card border border-bash-red rounded-lg shadow-2xl w-full max-w-sm overflow-hidden transform transition-all border-l-4 border-l-boss-red"
+             @click.away="showErrorModal = false">
+            <div class="p-4 flex items-start gap-4">
+                <div class="text-2xl text-boss-red mt-1">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-white text-base mb-1">Runtime Error</h3>
+                    <p class="text-sm text-vscode-muted mb-4" x-text="errorMessage"></p>
+                    <button @click="showErrorModal = false" class="bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white text-xs px-3 py-2 rounded-sm border border-vscode-border transition-colors">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Modal (VS Code Style) -->
     <div x-show="showModal" 
          style="display: none;"
@@ -320,6 +348,8 @@
                 showFeedback: false, // Used for shake effect trigger
                 isHit: false,
                 showDamage: false,
+                showErrorModal: false,
+                errorMessage: '',
                 
                 timerInterval: null,
                 startTime: null,
@@ -407,7 +437,8 @@
                                 this.finishQuiz();
                                 return;
                             }
-                            alert(data.error);
+                            this.errorMessage = data.error;
+                            this.showErrorModal = true;
                             this.isSubmitting = false;
                             return;
                         }
@@ -442,7 +473,8 @@
                     .catch(err => {
                         console.error(err);
                         this.isSubmitting = false;
-                        alert('Error submitting answer.');
+                        this.errorMessage = 'Connection Error: Failed to submit answer.';
+                        this.showErrorModal = true;
                     });
                 },
 

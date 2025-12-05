@@ -156,8 +156,18 @@ class SoloBattleService
             return $session; // Already finished
         }
 
-        // 1. Calculate duration
-        $session->waktu_selesai = $forcedEndTime ?? now();
+        // 1. Calculate duration & Validate End Time
+        $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
+        $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
+        
+        $endTime = $forcedEndTime ?? now();
+        
+        // Cap at deadline if exceeded (unless it's a manual finish which should be within limits, but good safety)
+        if ($endTime->greaterThan($deadline)) {
+            $endTime = $deadline;
+        }
+
+        $session->waktu_selesai = $endTime;
         $session->durasi_detik = $session->waktu_mulai->diffInSeconds($session->waktu_selesai);
 
         // 2. Calculate final score (percentage)

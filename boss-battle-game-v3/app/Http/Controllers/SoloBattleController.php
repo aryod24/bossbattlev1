@@ -74,7 +74,15 @@ class SoloBattleController extends Controller
         // For fallback/initial display (optional, but good for SSR)
         $timeRemaining = max(0, now()->diffInSeconds($deadline, false));
 
-        return view('solo.play', compact('soloRaid', 'session', 'questions', 'timeRemaining', 'deadline'));
+        // Get boss name based on level
+        $bossName = match($session->level) {
+            'Easy' => $soloRaid->boss_easy_name,
+            'Medium' => $soloRaid->boss_medium_name,
+            'Hard' => $soloRaid->boss_hard_name,
+            default => 'Boss'
+        };
+
+        return view('solo.play', compact('soloRaid', 'session', 'questions', 'timeRemaining', 'deadline', 'bossName'));
     }
 
     public function action(Request $request, SoloRaid $soloRaid)
@@ -101,6 +109,12 @@ class SoloBattleController extends Controller
     {
         if ($session->user_id !== auth()->id()) {
             abort(403);
+        }
+        
+        // Force finish if not already finished (e.g. user manually navigated here)
+        if (!$session->waktu_selesai) {
+            $this->service->finishSession($session->id);
+            $session->refresh();
         }
         
         $session->load('soloRaid');

@@ -17,7 +17,7 @@ class SoloRaidController extends Controller
         return view('solo.index', compact('raids'));
     }
 
-    public function map(SoloRaid $soloRaid)
+    public function map(SoloRaid $soloRaid, \App\Services\SoloBattleService $battleService)
     {
         // Period validation
         if (now()->lt($soloRaid->tanggal_mulai) || now()->gt($soloRaid->tanggal_selesai)) {
@@ -29,6 +29,17 @@ class SoloRaidController extends Controller
             ->whereNull('waktu_selesai')
             ->with('soloRaid')
             ->first();
+
+        // Handle Expired Session (e.g. Laptop died / Browser closed)
+        if ($activeSession) {
+            $config = \App\Services\SoloBattleService::LEVEL_CONFIG[$activeSession->level] ?? \App\Services\SoloBattleService::LEVEL_CONFIG['Easy'];
+            $deadline = $activeSession->waktu_mulai->addMinutes($config['timer_minutes']);
+            
+            if (now()->greaterThan($deadline)) {
+                $battleService->finishSession($activeSession->id, $deadline);
+                return redirect()->route('solo.result', $activeSession->id);
+            }
+        }
 
         // Fetch User Stats
         $userStats = [

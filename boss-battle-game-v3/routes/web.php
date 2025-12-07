@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\SoloRaidAdminController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SoloRaidController;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Leaderboard
+    Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 
     // Player Routes
     Route::get('/solo', [SoloRaidController::class, 'index'])->name('solo.index');

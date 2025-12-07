@@ -30,7 +30,7 @@
             <!-- Desktop Navigation (hidden on mobile/tablet) -->
             <nav class="hidden lg:flex items-center gap-4">
                 <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('dashboard') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('dashboard') }}">Dashboard</a>
-                <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('leaderboard*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="#">Leaderboard</a>
+                <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('leaderboard*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('leaderboard.index') }}">Leaderboard</a>
                 <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('solo.*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('solo.index') }}">Events</a>
                 <a class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors {{ request()->routeIs('profile.*') ? 'bg-primary text-white shadow-sm font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('profile.edit') }}">Profile</a>
             </nav>
@@ -67,7 +67,7 @@
                  style="display: none;">
                 <nav class="flex flex-col px-6 py-4 gap-2">
                     <a class="flex h-12 items-center rounded-lg px-4 transition-colors {{ request()->routeIs('dashboard') ? 'bg-primary text-white font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('dashboard') }}">Dashboard</a>
-                    <a class="flex h-12 items-center rounded-lg px-4 transition-colors {{ request()->routeIs('leaderboard*') ? 'bg-primary text-white font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="#">Leaderboard</a>
+                    <a class="flex h-12 items-center rounded-lg px-4 transition-colors {{ request()->routeIs('leaderboard*') ? 'bg-primary text-white font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('leaderboard.index') }}">Leaderboard</a>
                     <a class="flex h-12 items-center rounded-lg px-4 transition-colors {{ request()->routeIs('solo.*') ? 'bg-primary text-white font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('solo.index') }}">Events</a>
                     <a class="flex h-12 items-center rounded-lg px-4 transition-colors {{ request()->routeIs('profile.*') ? 'bg-primary text-white font-bold' : 'hover:bg-primary/20 text-text-muted hover:text-text-primary font-medium' }}" href="{{ route('profile.edit') }}">Profile</a>
                     <div class="border-t border-border my-2"></div>

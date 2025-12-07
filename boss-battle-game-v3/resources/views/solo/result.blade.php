@@ -121,23 +121,19 @@
                     <span class="text-vscode-muted">Correct/Total</span>
                     <span>{{ $session->jumlah_benar }} / {{ $session->jumlah_soal }}</span>
                 </div>
-                <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
-                    <span class="text-vscode-muted">Research Data</span>
-                    <span>{{ $session->is_counted_research ? 'RECORDED' : 'IGNORED' }}</span>
-                </div>
             </div>
 
+            <!-- Inline Notifications Removed (Moved to Modal) -->
+
             <!-- Footer / Prompt -->
-            <div class="mt-10 flex flex-col md:flex-row gap-4">
-                <a href="{{ route('solo.map', $session->solo_raid_id) }}" class="group flex items-center gap-2 px-5 py-2 bg-vscode-primary hover:bg-vscode-primary-dark text-white rounded-sm transition-all">
-                    <i class="fa-solid fa-map"></i>
-                    <span>cd ../map</span>
+            <div class="mt-8 flex flex-col md:flex-row gap-4">
+                <a href="{{ route('solo.map', $session->solo_raid_id) }}" class="group flex items-center justify-center gap-2 px-6 py-3 bg-vscode-primary hover:bg-vscode-primary-dark text-white rounded font-bold transition-all w-full md:w-auto">
+                    <span>Kembali</span>
                 </a>
                 
                 @if(!$session->boss_kalah)
-                <button @click="showRetryModal = true" class="group flex items-center gap-2 px-5 py-2 bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white rounded-sm transition-all border border-vscode-border">
-                    <i class="fa-solid fa-rotate-right"></i>
-                    <span>./retry_mission.sh</span>
+                <button @click="showRetryModal = true" class="group flex items-center justify-center gap-2 px-6 py-3 bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white rounded font-bold transition-all border border-vscode-border w-full md:w-auto">
+                    <span>Ulangi</span>
                 </button>
                 @endif
             </div>
@@ -163,7 +159,7 @@
             <div class="bg-[#333333] px-4 py-3 border-b border-vscode-border flex justify-between items-center">
                 <h3 class="text-vscode-text font-bold flex items-center gap-2">
                     <i class="fa-solid fa-triangle-exclamation text-yellow-500"></i>
-                    Confirm Retry
+                    Konfirmasi Ulangi
                 </h3>
                 <button @click="showRetryModal = false" class="text-vscode-muted hover:text-white">
                     <i class="fa-solid fa-xmark"></i>
@@ -173,18 +169,18 @@
             <!-- Modal Body -->
             <div class="p-6">
                 <p class="text-vscode-text mb-4 leading-relaxed">
-                    Are you sure you want to retry? <br>
-                    <span class="text-vscode-muted text-sm">Atau sebaiknya anda review materi terlebih dahulu?</span>
+                    Apakah Anda yakin ingin mengulangi misi ini? <br>
+                    <span class="text-vscode-muted text-sm">Pastikan Anda sudah siap!</span>
                 </p>
                 
                 <div class="flex flex-col gap-3 mt-6">
                     <a href="{{ route('solo.battle.init', ['soloRaid' => $session->solo_raid_id, 'level' => $session->level]) }}" 
-                       class="w-full text-center bg-vscode-primary hover:bg-vscode-primary-dark text-white font-bold py-2 px-4 rounded-sm transition-colors">
-                        Yes, Retry Mission
+                       class="w-full text-center bg-vscode-primary hover:bg-vscode-primary-dark text-white font-bold py-2 px-4 rounded transition-colors">
+                        Ya, Ulangi
                     </a>
                     <button @click="showRetryModal = false" 
-                            class="w-full bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white py-2 px-4 rounded-sm transition-colors border border-vscode-border">
-                        Cancel (Review Material)
+                            class="w-full bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white py-2 px-4 rounded transition-colors border border-vscode-border">
+                        Batal
                     </button>
                 </div>
             </div>

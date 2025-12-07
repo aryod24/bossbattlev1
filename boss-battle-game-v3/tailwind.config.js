@@ -15,18 +15,18 @@ export default {
             colors: {
                 // Primary Colors (VS Code Dark Theme)
                 "primary": "#007acc",
-                
+
                 // Background Colors
                 "background": "#1e1e1e",
                 "background-light": "#252526",
                 "background-dark": "#1e1e1e",
-                
+
                 // Card/Surface Colors
                 "card": "#252526",
                 "surface": "#252526",
                 "surface-light": "#2d2d2d",
                 "surface-dark": "#252526",
-                
+
                 // Text Colors
                 "text-primary": "#d4d4d4",
                 "text-light-primary": "#d4d4d4",
@@ -34,12 +34,12 @@ export default {
                 "text-muted": "#858585",
                 "text-light-secondary": "#858585",
                 "text-dark-secondary": "#9d9d9d",
-                
+
                 // Border Colors
                 "border": "#333333",
                 "border-light": "#404040",
                 "border-dark": "#333333",
-                
+
                 // Status Colors
                 "status-green-bg": "rgb(56 161 105 / 0.1)",
                 "status-green-text": "#38a169",
@@ -47,17 +47,17 @@ export default {
                 "status-red-text": "#e53e3e",
                 "status-gray-bg": "rgb(128 128 128 / 0.1)",
                 "status-gray-text": "#808080",
-                
+
                 // Accent Colors
                 "accent": "#007acc",
                 "accent-hover": "#1a8ad4",
-                
+
                 // Semantic Colors
                 "success": "#4ec9b0",
                 "warning": "#dcdcaa",
                 "error": "#f44747",
                 "info": "#9cdcfe",
-                
+
                 // Legacy Game/Map Colors (preserved for map components)
                 "game": {
                     "dark": "#0f172a",
@@ -68,7 +68,7 @@ export default {
                     "red": "#ef4444",
                     "teal": "#14b8a6",
                 },
-                
+
                 // Legacy Battle Colors
                 'boss': '#8B0000',
                 'damage': '#FF6B6B',
@@ -87,5 +87,8 @@ export default {
         },
     },
 
-    plugins: [forms],
+    plugins: [
+        forms,
+        require('@tailwindcss/container-queries'),
+    ],
 };

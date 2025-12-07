@@ -14,7 +14,21 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = Auth::user();
+    
+    // Get latest badge
+    $latestBadge = $user->userBadges()->with('badge')->latest()->first();
+    
+    // Get last raid session
+    $lastRaidSession = $user->sessionSolos()->with('soloRaid')->latest()->first();
+    
+    // Get active event (prioritize ongoing, then upcoming)
+    $activeEvent = \App\Models\Event::where('status', 'ongoing')->latest()->first();
+    if (!$activeEvent) {
+         $activeEvent = \App\Models\Event::where('status', 'draft')->latest()->first(); // Or upcoming logic
+    }
+
+    return view('dashboard', compact('latestBadge', 'lastRaidSession', 'activeEvent'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -41,9 +55,7 @@ Route::middleware('auth')->group(function () {
 
 // Admin Routes
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', \App\Http\Controllers\Admin\DashboardController::class)->name('dashboard');
 
     Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');

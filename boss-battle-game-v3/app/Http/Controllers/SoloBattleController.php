@@ -68,8 +68,8 @@ class SoloBattleController extends Controller
         
         // Check if expired
         if (now()->greaterThan($deadline)) {
-            $this->service->finishSession($session->id, $deadline);
-            return redirect()->route('solo.result', ['session' => $session->id]);
+            $result = $this->service->finishSession($session->id, $deadline);
+            return redirect()->route('solo.result', ['session' => $session->id])->with('battle_result', $result);
         }
         
         // For fallback/initial display (optional, but good for SSR)
@@ -103,6 +103,7 @@ class SoloBattleController extends Controller
     public function finish(Request $request, $sessionId)
     {
         $result = $this->service->finishSession($sessionId);
+        session()->flash('battle_result', $result);
         return response()->json($result);
     }
 
@@ -112,9 +113,11 @@ class SoloBattleController extends Controller
             abort(403);
         }
         
+        $battleResult = session('battle_result');
+        
         // Force finish if not already finished (e.g. user manually navigated here)
         if (!$session->waktu_selesai) {
-            $this->service->finishSession($session->id);
+            $battleResult = $this->service->finishSession($session->id);
             $session->refresh();
         }
         
@@ -122,7 +125,7 @@ class SoloBattleController extends Controller
         $bossName = $session->soloRaid->{'boss_'.strtolower($session->level).'_name'};
         $allBadges = \App\Models\Badge::all()->keyBy('id'); // Use ID as key for JS mapping
         
-        return view('solo.result', compact('session', 'bossName', 'allBadges'));
+        return view('solo.result', compact('session', 'bossName', 'allBadges', 'battleResult'));
     }
 
     public function getQuestion(SoloRaid $soloRaid)

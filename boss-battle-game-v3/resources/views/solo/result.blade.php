@@ -25,6 +25,9 @@
                         'vscode-text': '#d4d4d4',
                         'vscode-muted': '#858585',
                         'vscode-border': '#333333',
+                        'vscode-string': '#ce9178',
+                        'vscode-button': '#3c3c3c',
+                        'vscode-button-hover': '#4c4c4c',
                         'boss-red': '#FF5252',
                         'success-green': '#4EC9B0',
                         'terminal-bg': '#1e1e1e',
@@ -52,12 +55,16 @@
         @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #d4d4d4; } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 text-vscode-text font-mono" x-data="{ showRetryModal: false }">
+<body class="min-h-screen flex items-center justify-center p-4 text-vscode-text font-mono" 
+      x-data="{ 
+          showRetryModal: false, 
+          showRewardModal: {{ (isset($battleResult) && (($battleResult['level_up']['leveled_up'] ?? false) || !empty($battleResult['new_badges'] ?? []))) ? 'true' : 'false' }} 
+      }">
 
     <div class="w-full max-w-3xl terminal-window bg-vscode-card rounded-lg border border-vscode-border overflow-hidden relative">
         
         <!-- Terminal Header -->
-        <div class="bg-[#333333] px-4 py-2 flex items-center justify-between border-b border-vscode-border">
+        <div class="bg-vscode-border px-4 py-2 flex items-center justify-between border-b border-vscode-border">
             <div class="flex items-center gap-2">
                 <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
                 <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
@@ -81,16 +88,16 @@
                     <span class="text-vscode-muted">[INFO]</span> Analyzing battle data...
                 </div>
                 <div class="mb-2">
-                    <span class="text-vscode-muted">[INFO]</span> Target: <span class="text-[#ce9178]">'{{ $bossName }}'</span>
+                    <span class="text-vscode-muted">[INFO]</span> Target: <span class="text-vscode-string">'{{ $bossName }}'</span>
                 </div>
                 
                 @if($session->boss_kalah)
-                    <div class="mt-6 mb-6 p-4 border-l-4 border-success-green bg-[#1e1e1e]/50">
+                    <div class="mt-6 mb-6 p-4 border-l-4 border-success-green bg-vscode-bg/50">
                         <h1 class="text-2xl md:text-3xl font-bold text-success-green mb-2">BUILD SUCCESSFUL</h1>
                         <p class="text-vscode-text">Target eliminated. Mission accomplished.</p>
                     </div>
                 @else
-                    <div class="mt-6 mb-6 p-4 border-l-4 border-boss-red bg-[#1e1e1e]/50">
+                    <div class="mt-6 mb-6 p-4 border-l-4 border-boss-red bg-vscode-bg/50">
                         <h1 class="text-2xl md:text-3xl font-bold text-boss-red mb-2">BUILD FAILED</h1>
                         <p class="text-vscode-text">Target remains active. Mission failed.</p>
                     </div>
@@ -132,7 +139,7 @@
                 </a>
                 
                 @if(!$session->boss_kalah)
-                <button @click="showRetryModal = true" class="group flex items-center justify-center gap-2 px-6 py-3 bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white rounded font-bold transition-all border border-vscode-border w-full md:w-auto">
+                <button @click="showRetryModal = true" class="group flex items-center justify-center gap-2 px-6 py-3 bg-vscode-button hover:bg-vscode-button-hover text-white rounded font-bold transition-all border border-vscode-border w-full md:w-auto">
                     <span>Ulangi</span>
                 </button>
                 @endif
@@ -156,7 +163,7 @@
              @click.away="showRetryModal = false">
             
             <!-- Modal Header -->
-            <div class="bg-[#333333] px-4 py-3 border-b border-vscode-border flex justify-between items-center">
+            <div class="bg-vscode-border px-4 py-3 border-b border-vscode-border flex justify-between items-center">
                 <h3 class="text-vscode-text font-bold flex items-center gap-2">
                     <i class="fa-solid fa-triangle-exclamation text-yellow-500"></i>
                     Konfirmasi Ulangi
@@ -179,13 +186,87 @@
                         Ya, Ulangi
                     </a>
                     <button @click="showRetryModal = false" 
-                            class="w-full bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white py-2 px-4 rounded transition-colors border border-vscode-border">
+                            class="w-full bg-vscode-button hover:bg-vscode-button-hover text-white py-2 px-4 rounded transition-colors border border-vscode-border">
                         Batal
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Rewards/Level Up Modal -->
+    @if(isset($battleResult) && ( ($battleResult['level_up']['leveled_up'] ?? false) || !empty($battleResult['new_badges'] ?? []) ))
+    <div x-show="showRewardModal" 
+         style="display: none;"
+         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+         x-transition:enter="transition ease-out duration-500"
+         x-transition:enter-start="opacity-0 scale-90 translate-y-4"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+         x-transition:leave-end="opacity-0 scale-90 translate-y-4">
+        
+        <!-- VS Code Notification/Command Palette Style -->
+        <div class="bg-vscode-card border border-vscode-border shadow-2xl w-full max-w-lg overflow-hidden relative" style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);">
+            <!-- Accent Line (Top) -->
+            <div class="h-1 w-full bg-yellow-500"></div>
+
+            <!-- Header -->
+            <div class="bg-vscode-bg px-6 py-4 border-b border-vscode-border flex justify-between items-center">
+                <h3 class="text-white font-bold text-lg flex items-center gap-3 tracking-wide">
+                    <span class="text-yellow-500"><i class="fa-solid fa-star"></i></span>
+                    MISSION REWARDS
+                </h3>
+                <button @click="showRewardModal = false" class="text-vscode-muted hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-8 space-y-8">
+                <!-- Level Up Section -->
+                @if($battleResult['level_up']['leveled_up'] ?? false)
+                <div class="text-center relative">
+                    <div class="absolute inset-0 bg-yellow-500/5 blur-xl rounded-full"></div>
+                    <div class="relative">
+                        <div class="text-vscode-muted text-xs font-bold uppercase tracking-[0.3em] mb-2">Field Promotion</div>
+                        <div class="text-5xl font-black text-white mb-3 drop-shadow-md font-mono">
+                            LEVEL <span class="text-yellow-500">{{ $battleResult['level_up']['new_level'] }}</span>
+                        </div>
+                        <p class="text-vscode-text text-sm font-mono">Clearance level upgraded.</p>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Badges Section -->
+                @if(!empty($battleResult['new_badges']))
+                <div class="{{ ($battleResult['level_up']['leveled_up'] ?? false) ? 'border-t border-dashed border-vscode-border pt-8' : '' }}">
+                    <div class="text-center mb-6">
+                        <span class="text-vscode-muted text-xs uppercase tracking-widest bg-vscode-bg border border-vscode-border inline-block px-3 py-1 rounded-sm">New Achievements</span>
+                    </div>
+                    
+                    <div class="grid gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                        @foreach($battleResult['new_badges'] as $badge)
+                        <div class="flex items-center gap-4 bg-vscode-bg p-3 rounded-sm border border-vscode-border hover:border-vscode-muted transition-colors group">
+                            <div class="w-10 h-10 rounded bg-vscode-border flex items-center justify-center shrink-0 group-hover:bg-vscode-button-hover transition-colors">
+                                <i class="{{ $badge->icon ?? 'fa-solid fa-medal' }} text-xl text-yellow-500"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-bold text-vscode-text text-base group-hover:text-white transition-colors">{{ $badge->name }}</div>
+                                <div class="text-xs text-vscode-muted leading-tight font-mono">{{ $badge->description }}</div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <button @click="showRewardModal = false" class="w-full py-3 bg-vscode-primary hover:bg-vscode-primary/90 text-white font-bold text-base rounded-sm shadow-lg transition-all focus:ring-2 focus:ring-offset-2 focus:ring-vscode-primary focus:ring-offset-vscode-bg">
+                    CLAIM REWARDS
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Alpine.js (Already included in head, but ensuring x-data works) -->
     <script>

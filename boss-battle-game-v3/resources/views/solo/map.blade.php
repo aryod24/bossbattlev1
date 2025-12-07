@@ -214,49 +214,8 @@
         <x-solo.map-visual :solo-raid="$soloRaid" />
     </div>
 
-    <!-- Materi Modal (Full Width untuk konten panjang) -->
-    <div x-show="showInfoModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-start justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showInfoModal" @click="showInfoModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-black opacity-75"></div>
-            </div>
-
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div x-show="showInfoModal" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-border">
-                
-                <!-- Modal Header -->
-                <div class="bg-background-dark px-6 py-4 border-b border-border flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-primary/20">
-                            <span class="material-symbols-outlined text-primary">school</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-text-primary" x-text="infoTitle"></h3>
-                    </div>
-                    <button @click="showInfoModal = false" class="text-text-muted hover:text-text-primary transition-colors">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
-                
-                <!-- Modal Body (Scrollable) -->
-                <div class="bg-card px-6 py-6 max-h-[70vh] overflow-y-auto">
-                    <div class="prose" x-html="renderedContent"></div>
-                </div>
-                
-                <!-- Modal Footer -->
-                <div class="bg-background-dark px-6 py-4 border-t border-border flex justify-end">
-                    <button type="button" @click="showInfoModal = false" class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-6 py-2.5 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
-                        Got it
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Materi Modal Component -->
+    <x-solo.materi-modal />
 
     <!-- Start Battle Confirmation Modal -->
     <div x-show="showStartModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">

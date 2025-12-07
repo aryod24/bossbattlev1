@@ -1,6 +1,5 @@
 <x-app-layout>
-    <div class="flex flex-1 justify-center px-4 py-8 sm:px-6 lg:px-8">
-        <div class="flex w-full max-w-7xl flex-col gap-8">
+    <div class="flex flex-col gap-8">
             <header>
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div class="flex min-w-72 flex-col gap-3">
@@ -172,6 +171,5 @@
                     </div>
                 </aside>
             </div>
-        </div>
     </div>
 </x-app-layout>

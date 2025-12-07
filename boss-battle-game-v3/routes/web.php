@@ -21,7 +21,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/profile/badges', [\App\Http\Controllers\BadgeController::class, 'index'])->name('profile.badges');
 
 
     // Player Routes
@@ -67,6 +66,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     
     // Image Upload for Materi
     Route::post('upload-materi-image', [\App\Http\Controllers\Admin\ImageUploadController::class, 'uploadMateriImage'])->name('upload.materi-image');
+
+    // Badges Management
+    Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
 });
 
 require __DIR__.'/auth.php';

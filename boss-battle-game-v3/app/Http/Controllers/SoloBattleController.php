@@ -120,7 +120,7 @@ class SoloBattleController extends Controller
         
         $session->load('soloRaid');
         $bossName = $session->soloRaid->{'boss_'.strtolower($session->level).'_name'};
-        $allBadges = \App\Services\BadgeService::BADGE_DETAILS;
+        $allBadges = \App\Models\Badge::all()->keyBy('id'); // Use ID as key for JS mapping
         
         return view('solo.result', compact('session', 'bossName', 'allBadges'));
     }

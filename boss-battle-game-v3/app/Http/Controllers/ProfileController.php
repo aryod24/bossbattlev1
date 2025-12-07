@@ -16,8 +16,18 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        
+        // Load user's unlocked badges
+        $unlockedBadges = $user->userBadges->keyBy('badge_id');
+        
+        // Get all badge definitions from DB
+        $allBadges = \App\Models\Badge::all();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'unlockedBadges' => $unlockedBadges,
+            'allBadges' => $allBadges,
         ]);
     }
 

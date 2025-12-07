@@ -99,6 +99,9 @@
                         <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.sessions.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.sessions.index') }}">
                             <span class="material-symbols-outlined">database</span>Session Monitor
                         </a>
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.badges.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.badges.index') }}">
+                            <span class="material-symbols-outlined">emoji_events</span>Badges
+                        </a>
                     </nav>
                 </div>
                 <div class="flex flex-col gap-1">

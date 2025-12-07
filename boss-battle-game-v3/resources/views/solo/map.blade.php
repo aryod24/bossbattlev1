@@ -9,6 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Markdown & Code Highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -104,6 +113,97 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+        
+        /* Prose styling for markdown content */
+        .prose {
+            color: #d4d4d4;
+            max-width: none;
+        }
+        .prose h1 { font-size: 2em; font-weight: 800; color: #007acc; margin-top: 0; margin-bottom: 0.5em; }
+        .prose h2 { font-size: 1.5em; font-weight: 700; color: #007acc; margin-top: 1.5em; margin-bottom: 0.5em; }
+        .prose h3 { font-size: 1.25em; font-weight: 600; color: #4ec9b0; margin-top: 1.25em; margin-bottom: 0.5em; }
+        .prose h4 { font-size: 1.1em; font-weight: 600; color: #9cdcfe; margin-top: 1em; margin-bottom: 0.5em; }
+        
+        .prose p { margin-top: 0.75em; margin-bottom: 0.75em; line-height: 1.7; }
+        .prose strong { color: #dcdcaa; font-weight: 600; }
+        .prose em { color: #ce9178; font-style: italic; }
+        
+        .prose code {
+            background: #2d2d2d;
+            color: #ce9178;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .prose pre {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 1em;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        
+        .prose pre code {
+            background: transparent;
+            padding: 0;
+            color: #d4d4d4;
+            font-size: 0.875em;
+        }
+        
+        .prose blockquote {
+            border-left: 4px solid #007acc;
+            background: #252526;
+            padding: 0.5em 1em;
+            margin: 1em 0;
+            font-style: italic;
+            color: #858585;
+        }
+        
+        .prose ul, .prose ol {
+            margin: 0.75em 0;
+            padding-left: 1.5em;
+        }
+        
+        .prose li {
+            margin: 0.5em 0;
+        }
+        
+        .prose table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        
+        .prose th, .prose td {
+            border: 1px solid #333;
+            padding: 0.5em;
+            text-align: left;
+        }
+        
+        .prose th {
+            background: #2d2d2d;
+            color: #007acc;
+            font-weight: 600;
+        }
+        
+        .prose img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin: 1em 0;
+        }
+        
+        .prose a {
+            color: #007acc;
+            text-decoration: none;
+        }
+        
+        .prose a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body x-data="dungeonMap({{ $soloRaid->id }})">
@@ -114,31 +214,43 @@
         <x-solo.map-visual :solo-raid="$soloRaid" />
     </div>
 
-    <!-- Info Modal -->
+    <!-- Materi Modal (Full Width untuk konten panjang) -->
     <div x-show="showInfoModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="flex items-start justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div x-show="showInfoModal" @click="showInfoModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
                 <div class="absolute inset-0 bg-black opacity-75"></div>
             </div>
 
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div x-show="showInfoModal" class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
-                <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 sm:mx-0 sm:h-10 sm:w-10">
-                            <span class="material-symbols-outlined text-primary">menu_book</span>
+            <div x-show="showInfoModal" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full border border-border">
+                
+                <!-- Modal Header -->
+                <div class="bg-background-dark px-6 py-4 border-b border-border flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-primary/20">
+                            <span class="material-symbols-outlined text-primary">school</span>
                         </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-bold text-text-primary" x-text="infoTitle"></h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-text-muted whitespace-pre-line" x-text="infoContent"></p>
-                            </div>
-                        </div>
+                        <h3 class="text-xl font-bold text-text-primary" x-text="infoTitle"></h3>
                     </div>
+                    <button @click="showInfoModal = false" class="text-text-muted hover:text-text-primary transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
                 </div>
-                <div class="bg-background-dark px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" @click="showInfoModal = false" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+                
+                <!-- Modal Body (Scrollable) -->
+                <div class="bg-card px-6 py-6 max-h-[70vh] overflow-y-auto">
+                    <div class="prose" x-html="renderedContent"></div>
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="bg-background-dark px-6 py-4 border-t border-border flex justify-end">
+                    <button type="button" @click="showInfoModal = false" class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-6 py-2.5 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
                         Got it
                     </button>
                 </div>
@@ -247,6 +359,20 @@
     </div>
 
     <script>
+        // Configure marked.js with highlight.js before Alpine init
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (e) {}
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+        
         document.addEventListener('alpine:init', () => {
             Alpine.data('dungeonMap', (raidId) => ({
                 raidId: raidId,
@@ -258,6 +384,7 @@
                 showInfoModal: false,
                 infoTitle: '',
                 infoContent: '',
+                renderedContent: '',
                 showStartModal: false,
                 showActiveSessionModal: false,
                 selectedLevel: '',
@@ -285,11 +412,19 @@
                 },
 
                 openInfo(nodeId) {
-                    fetch(`/solo/${this.raidId}/info/${nodeId}`)
+                    fetch(`/solo/${this.raidId}/materi/${nodeId}`)
                         .then(res => res.json())
                         .then(data => {
                             this.infoTitle = data.title;
-                            this.infoContent = data.content;
+                            this.infoContent = data.content || ''; 
+                            // Render markdown to HTML
+                            this.renderedContent = marked.parse(data.content || 'Belum ada materi.');
+                            this.showInfoModal = true;
+                        })
+                        .catch(err => {
+                            console.error('Error loading materi:', err);
+                            this.infoTitle = 'Error';
+                            this.renderedContent = '<p class="text-error">Gagal memuat materi. Silakan coba lagi.</p>';
                             this.showInfoModal = true;
                         });
                 },

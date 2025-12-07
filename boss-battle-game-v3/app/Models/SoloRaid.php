@@ -11,7 +11,7 @@ class SoloRaid extends Model
     protected $table = 'solo_raid';
     protected $fillable = [
         'nama', 'deskripsi', 'tanggal_mulai', 'tanggal_selesai', 
-        'status', 'created_by', 'question_bank_id', 'info_node_1', 'info_node_2', 'info_node_3',
+        'status', 'created_by', 'question_bank_id', 'materi_node_1', 'materi_node_2', 'materi_node_3',
         'boss_easy_name', 'boss_medium_name', 'boss_hard_name',
         'easy_enabled', 'medium_enabled', 'hard_enabled',
         'easy_date_start', 'easy_date_end',

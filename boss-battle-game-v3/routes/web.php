@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     // Player Routes
     Route::get('/solo', [SoloRaidController::class, 'index'])->name('solo.index');
     Route::get('/solo/{soloRaid}/map', [SoloRaidController::class, 'map'])->name('solo.map');
-    Route::get('/solo/{soloRaid}/info/{nodeId}', [SoloRaidController::class, 'info'])->name('solo.info');
+    Route::get('/solo/{soloRaid}/materi/{nodeId}', [SoloRaidController::class, 'materi'])->name('solo.materi');
     Route::get('/solo/{soloRaid}/level-select', [SoloRaidController::class, 'levelSelect'])->name('solo.level-select');
     
     // Battle Routes
@@ -62,6 +62,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('sessions/destroy', [\App\Http\Controllers\Admin\AdminSessionController::class, 'destroy'])->name('sessions.destroy');
     Route::post('sessions/clear', [\App\Http\Controllers\Admin\AdminSessionController::class, 'clear'])->name('sessions.clear');
     Route::post('sessions/check-expired', [\App\Http\Controllers\Admin\AdminSessionController::class, 'checkExpired'])->name('sessions.check-expired');
+    
+    // Image Upload for Materi
+    Route::post('upload-materi-image', [\App\Http\Controllers\Admin\ImageUploadController::class, 'uploadMateriImage'])->name('upload.materi-image');
 });
 
 require __DIR__.'/auth.php';

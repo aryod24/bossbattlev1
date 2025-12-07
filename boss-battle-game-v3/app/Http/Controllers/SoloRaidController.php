@@ -112,16 +112,24 @@ class SoloRaidController extends Controller
         return view('solo.map', compact('soloRaid', 'userStats', 'sessionHistory', 'levelStats', 'activeSession'));
     }
 
-    public function info(SoloRaid $soloRaid, $nodeId)
+
+    public function materi(SoloRaid $soloRaid, $nodeId)
     {
         $content = match($nodeId) {
-            '1' => $soloRaid->info_node_1,
-            '2' => $soloRaid->info_node_2,
-            '3' => $soloRaid->info_node_3,
-            default => 'Info not found'
+            '1' => $soloRaid->materi_node_1,
+            '2' => $soloRaid->materi_node_2,
+            '3' => $soloRaid->materi_node_3,
+            default => null
         };
 
-        return response()->json(['title' => "Info Node $nodeId", 'content' => $content]);
+        if (!$content) {
+            return response()->json(['error' => 'Materi tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'title' => "Materi Node $nodeId",
+            'content' => $content
+        ]);
     }
 
     public function levelSelect(SoloRaid $soloRaid)

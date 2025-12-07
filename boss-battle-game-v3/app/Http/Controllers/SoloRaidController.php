@@ -9,9 +9,10 @@ class SoloRaidController extends Controller
 {
     public function index()
     {
+        // Show all active raids, including expired ones
         $raids = SoloRaid::where('status', 'active')
             ->whereDate('tanggal_mulai', '<=', now())
-            ->whereDate('tanggal_selesai', '>=', now())
+            ->orderBy('tanggal_selesai', 'desc')
             ->paginate(6);
             
         return view('solo.index', compact('raids'));

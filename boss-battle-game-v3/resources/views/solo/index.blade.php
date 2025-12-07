@@ -1,5 +1,17 @@
 <x-app-layout>
-    <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-6" x-data="{ 
+        currentFilter: 'all',
+        searchQuery: '',
+        filterEvents(status) {
+            this.currentFilter = status;
+        },
+        isVisible(eventStatus, isExpired) {
+            if (this.currentFilter === 'all') return true;
+            if (this.currentFilter === 'active') return eventStatus === 'active' && !isExpired;
+            if (this.currentFilter === 'closed') return isExpired;
+            return true;
+        }
+    }">
         <!-- Page Heading -->
         <div class="flex flex-wrap justify-between items-center gap-4">
             <div class="flex flex-col gap-2">
@@ -18,17 +30,20 @@
         <!-- Toolbar: Filters and Search -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex gap-2 p-1 bg-card border border-border rounded-lg overflow-x-auto">
-                <div class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-primary pl-4 pr-4 shadow-sm">
-                    <p class="text-white text-sm font-bold leading-normal">Semua</p>
+                <div @click="filterEvents('all')" 
+                     :class="currentFilter === 'all' ? 'bg-primary shadow-sm' : 'hover:bg-primary/20'" 
+                     class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors">
+                    <p :class="currentFilter === 'all' ? 'text-white font-bold' : 'text-text-primary font-medium'" class="text-sm leading-normal">Semua</p>
                 </div>
-                <div class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg hover:bg-primary/20 pl-4 pr-4 transition-colors">
-                    <p class="text-sm font-medium leading-normal text-text-primary">Aktif</p>
+                <div @click="filterEvents('active')" 
+                     :class="currentFilter === 'active' ? 'bg-primary shadow-sm' : 'hover:bg-primary/20'" 
+                     class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors">
+                    <p :class="currentFilter === 'active' ? 'text-white font-bold' : 'text-text-primary font-medium'" class="text-sm leading-normal">Aktif</p>
                 </div>
-                <div class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg hover:bg-primary/20 pl-4 pr-4 transition-colors">
-                    <p class="text-sm font-medium leading-normal text-text-primary">Mendatang</p>
-                </div>
-                <div class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg hover:bg-primary/20 pl-4 pr-4 transition-colors">
-                    <p class="text-sm font-medium leading-normal text-text-primary">Selesai</p>
+                <div @click="filterEvents('closed')" 
+                     :class="currentFilter === 'closed' ? 'bg-primary shadow-sm' : 'hover:bg-primary/20'" 
+                     class="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg pl-4 pr-4 transition-colors">
+                    <p :class="currentFilter === 'closed' ? 'text-white font-bold' : 'text-text-primary font-medium'" class="text-sm leading-normal">Selesai</p>
                 </div>
             </div>
             <div class="w-full md:max-w-xs">
@@ -37,7 +52,7 @@
                         <div class="text-text-muted flex items-center justify-center pl-4 rounded-l-lg border-r-0">
                             <span class="material-symbols-outlined">search</span>
                         </div>
-                        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-base font-normal h-full placeholder:text-text-muted px-4 pl-2 focus:outline-none focus:ring-0 border-none bg-transparent text-text-primary" placeholder="Cari event..." value=""/>
+                        <input x-model="searchQuery" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-base font-normal h-full placeholder:text-text-muted px-4 pl-2 focus:outline-none focus:ring-0 border-none bg-transparent text-text-primary" placeholder="Cari event..." value=""/>
                     </div>
                 </label>
             </div>
@@ -46,7 +61,12 @@
         <!-- Event Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($raids as $raid)
-                <div class="flex flex-col bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden {{ $raid->status === 'draft' ? 'opacity-70' : '' }}">
+                @php
+                    $isExpired = now()->greaterThan($raid->tanggal_selesai);
+                @endphp
+                <div x-show="isVisible('{{ $raid->status }}', {{ $isExpired ? 'true' : 'false' }}) && (searchQuery === '' || '{{ strtolower($raid->nama) }}'.includes(searchQuery.toLowerCase()))"
+                     x-transition
+                     class="flex flex-col bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden {{ $raid->status === 'draft' ? 'opacity-70' : '' }}">
                     <div class="p-5">
                         <div class="flex justify-between items-start gap-4">
                             <div>
@@ -63,7 +83,7 @@
                             <img class="w-12 h-12 rounded-full border-2 border-border object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($raid->boss_easy_name ?? 'Boss') }}&background=random" alt="Boss">
                         </div>
                         
-                        @if($raid->status === 'active')
+                        @if($raid->status === 'active' && !$isExpired)
                             <div class="flex items-center text-error mt-3 animate-pulse">
                                 <span class="material-symbols-outlined text-base mr-1">timer</span>
                                 <p class="text-sm font-bold">Berakhir {{ \Carbon\Carbon::parse($raid->tanggal_selesai)->diffForHumans() }}</p>
@@ -86,11 +106,16 @@
                         <p class="text-xs text-text-muted mb-4 line-clamp-2">{{ $raid->deskripsi }}</p>
                         
                         <div class="flex justify-between items-center">
-                            @if($raid->status === 'active')
+                            @if($raid->status === 'active' && !$isExpired)
                                 <span class="pulse-red text-xs font-bold px-3 py-1 bg-error text-white rounded-md uppercase tracking-wider">Ongoing</span>
                                 <a href="{{ route('solo.map', $raid) }}" class="flex items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-bold px-5 shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:scale-105">
                                     Bergabung
                                 </a>
+                            @elseif($raid->status === 'active' && $isExpired)
+                                <span class="text-xs font-bold px-3 py-1 bg-text-muted text-white rounded-md uppercase tracking-wider">Tutup</span>
+                                <button class="flex items-center justify-center rounded-lg h-10 bg-border text-text-muted gap-2 text-sm font-bold px-5 cursor-not-allowed" disabled>
+                                    Tutup
+                                </button>
                             @elseif($raid->status === 'selesai')
                                 <span class="text-xs font-bold px-3 py-1 bg-success text-white rounded-md uppercase tracking-wider">Selesai</span>
                                 <button class="flex items-center justify-center rounded-lg h-10 bg-info text-white gap-2 text-sm font-bold px-5 shadow-sm hover:brightness-110 transition-colors duration-200">

@@ -200,7 +200,7 @@ class SoloBattleService
         // 3. Determine if boss defeated
         $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
         $minDamage = $config['min_correct'];
-        $session->boss_kalah = ($session->jumlah_benar >= $minDamage);
+        $session->boss_kalah = ($session->jumlah_benar >= $minDamage) || ($session->skor_akhir >= 100);
 
         // 4. Calculate XP with retry penalty
         // Basic XP calculation logic (simplified for now)

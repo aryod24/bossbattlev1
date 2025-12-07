@@ -1,13 +1,4 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-text-primary">
-            {{ __('Profile Information') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-text-muted">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
+    <!-- Header removed, handled in parent view -->
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf

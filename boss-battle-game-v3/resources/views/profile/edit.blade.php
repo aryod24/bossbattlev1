@@ -61,27 +61,18 @@
         <!-- Profile Information -->
         <div class="bg-card shadow-xl sm:rounded-2xl border border-border p-6 sm:p-8">
             <div class="max-w-xl">
-                <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">person</span>
-                    Profile Information
-                </h3>
+                <header class="mb-6">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                        Profile Information
+                    </h3>
+                    <p class="mt-1 text-sm text-text-muted">
+                        {{ __("Update your account's profile information and email address.") }}
+                    </p>
+                </header>
                 @include('profile.partials.update-profile-information-form')
             </div>
         </div>
-        
-        <!-- Update Password (Optional if needed, else just Profile Info as per existing code) -->
-        <!-- Logic for delete account is often in profile.edit too, if I removed it I should check if it was there. 
-             Wait, looking at the code I read in Step 183: 
-             It only had 'Profile Information'. 
-             Wait, verify line 76: @include('profile.partials.update-profile-information-form')
-             Did I miss other includes?
-             Let's re-read Step 183 carefully.
-             It shows only update-profile-information-form.
-             However, typically Laravel Breeze has update-password-form and delete-user-form.
-             Maybe they were removed previously or I just didn't see them in the truncated view?
-             Step 183 says "Showing lines 1 to 82" and "The above content shows the entire, complete file contents".
-             So it seems it only has `update-profile-information-form`.
-             Okay, I will stick to what was there.
-        -->
+
     </div>
 </x-app-layout>

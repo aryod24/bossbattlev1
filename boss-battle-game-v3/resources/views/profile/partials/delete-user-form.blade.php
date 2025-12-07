@@ -1,13 +1,4 @@
-<section class="space-y-6">
-    <header>
-        <h2 class="text-lg font-medium text-text-primary">
-            {{ __('Delete Account') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-text-muted">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
-        </p>
-    </header>
+    <!-- Header removed, handled in parent view -->
 
     <x-danger-button
         x-data=""
@@ -15,7 +6,7 @@
     >{{ __('Delete Account') }}</x-danger-button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6 bg-card">
+        <form method="post" action="{{ $action ?? route('profile.destroy') }}" class="p-6 bg-card">
             @csrf
             @method('delete')
 

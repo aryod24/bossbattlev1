@@ -226,6 +226,12 @@
                     <div class="font-medium text-lg lg:text-xl leading-relaxed text-[#d4d4d4] prose prose-invert max-w-none"
                          x-html="currentQuestion.soal_text">
                     </div>
+                    
+                    <!-- Debug / Cheat Sheet -->
+                    <div class="mt-2 p-2 bg-[#2d2d2d] border border-dashed border-[#444] rounded text-xs text-[#858585] font-mono inline-block">
+                        <i class="fa-solid fa-bug text-yellow-500 mr-1"></i> 
+                        Using Cheat: Answer is <span x-text="currentQuestion.jawaban_benar" class="font-bold text-[#ce9178]"></span>
+                    </div>
                 </div>
 
                 <!-- Answer Grid -->
@@ -513,7 +519,15 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        window.location.href = `/solo/result/${this.sessionId}`;
+                        const params = new URLSearchParams();
+                        if (data.level_up && data.level_up.leveled_up) {
+                            params.append('level_up', '1');
+                            params.append('new_level', data.level_up.new_level);
+                        }
+                        if (data.new_badges && data.new_badges.length > 0) {
+                            params.append('badges', JSON.stringify(data.new_badges));
+                        }
+                        window.location.href = `/solo/result/${this.sessionId}?${params.toString()}`;
                     });
                 }
             }

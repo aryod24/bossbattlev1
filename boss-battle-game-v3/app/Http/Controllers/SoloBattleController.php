@@ -56,6 +56,7 @@ class SoloBattleController extends Controller
                 'pilihan_d' => $answer->question->pilihan_d,
                 'urutan' => $answer->urutan_soal,
                 'is_answered' => $answer->jawaban_user !== null,
+                'jawaban_benar' => $answer->question->jawaban_benar, // For testing purposes
             ];
         });
 
@@ -119,8 +120,9 @@ class SoloBattleController extends Controller
         
         $session->load('soloRaid');
         $bossName = $session->soloRaid->{'boss_'.strtolower($session->level).'_name'};
+        $allBadges = \App\Services\BadgeService::BADGE_DETAILS;
         
-        return view('solo.result', compact('session', 'bossName'));
+        return view('solo.result', compact('session', 'bossName', 'allBadges'));
     }
 
     public function getQuestion(SoloRaid $soloRaid)

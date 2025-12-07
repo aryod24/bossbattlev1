@@ -18,6 +18,15 @@
                 </div>
             </div>
 
+            <!-- XP & Level Indicator -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <div class="flex items-center space-x-3 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-1.5 border border-gray-200 dark:border-gray-700">
+                    <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lvl {{ Auth::user()->level }}</span>
+                    <div class="h-4 w-px bg-gray-300 dark:bg-gray-600"></div>
+                    <span class="text-xs font-bold text-primary">{{ Auth::user()->total_xp }} XP</span>
+                </div>
+            </div>
+
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
@@ -34,6 +43,9 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link :href="route('profile.badges')">
+                            {{ __('My Badges') }}
+                        </x-dropdown-link>
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>

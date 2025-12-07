@@ -17,6 +17,15 @@ class SoloBattleService
         'Hard' => ['questions' => 17, 'boss_hp' => 17, 'min_correct' => 11, 'timer_minutes' => 4],
     ];
 
+    protected $xpService;
+    protected $badgeService;
+
+    public function __construct(XpService $xpService, BadgeService $badgeService)
+    {
+        $this->xpService = $xpService;
+        $this->badgeService = $badgeService;
+    }
+
     public function initSession(User $user, SoloRaid $soloRaid, string $level)
     {
         // 1. Check for existing active session
@@ -184,7 +193,7 @@ class SoloBattleService
         
         $endTime = $forcedEndTime ?? now();
         
-        // Cap at deadline if exceeded (unless it's a manual finish which should be within limits, but good safety)
+        // Cap at deadline if exceeded
         if ($endTime->greaterThan($deadline)) {
             $endTime = $deadline;
         }
@@ -202,37 +211,28 @@ class SoloBattleService
         $minDamage = $config['min_correct'];
         $session->boss_kalah = ($session->jumlah_benar >= $minDamage) || ($session->skor_akhir >= 100);
 
-        // 4. Calculate XP with retry penalty
-        // Basic XP calculation logic (simplified for now)
-        $baseXP = $session->jumlah_benar * 10; // 10 XP per correct answer
-        $bonusXP = $session->boss_kalah ? 50 : 0; // Bonus for winning
-        
-        $retryPenalty = match($session->attempt_number) {
-            1 => 1.0,
-            2 => 0.5,
-            default => 0
-        };
-
-        $finalXP = ($baseXP + $bonusXP) * $retryPenalty;
+        // 4. Calculate XP using XpService
+        $finalXP = $this->xpService->calculateSessionXP($session);
         $session->xp_diperoleh = $finalXP;
 
         $session->save();
 
-        // 5. Update user XP
-        $session->user->total_xp += $finalXP;
-        $session->user->save();
+        // 5. Update user XP & Check Level Up
+        $levelUpResult = $this->xpService->addXP($session->user, $finalXP);
 
-        // 6. Check level up & badges (Placeholder)
-        // XpService::checkLevelUp($session->user_id);
-        // BadgeService::checkAll($session->user_id);
+        // 6. Check badges
+        $newBadges = $this->badgeService->checkAll($session->user, $session);
 
         return [
+            'pemenang' => $session->boss_kalah ? 'Player' : 'Boss',
             'boss_kalah' => $session->boss_kalah,
             'skor_akhir' => $session->skor_akhir,
             'jumlah_benar' => $session->jumlah_benar,
             'jumlah_soal' => $session->jumlah_soal,
             'xp_diperoleh' => $finalXP,
             'durasi' => gmdate("H:i:s", $session->durasi_detik),
+            'level_up' => $levelUpResult,
+            'new_badges' => $newBadges
         ];
     }
 

@@ -69,6 +69,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // Badges Management
     Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
+
+    // User Management
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 });
 
 require __DIR__.'/auth.php';

@@ -1,10 +1,4 @@
 <x-admin-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-text-primary leading-tight">
-            {{ __('Edit Solo Raid') }}
-        </h2>
-    </x-slot>
-
     <!-- EasyMDE CSS -->
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
     <style>
@@ -80,11 +74,19 @@
         .editor-preview a:hover, .editor-preview-active a:hover { text-decoration: underline; }
     </style>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-card overflow-hidden shadow-sm sm:rounded-lg border border-border">
-                <div class="p-6 text-text-primary">
-                    <form action="{{ route('admin.solo-raids.update', $soloRaid) }}" method="POST">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex items-center gap-4 mb-8">
+            <a href="{{ route('admin.solo-raids.index') }}" class="p-2 hover:bg-card rounded-full transition-colors border border-transparent hover:border-border">
+                <span class="material-symbols-outlined text-text-muted">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-3xl font-black text-text-primary">Edit Solo Raid</h1>
+                <p class="text-text-muted mt-1">Configure event details and level thresholds.</p>
+            </div>
+        </div>
+
+        <div class="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <form action="{{ route('admin.solo-raids.update', $soloRaid) }}" method="POST">
                         @csrf
                         @method('PATCH')
 
@@ -192,8 +194,6 @@
                             <button type="submit" class="bg-primary hover:bg-primary/80 text-white font-bold py-2 px-4 rounded">Update Raid</button>
                         </div>
                     </form>
-                </div>
-            </div>
         </div>
     </div>
 

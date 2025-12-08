@@ -1,14 +1,17 @@
 <x-admin-layout>
-    <!-- PageHeading -->
-    <header class="mb-6">
-        <h1 class="text-4xl font-black tracking-tight text-text-primary">Edit Soal</h1>
-    </header>
+    <div class="max-w-4xl mx-auto space-y-6">
+        <div class="flex items-center gap-4 mb-8">
+            <a href="{{ route('admin.questions.index') }}" class="p-2 hover:bg-card rounded-full transition-colors border border-transparent hover:border-border">
+                <span class="material-symbols-outlined text-text-muted">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-3xl font-black text-text-primary">Edit Soal</h1>
+                <p class="text-text-muted mt-1">Edit question details and answer key.</p>
+            </div>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-card overflow-hidden shadow-sm sm:rounded-lg border border-border">
-                <div class="p-6 text-text-primary">
-                    <form method="POST" action="{{ route('admin.questions.update', $question) }}" x-data="{ type: '{{ old('tipe', $question->tipe) }}' }">
+        <div class="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <form method="POST" action="{{ route('admin.questions.update', $question) }}" x-data="{ type: '{{ old('tipe', $question->tipe) }}' }">
                         @csrf
                         @method('PUT')
 
@@ -104,8 +107,6 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
         </div>
     </div>
 </x-admin-layout>

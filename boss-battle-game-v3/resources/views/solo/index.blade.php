@@ -66,44 +66,71 @@
                 @endphp
                 <div x-show="isVisible('{{ $raid->status }}', {{ $isExpired ? 'true' : 'false' }}) && (searchQuery === '' || '{{ strtolower($raid->nama) }}'.includes(searchQuery.toLowerCase()))"
                      x-transition
-                     class="flex flex-col bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden {{ $raid->status === 'draft' ? 'opacity-70' : '' }}">
-                    <div class="p-5">
-                        <div class="flex justify-between items-start gap-4">
-                            <div>
-                                <h3 class="text-lg font-bold text-text-primary">{{ $raid->nama }}</h3>
-                                @if($raid->hard_enabled)
-                                    <span class="text-xs font-bold px-2 py-1 bg-red-500 text-white rounded-md">Hard</span>
-                                @elseif($raid->medium_enabled)
-                                    <span class="text-xs font-bold px-2 py-1 bg-orange-500 text-white rounded-md">Medium</span>
+                     class="flex flex-col bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden h-full {{ $raid->status === 'draft' ? 'opacity-70' : '' }}">
+                    <div class="p-5 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start gap-4 mb-2">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-text-primary mb-1">{{ $raid->nama }}</h3>
+                                
+                                {{-- Deadline / Countdown Section --}}
+                                @if($raid->status === 'active')
+                                    @if(!$isExpired)
+                                        <div class="flex items-center text-error animate-pulse">
+                                            <span class="material-symbols-outlined text-sm mr-1">timer</span>
+                                            <p class="text-xs font-bold">Berakhir {{ \Carbon\Carbon::parse($raid->tanggal_selesai)->diffForHumans() }}</p>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center text-text-muted">
+                                            <span class="material-symbols-outlined text-sm mr-1">event_busy</span>
+                                            <p class="text-xs font-bold">Event Berakhir</p>
+                                        </div>
+                                    @endif
+                                @elseif($raid->status === 'selesai')
+                                     <div class="flex items-center text-success">
+                                        <span class="material-symbols-outlined text-sm mr-1">check_circle</span>
+                                        <p class="text-xs font-bold">Telah Diselesaikan</p>
+                                    </div>
                                 @else
-                                    <span class="text-xs font-bold px-2 py-1 bg-green-500 text-white rounded-md">Easy</span>
+                                    <div class="flex items-center text-text-muted">
+                                        <span class="material-symbols-outlined text-sm mr-1">edit_note</span>
+                                        <p class="text-xs font-bold">Mode Draft</p>
+                                    </div>
                                 @endif
                             </div>
                             <!-- Placeholder Boss Image -->
-                            <img class="w-12 h-12 rounded-full border-2 border-border object-cover" src="https://ui-avatars.com/api/?name={{ urlencode($raid->boss_easy_name ?? 'Boss') }}&background=random" alt="Boss">
+                            <img class="w-12 h-12 rounded-full border-2 border-border object-cover shrink-0" src="https://ui-avatars.com/api/?name={{ urlencode($raid->boss_easy_name ?? 'Boss') }}&background=random" alt="Boss">
                         </div>
                         
-                        @if($raid->status === 'active' && !$isExpired)
-                            <div class="flex items-center text-error mt-3 animate-pulse">
-                                <span class="material-symbols-outlined text-base mr-1">timer</span>
-                                <p class="text-sm font-bold">Berakhir {{ \Carbon\Carbon::parse($raid->tanggal_selesai)->diffForHumans() }}</p>
+                        <p class="text-xs text-text-muted mb-4 line-clamp-2 mt-2">{{ $raid->deskripsi }}</p>
+
+                        <div class="mt-auto">
+                           <!-- Progress Bar Placeholder -->
+                            <div class="text-xs text-text-muted mb-1 flex justify-between">
+                                <span>XP Reward</span>
+                                <span class="font-bold text-text-primary">{{ $raid->question_count ?? 10 }}0 XP</span>
                             </div>
-                        @endif
+                            <div class="w-full bg-border rounded-full h-1.5 mb-4">
+                                <div class="bg-primary h-1.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="px-5 py-4 border-t border-border bg-background-dark/50">
-                        <div class="flex items-center gap-2 text-sm text-text-muted mb-3">
-                            <span class="material-symbols-outlined text-lg">calendar_today</span>
-                            <span>{{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y') }}</span>
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2 text-sm text-text-muted">
+                                <span class="material-symbols-outlined text-lg">calendar_today</span>
+                                <span class="font-medium">{{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y') }}</span>
+                            </div>
+
+                            {{-- Difficulty Badge (Moved here) --}}
+                            @if($raid->hard_enabled)
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded uppercase tracking-wider">Hard</span>
+                            @elseif($raid->medium_enabled)
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded uppercase tracking-wider">Medium</span>
+                            @else
+                                <span class="text-[10px] font-bold px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 rounded uppercase tracking-wider">Easy</span>
+                            @endif
                         </div>
-                        
-                        <!-- Progress Bar Placeholder (can be dynamic later) -->
-                        <div class="text-sm text-text-muted mb-2">XP Reward: {{ $raid->question_count ?? 10 }}0 XP</div>
-                        <div class="w-full bg-border rounded-full h-2 mb-3">
-                            <div class="bg-primary h-2 rounded-full" style="width: 0%"></div>
-                        </div>
-                        
-                        <p class="text-xs text-text-muted mb-4 line-clamp-2">{{ $raid->deskripsi }}</p>
                         
                         <div class="flex justify-between items-center">
                             @if($raid->status === 'active' && !$isExpired)

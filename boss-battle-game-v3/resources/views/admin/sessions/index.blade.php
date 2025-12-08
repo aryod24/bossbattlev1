@@ -1,9 +1,9 @@
 <x-admin-layout>
     <div x-data="{ activeTab: 'overview' }">
-        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card p-6 rounded-2xl shadow-sm border border-border">
             <div>
-                <h1 class="text-4xl font-black text-text-primary">Session Monitor</h1>
-                <p class="text-text-muted mt-2">Monitor and manage active game sessions.</p>
+                <h1 class="text-4xl font-black text-text-primary tracking-tight">Session Monitor</h1>
+                <p class="text-text-muted mt-2 font-medium">Monitor and manage active game sessions.</p>
             </div>
             
             <!-- Tabs Navigation -->

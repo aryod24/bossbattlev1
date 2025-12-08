@@ -1,12 +1,16 @@
 <x-admin-layout>
     <!-- PageHeading -->
-    <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h1 class="text-4xl font-black tracking-tight">Manajemen Event</h1>
+    <!-- PageHeading -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-card p-6 rounded-2xl shadow-sm border border-border">
+        <div>
+            <h1 class="text-4xl font-black text-text-primary tracking-tight">Manajemen Event</h1>
+            <p class="text-text-muted mt-2 font-medium">Manage solo raid events and schedules.</p>
+        </div>
         <a href="{{ route('admin.solo-raids.create') }}" class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-accent-hover">
             <span class="material-symbols-outlined">add_circle</span>
             <span class="truncate">Buat Event Baru</span>
         </a>
-    </header>
+    </div>
 
     <!-- SearchBar -->
     <div class="mb-4">

@@ -1,7 +1,11 @@
 <x-admin-layout>
     <!-- PageHeading -->
-    <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h1 class="text-4xl font-black tracking-tight">Bank Soal</h1>
+    <!-- PageHeading -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-card p-6 rounded-2xl shadow-sm border border-border">
+        <div>
+            <h1 class="text-4xl font-black text-text-primary tracking-tight">Bank Soal</h1>
+            <p class="text-text-muted mt-2 font-medium">Manage master data of questions and quizzes.</p>
+        </div>
         <div class="flex gap-2">
             <a href="{{ route('admin.questions.template') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-success hover:brightness-110 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
                 <span class="material-symbols-outlined">download</span>
@@ -16,7 +20,7 @@
                 <span class="truncate">Tambah Soal</span>
             </a>
         </div>
-    </header>
+    </div>
 
     <!-- Bank Tabs (Dynamic) -->
     <div class="flex gap-2 p-1 bg-card border border-border rounded-lg mb-4 overflow-x-auto">

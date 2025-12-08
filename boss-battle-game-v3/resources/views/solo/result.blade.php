@@ -58,6 +58,8 @@
 <body class="min-h-screen flex items-center justify-center p-4 text-vscode-text font-mono" 
       x-data="{ 
           showRetryModal: false, 
+          showClosedModal: false,
+          isEventClosed: {{ ($session->soloRaid->status !== 'active' || ($session->soloRaid->tanggal_selesai && now()->gt($session->soloRaid->tanggal_selesai))) ? 'true' : 'false' }},
           showRewardModal: {{ (isset($battleResult) && (($battleResult['level_up']['leveled_up'] ?? false) || !empty($battleResult['new_badges'] ?? []))) ? 'true' : 'false' }} 
       }">
 
@@ -139,7 +141,7 @@
                 </a>
                 
                 @if(!$session->boss_kalah)
-                <button @click="showRetryModal = true" class="group flex items-center justify-center gap-2 px-6 py-3 bg-vscode-button hover:bg-vscode-button-hover text-white rounded font-bold transition-all border border-vscode-border w-full md:w-auto">
+                <button @click="isEventClosed ? showClosedModal = true : showRetryModal = true" class="group flex items-center justify-center gap-2 px-6 py-3 bg-vscode-button hover:bg-vscode-button-hover text-white rounded font-bold transition-all border border-vscode-border w-full md:w-auto">
                     <span>Ulangi</span>
                 </button>
                 @endif
@@ -188,6 +190,57 @@
                     <button @click="showRetryModal = false" 
                             class="w-full bg-vscode-button hover:bg-vscode-button-hover text-white py-2 px-4 rounded transition-colors border border-vscode-border">
                         Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Closed Modal -->
+    <div x-show="showClosedModal" 
+         style="display: none;"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="bg-vscode-card border border-vscode-border rounded-lg shadow-2xl w-full max-w-md overflow-hidden transform transition-all"
+             @click.away="showClosedModal = false">
+            
+            <!-- Modal Header -->
+            <div class="bg-vscode-border px-4 py-3 border-b border-vscode-border flex justify-between items-center">
+                <h3 class="text-vscode-text font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-boss-red"></i>
+                    Event Berakhir
+                </h3>
+                <button @click="showClosedModal = false" class="text-vscode-muted hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 rounded-full bg-boss-red/10 flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-calendar-xmark text-3xl text-boss-red"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-2">Misi Ditutup</h4>
+                    <p class="text-vscode-text text-sm leading-relaxed">
+                        Maaf, periode event <span class="text-yellow-500 font-bold">{{ $session->soloRaid->nama }}</span> sudah berakhir. Anda tidak dapat mengulangi misi ini lagi.
+                    </p>
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <a href="{{ route('solo.index') }}" 
+                       class="w-full text-center bg-vscode-primary hover:bg-vscode-primary-dark text-white font-bold py-2 px-4 rounded transition-colors">
+                        Kembali ke Daftar Event
+                    </a>
+                    <button @click="showClosedModal = false" 
+                            class="w-full bg-vscode-button hover:bg-vscode-button-hover text-white py-2 px-4 rounded transition-colors border border-vscode-border">
+                        Tutup
                     </button>
                 </div>
             </div>

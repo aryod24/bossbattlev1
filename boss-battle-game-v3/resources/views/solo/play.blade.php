@@ -281,7 +281,7 @@
                     <span><i class="fa-solid fa-triangle-exclamation"></i> 0</span>
                 </div>
                 <div>
-                    <span>Boss Battle System v1.1</span>
+                    <span>Solo Boss Battle</span>
                 </div>
             </div>
         </div>

@@ -49,6 +49,31 @@ class SoloBattleService
                 ->where('level', $level)
                 ->count() + 1;
 
+            // Check if raid is active
+            if ($soloRaid->status !== 'active') {
+                throw new \Exception('Maaf, event ini belum aktif atau sudah dinonaktifkan.');
+            }
+
+            // Check global dates
+            $now = now();
+            if ($soloRaid->tanggal_mulai && $now->lt($soloRaid->tanggal_mulai)) {
+                throw new \Exception('Maaf, event ini belum dimulai.');
+            }
+            if ($soloRaid->tanggal_selesai && $now->gt($soloRaid->tanggal_selesai)) {
+                 throw new \Exception('Maaf, event ini sudah berakhir.');
+            }
+            
+            // Check level specific dates if set
+            $levelStart = $soloRaid->{strtolower($level) . '_date_start'};
+            $levelEnd = $soloRaid->{strtolower($level) . '_date_end'};
+
+            if ($levelStart && $now->lt($levelStart)) {
+                 throw new \Exception("Level {$level} belum dimulai.");
+            }
+            if ($levelEnd && $now->gt($levelEnd)) {
+                 throw new \Exception("Level {$level} sudah berakhir.");
+            }
+
             $session = SessionSolo::create([
                 'user_id' => $user->id,
                 'solo_raid_id' => $soloRaid->id,

@@ -17,8 +17,12 @@ class SoloBattleController extends Controller
 
     public function init(SoloRaid $soloRaid, $level)
     {
-        $session = $this->service->initSession(auth()->user(), $soloRaid, $level);
-        return redirect()->route('solo.battle', ['soloRaid' => $soloRaid->id, 'session' => $session->id]);
+        try {
+            $session = $this->service->initSession(auth()->user(), $soloRaid, $level);
+            return redirect()->route('solo.battle', ['soloRaid' => $soloRaid->id, 'session' => $session->id]);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function index(SoloRaid $soloRaid, SessionSolo $session = null)

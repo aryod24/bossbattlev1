@@ -34,9 +34,11 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Welcome Card -->
-        <div class="lg:col-span-2 bg-card p-6 rounded-lg shadow-sm border border-border">
-            <h1 class="text-2xl font-bold text-text-primary mb-2">Welcome back, {{ auth()->user()->nama }}!</h1>
-            <p class="text-text-muted">Ready to conquer the code? Check out the latest events and boost your rank.</p>
+        <div class="lg:col-span-2 bg-card p-6 rounded-lg shadow-sm border border-border flex flex-col justify-center h-full">
+            <div>
+                <h1 class="text-2xl font-bold text-text-primary mb-2">Welcome back, {{ auth()->user()->nama }}!</h1>
+                <p class="text-text-muted">Ready to conquer the code? Check out the latest events and boost your rank.</p>
+            </div>
             
             <div class="mt-6 flex gap-4">
                 <a href="{{ route('solo.index') }}" class="flex items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-bold px-5 shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:-translate-y-0.5">

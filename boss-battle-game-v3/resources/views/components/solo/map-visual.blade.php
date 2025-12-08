@@ -6,7 +6,7 @@
         <!-- Header -->
         <div class="text-center mb-6 w-full">
             <h1 class="text-xl font-extrabold uppercase tracking-wider text-text-primary mb-2">
-                Solo Raid Event
+                Solo Boss Battle
             </h1>
             <div class="flex justify-center items-center gap-2">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-success/20 text-success border border-success/30">ACTIVE</span>
@@ -58,11 +58,11 @@
             <!-- NODE 1: Info 1 (Top-Left) -->
             <div class="absolute w-full" style="top: 20px; left: 13px;">
                 <div class="flex items-start gap-3 group node" @click="openInfo(1)">
-                    <div class="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-info flex items-center justify-center shadow-[0_0_15px_rgba(156,220,254,0.4)]">
-                        <span class="material-symbols-outlined text-info text-2xl">menu_book</span>
+                    <div class="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-[#007acc] flex items-center justify-center shadow-[0_0_15px_rgba(0,122,204,0.4)]">
+                        <span class="material-symbols-outlined text-[#007acc] text-2xl">menu_book</span>
                     </div>
-                    <div class="glass-panel p-2 rounded-lg border-l-4 border-l-info mt-1 max-w-[180px]">
-                        <p class="text-[10px] text-info font-bold uppercase tracking-wide">Info Node</p>
+                    <div class="glass-panel p-2 rounded-lg border-l-4 border-l-[#007acc] mt-1 max-w-[180px]">
+                        <p class="text-[10px] text-[#007acc] font-bold uppercase tracking-wide">RESOURCE</p>
                         <p class="text-sm font-bold text-white leading-tight">Study Material 1</p>
                     </div>
                 </div>
@@ -89,11 +89,11 @@
             <!-- NODE 3: Info 2 (Mid-Left) -->
             <div class="absolute w-full" style="top: 240px; left: 13px;">
                 <div class="flex items-center gap-4 node" @click="openInfo(2)">
-                    <div class="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-info flex items-center justify-center shadow-[0_0_15px_rgba(156,220,254,0.4)]">
-                        <span class="material-symbols-outlined text-info text-2xl">menu_book</span>
+                    <div class="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-[#007acc] flex items-center justify-center shadow-[0_0_15px_rgba(0,122,204,0.4)]">
+                        <span class="material-symbols-outlined text-[#007acc] text-2xl">menu_book</span>
                     </div>
-                    <div class="glass-panel p-2 rounded-lg border-l-4 border-l-info max-w-[180px]">
-                        <p class="text-[10px] text-info font-bold uppercase">Info Node</p>
+                    <div class="glass-panel p-2 rounded-lg border-l-4 border-l-[#007acc] max-w-[180px]">
+                        <p class="text-[10px] text-[#007acc] font-bold uppercase">RESOURCE</p>
                         <p class="text-sm font-bold text-white">Study Material 2</p>
                     </div>
                 </div>
@@ -120,11 +120,11 @@
             <!-- NODE 5: Info 3 (Lower-Left) -->
             <div class="absolute w-full" style="top: 460px; left: 13px;">
                 <div class="flex items-center gap-3 node" @click="openInfo(3)">
-                    <div class="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-info flex items-center justify-center shadow-[0_0_15px_rgba(156,220,254,0.4)]">
-                        <span class="material-symbols-outlined text-info text-2xl">menu_book</span>
+                    <div class="relative z-10 w-16 h-16 rounded-full bg-surface border-2 border-[#007acc] flex items-center justify-center shadow-[0_0_15px_rgba(0,122,204,0.4)]">
+                        <span class="material-symbols-outlined text-[#007acc] text-2xl">menu_book</span>
                     </div>
-                    <div class="glass-panel p-2 rounded-lg border-l-4 border-l-info max-w-[180px]">
-                        <p class="text-[10px] text-info font-bold uppercase">Info Node</p>
+                    <div class="glass-panel p-2 rounded-lg border-l-4 border-l-[#007acc] max-w-[180px]">
+                        <p class="text-[10px] text-[#007acc] font-bold uppercase">RESOURCE</p>
                         <p class="text-sm font-bold text-white">Study Material 3</p>
                     </div>
                 </div>

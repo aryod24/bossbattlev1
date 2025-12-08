@@ -69,9 +69,15 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
                 <!-- TABLE SECTION -->
+                <!-- TABLE SECTION -->
                 <main class="lg:col-span-2">
-                    <h2 class="text-text-primary text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Full Leaderboard</h2>
-                    <div class="overflow-hidden rounded-lg bg-card border border-border">
+                    <div class="overflow-hidden rounded-lg bg-card border border-border shadow-sm">
+                        <!-- Card Header -->
+                        <div class="p-6 border-b border-border">
+                            <h2 class="text-text-primary text-[22px] font-bold leading-tight tracking-[-0.015em]">Full Leaderboard</h2>
+                        </div>
+                        
+                        <!-- Table -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left text-text-secondary">
                                 <thead class="text-xs text-text-secondary uppercase bg-surface-light dark:bg-surface-dark">

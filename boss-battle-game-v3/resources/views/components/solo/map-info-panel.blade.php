@@ -2,20 +2,22 @@
 
 <div class="w-full md:w-1/2 bg-card p-6 md:p-12 flex flex-col justify-center overflow-y-auto">
     <!-- Header -->
-    <div class="mb-8">
-        <div class="flex justify-between items-center mb-6">
-            <!-- Logo + Text -->
+    <div class="mb-2">
+        <!-- Header Card -->
+        <div class="flex justify-between items-center bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-border mb-6 shadow-sm">
+            <!-- Left: Back to List -->
+            <a href="{{ route('solo.index') }}" class="group inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+                Back to List
+            </a>
+
+            <!-- Right: Logo -->
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10">
+                <h2 class="text-lg font-bold text-text-primary hidden sm:block">CodeBossArena</h2>
+                <div class="w-8 h-8">
                     <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="w-full h-full object-contain">
                 </div>
-                <h2 class="text-xl font-bold text-text-primary">CodeBossArena</h2>
             </div>
-            
-            <!-- Back Button -->
-            <a href="{{ route('solo.index') }}" class="bg-primary hover:bg-accent-hover px-6 py-2 rounded-lg font-semibold transition-colors text-white">
-                ← Back to List
-            </a>
         </div>
 
         <!-- Active Session Warning -->

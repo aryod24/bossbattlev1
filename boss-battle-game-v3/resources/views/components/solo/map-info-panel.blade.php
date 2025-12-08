@@ -108,7 +108,9 @@
                             </div>
                             <div>
                                 <p class="text-xs text-text-muted">Status</p>
-                                @if($session->boss_kalah || $session->skor_akhir >= 100)
+                                @if(!$session->waktu_selesai)
+                                    <p class="text-xs font-bold text-yellow-500 animate-pulse">ON GOING</p>
+                                @elseif($session->boss_kalah || $session->skor_akhir >= 100)
                                     <p class="text-xs font-bold text-green-500">✓ WIN</p>
                                 @else
                                     <p class="text-xs font-bold text-red-500">✗ LOSS</p>

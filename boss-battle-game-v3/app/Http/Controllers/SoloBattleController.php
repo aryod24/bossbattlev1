@@ -132,11 +132,7 @@ class SoloBattleController extends Controller
         return view('solo.result', compact('session', 'bossName', 'allBadges', 'battleResult'));
     }
 
-    public function getQuestion(SoloRaid $soloRaid)
-    {
-        // Not used in this implementation as questions are loaded in index
-        return response()->json(['message' => 'Not implemented']);
-    }
+
 
     public function checkExpired()
     {

@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/solo/{soloRaid}/battle/action', [\App\Http\Controllers\SoloBattleController::class, 'action'])->name('solo.battle.action');
     Route::post('/solo/{soloRaid}/battle/finish/{session}', [\App\Http\Controllers\SoloBattleController::class, 'finish'])->name('solo.battle.finish');
     Route::get('/solo/result/{session}', [\App\Http\Controllers\SoloBattleController::class, 'result'])->name('solo.result');
-    Route::get('/solo/{soloRaid}/battle/question', [\App\Http\Controllers\SoloBattleController::class, 'getQuestion'])->name('solo.battle.question');
+
     Route::post('/solo/check-expired', [\App\Http\Controllers\SoloBattleController::class, 'checkExpired'])->name('solo.check-expired');
 });
 
@@ -80,9 +80,6 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('sessions/clear', [\App\Http\Controllers\Admin\AdminSessionController::class, 'clear'])->name('sessions.clear');
     Route::post('sessions/check-expired', [\App\Http\Controllers\Admin\AdminSessionController::class, 'checkExpired'])->name('sessions.check-expired');
     
-    // Image Upload for Materi
-    Route::post('upload-materi-image', [\App\Http\Controllers\Admin\ImageUploadController::class, 'uploadMateriImage'])->name('upload.materi-image');
-
     // Badges Management
     Route::resource('badges', \App\Http\Controllers\Admin\BadgeController::class);
 

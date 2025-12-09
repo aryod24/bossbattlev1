@@ -37,7 +37,12 @@ class BadgeController extends Controller
             'description' => 'required|string',
             'category' => 'nullable|string',
             'threshold' => 'nullable|integer',
+            'requirements' => 'nullable|json',
         ]);
+
+        if (!empty($validated['requirements'])) {
+            $validated['requirements'] = json_decode($validated['requirements'], true);
+        }
 
         Badge::create($validated);
 
@@ -72,7 +77,14 @@ class BadgeController extends Controller
             'description' => 'required|string',
             'category' => 'nullable|string',
             'threshold' => 'nullable|integer',
+            'requirements' => 'nullable|json',
         ]);
+
+        if (!empty($validated['requirements'])) {
+            $validated['requirements'] = json_decode($validated['requirements'], true);
+        } else {
+            $validated['requirements'] = null; // Ensure we can clear it
+        }
 
         $badge->update($validated);
 

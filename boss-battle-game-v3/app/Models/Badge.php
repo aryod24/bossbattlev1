@@ -16,11 +16,13 @@ class Badge extends Model
         'description',
         'category',
         'threshold',
+        'requirements',
         'is_system',
     ];
 
     protected $casts = [
         'is_system' => 'boolean',
+        'requirements' => 'array',
     ];
 
     public function userBadges()

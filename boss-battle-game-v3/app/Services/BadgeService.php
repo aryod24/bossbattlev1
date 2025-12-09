@@ -25,46 +25,132 @@ class BadgeService
      * @param mixed $currentSession - Instance of SessionSolo or EventParticipant (optional)
      * @return array - List of newly unlocked badge models
      */
+    /**
+     * Check all badges for a user.
+     * 
+     * @param User $user
+     * @param mixed $currentSession - Instance of SessionSolo or EventParticipant (optional)
+     * @return array - List of newly unlocked badge models
+     */
     public function checkAll(User $user, $currentSession = null)
     {
         $unlockedBadges = [];
+        $badges = Badge::where('is_system', true)->get();
 
-        // Fetch all system badges to check against
-        // Optimized: In a real app, you might want to cache this or only fetch needed ones
-        // But since we only have 5 system badges, fetching all is fine.
-        $systemBadges = Badge::where('is_system', true)->get()->keyBy('slug');
+        foreach ($badges as $badge) {
+            $isUnlocked = false;
 
-        if ($this->checkBossNovice($user) && isset($systemBadges[self::SLUG_BOSS_NOVICE])) {
-           if ($this->unlockBadge($user, $systemBadges[self::SLUG_BOSS_NOVICE])) {
-               $unlockedBadges[] = $systemBadges[self::SLUG_BOSS_NOVICE];
-           }
-        }
+            // 1. Dynamic Check via Requirements JSON
+            if (!empty($badge->requirements)) {
+                $isUnlocked = $this->checkDynamicRequirements($user, $badge->requirements, $currentSession);
+            } 
+            // 2. Legacy Fallback via Slug
+            else {
+                switch ($badge->slug) {
+                    case self::SLUG_BOSS_NOVICE:
+                        $isUnlocked = $this->checkBossNovice($user);
+                        break;
+                    case self::SLUG_BOSS_VETERAN:
+                        $isUnlocked = $this->checkBossVeteran($user);
+                        break;
+                    case self::SLUG_TOP_3_CHALLENGER:
+                        $isUnlocked = $this->checkTop3Challenger($user);
+                        break;
+                    case self::SLUG_PERFECT_STRIKE:
+                        if ($currentSession) {
+                            $isUnlocked = $this->checkPerfectStrike($user, $currentSession);
+                        }
+                        break;
+                    case self::SLUG_EVENT_WARRIOR:
+                        $isUnlocked = $this->checkEventWarrior($user);
+                        break;
+                }
+            }
 
-        if ($this->checkBossVeteran($user) && isset($systemBadges[self::SLUG_BOSS_VETERAN])) {
-           if ($this->unlockBadge($user, $systemBadges[self::SLUG_BOSS_VETERAN])) {
-               $unlockedBadges[] = $systemBadges[self::SLUG_BOSS_VETERAN];
-           }
-        }
-        
-        if ($this->checkTop3Challenger($user) && isset($systemBadges[self::SLUG_TOP_3_CHALLENGER])) {
-             if ($this->unlockBadge($user, $systemBadges[self::SLUG_TOP_3_CHALLENGER])) {
-                 $unlockedBadges[] = $systemBadges[self::SLUG_TOP_3_CHALLENGER];
-             }
-        }
-
-        if ($currentSession && $this->checkPerfectStrike($user, $currentSession) && isset($systemBadges[self::SLUG_PERFECT_STRIKE])) {
-             if ($this->unlockBadge($user, $systemBadges[self::SLUG_PERFECT_STRIKE])) {
-                 $unlockedBadges[] = $systemBadges[self::SLUG_PERFECT_STRIKE];
-             }
-        }
-
-        if ($this->checkEventWarrior($user) && isset($systemBadges[self::SLUG_EVENT_WARRIOR])) {
-             if ($this->unlockBadge($user, $systemBadges[self::SLUG_EVENT_WARRIOR])) {
-                 $unlockedBadges[] = $systemBadges[self::SLUG_EVENT_WARRIOR];
-             }
+            if ($isUnlocked) {
+                 if ($this->unlockBadge($user, $badge)) {
+                     $unlockedBadges[] = $badge;
+                 }
+            }
         }
         
         return $unlockedBadges;
+    }
+
+    /**
+     * Check dynamic requirements from JSON
+     */
+    public function checkDynamicRequirements(User $user, array $requirements, $currentSession = null)
+    {
+        // Support single rule or array of rules (implicit AND)
+        $rules = isset($requirements['type']) ? [$requirements] : ($requirements['rules'] ?? $requirements);
+
+        foreach ($rules as $rule) {
+            $type = $rule['type'] ?? '';
+            $pass = false;
+
+            switch ($type) {
+                // Check for N victories (optionally unique raids)
+                case 'solo_victory_count':
+                    $query = SessionSolo::query()
+                        ->where('user_id', $user->id)
+                        ->where('boss_kalah', true);
+                    
+                    if (isset($rule['difficulty'])) {
+                         $query->whereIn('level', (array)$rule['difficulty']);
+                    }
+                    
+                    if (!empty($rule['unique_raid'])) {
+                        $count = $query->distinct('solo_raid_id')->count('solo_raid_id');
+                    } else {
+                        $count = $query->count();
+                    }
+                    
+                    $target = $rule['count'] ?? 1;
+                    $pass = $count >= $target;
+                    break;
+                
+                // Check for victories in specific set of levels (e.g. Easy AND Medium AND Hard)
+                case 'complete_difficulties':
+                    $targetLevels = $rule['levels'] ?? ['Easy', 'Medium', 'Hard'];
+                    $pass = true;
+                    foreach ($targetLevels as $lvl) {
+                        $hasWin = SessionSolo::where('user_id', $user->id)
+                            ->where('level', $lvl)
+                            ->where('boss_kalah', true)
+                            ->exists();
+                        if (!$hasWin) {
+                            $pass = false;
+                            break;
+                        }
+                    }
+                    break;
+
+                case 'event_participation_count':
+                    $count = EventParticipant::where('user_id', $user->id)->count();
+                    $target = $rule['count'] ?? 1;
+                    $pass = $count >= $target;
+                    break;
+                    
+                case 'perfect_score':
+                    // Requires current session to be perfect
+                    if (!$currentSession) {
+                        $pass = false; 
+                        break; 
+                    }
+                    // Reuse existing logic
+                    $pass = $this->checkPerfectStrike($user, $currentSession);
+                    break;
+
+                default: 
+                    // If unknown rule, fail safe
+                    $pass = false;
+            }
+
+            if (!$pass) return false;
+        }
+
+        return true;
     }
 
     // 1. Boss Novice: Kalahkan 1 boss any level

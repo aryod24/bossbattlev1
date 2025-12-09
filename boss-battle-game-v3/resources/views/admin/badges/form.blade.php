@@ -55,6 +55,27 @@
                           placeholder="How to unlock this badge...">{{ old('description', $badge->description ?? '') }}</textarea>
                 @error('description') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>
+            <!-- Requirements JSON -->
+            <div>
+                <label class="block text-sm font-bold text-text-light-secondary mb-2">
+                    Requirements (JSON Configuration)
+                    <span class="text-xs font-normal text-text-muted ml-2">Leaving empty uses legacy/system logic.</span>
+                </label>
+                <div class="space-y-2">
+                    <textarea name="requirements" rows="6" 
+                              class="w-full font-mono text-sm rounded-xl border-border bg-surface-dark text-text-primary focus:border-primary focus:ring-primary"
+                              placeholder='{"type": "solo_victory_count", "count": 10}'>{{ old('requirements', isset($badge) && $badge->requirements ? json_encode($badge->requirements, JSON_PRETTY_PRINT) : '') }}</textarea>
+                    
+                    <div class="text-xs text-text-muted bg-surface-light dark:bg-black/20 p-3 rounded-lg border border-border">
+                        <p class="font-bold mb-1">Common Examples:</p>
+                        <code class="block text-primary mb-1">{"type": "solo_victory_count", "count": 10}</code>
+                        <code class="block text-primary mb-1">{"type": "complete_difficulties", "levels": ["Easy", "Hard"]}</code>
+                        <code class="block text-primary mb-1">{"type": "solo_victory_count", "count": 6, "unique_raid": true}</code>
+                        <code class="block text-primary">{"type": "event_participation_count", "count": 5}</code>
+                    </div>
+                </div>
+                @error('requirements') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
             
             <div class="pt-4 border-t border-border flex justify-end gap-4">
                 <a href="{{ route('admin.badges.index') }}" class="px-6 py-3 rounded-xl font-bold hover:bg-surface-light text-text-muted transition-colors border border-transparent hover:border-border">Cancel</a>

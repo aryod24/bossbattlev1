@@ -107,16 +107,24 @@ class SoloBattleService
         // For now, we assume there are enough questions.
 
         $order = 1;
+        $answersToInsert = [];
+        $now = now(); // Timestamp for bulk insert
+
         foreach ($questions as $question) {
-            SessionAnswer::create([
+            $answersToInsert[] = [
                 'session_id' => $session->id,
                 'session_type' => 'solo',
                 'question_id' => $question->id,
                 'urutan_soal' => $order++,
                 'attempt_number' => $session->attempt_number,
                 'is_counted_research' => $session->is_counted_research,
-                // 'answered_at' => null // Default is null now
-            ]);
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        if (!empty($answersToInsert)) {
+            SessionAnswer::insert($answersToInsert);
         }
     }
 

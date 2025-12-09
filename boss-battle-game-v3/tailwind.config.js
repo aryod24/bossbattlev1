@@ -40,6 +40,17 @@ export default {
                 "border-light": "#404040",
                 "border-dark": "#333333",
 
+                // VS Code Specific (Mapped to existing tokens for consistency)
+                'vscode-bg': '#1e1e1e',
+                'vscode-card': '#252526',
+                'vscode-primary': '#007acc',
+                'vscode-primary-dark': '#005fa3',
+                'vscode-text': '#d4d4d4',
+                'vscode-muted': '#858585',
+                'vscode-border': '#333333',
+                'boss-red': '#FF5252',
+                'success-green': '#4EC9B0',
+
                 // Status Colors
                 "status-green-bg": "rgb(56 161 105 / 0.1)",
                 "status-green-text": "#38a169",

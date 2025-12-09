@@ -7,69 +7,42 @@
     <title>Solo Boss Battle - {{ $bossName }}</title>
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Fira Code (Font Coding) & Nunito -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vite Assets (Optimized) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class', // Enable dark mode manually if needed, though we force dark theme here
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Nunito', 'sans-serif'],
-                        mono: ['"Fira Code"', 'monospace'], // Font khas coding
-                    },
-                    colors: {
-                        'vscode-bg': '#1e1e1e',       
-                        'vscode-card': '#252526',     
-                        'vscode-primary': '#007acc',  
-                        'vscode-primary-dark': '#005fa3',
-                        'vscode-text': '#d4d4d4',
-                        'vscode-muted': '#858585',
-                        'vscode-border': '#333333',
-                        'boss-red': '#FF5252',
-                        'success-green': '#4EC9B0',
-                    },
-                    animation: {
-                        'bounce-short': 'bounce-short 0.5s ease-in-out 1',
-                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-                        'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                        'float': 'float 3s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'shake': {
-                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-                        },
-                        'pop': {
-                            '0%': { transform: 'scale(0.9)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' }
-                        },
-                        'float': {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' }
-                        }
-                    }
-                }
-            }
+    <style>
+        /* Custom Animations Config (Moved from inline JS) */
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-    </script>
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-bounce-short { animation: bounce-short 0.5s ease-in-out 1; }
+        .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
     <style>
         body {
-            background-color: #1e1e1e;
-            /* Grid pattern halus ala text editor */
-            background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px);
-            background-size: 40px 40px;
+            background-color: #1e1e1e; 
+            background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px);
+            background-size: 50px 50px;
             background-position: center center;
         }
         .boss-hit {
@@ -196,12 +169,8 @@
             <div class="flex items-center bg-vscode-card border-b border-vscode-border">
                 <div class="px-4 py-3 bg-[#1e1e1e] border-t-2 border-t-vscode-primary text-sm font-mono text-vscode-text flex items-center gap-2">
                     <i class="fa-brands fa-js text-yellow-500"></i>
-                    soal_<span x-text="(currentQuestionIndex + 1).toString().padStart(2, '0')"></span>.js
+                    soal_<span x-text="(currentQuestionIndex + 1).toString().padStart(2, '0')"></span>
                     <i class="fa-solid fa-xmark ml-2 text-vscode-muted hover:text-white cursor-pointer"></i>
-                </div>
-                <div class="px-4 py-3 text-sm font-mono text-vscode-muted hover:bg-[#2a2a2a] cursor-pointer flex items-center gap-2 transition-colors">
-                    <i class="fa-brands fa-css3-alt text-blue-500"></i>
-                    style.css
                 </div>
             </div>
 
@@ -266,7 +235,7 @@
                             <button @click="submitAnswer(shortAnswerInput)"
                                     :disabled="!shortAnswerInput || isSubmitting"
                                     class="bg-vscode-primary hover:bg-vscode-primary-dark text-white font-mono font-bold py-2 px-6 rounded-sm transition-colors flex items-center gap-2">
-                                <i class="fa-solid fa-play"></i> Run Code (Submit)
+                                <i class="fa-solid fa-play"></i> Submit
                             </button>
                         </div>
                     </template>
@@ -277,8 +246,6 @@
             <div class="p-2 px-4 bg-vscode-primary flex justify-between items-center text-[10px] lg:text-xs text-white font-mono">
                 <div class="flex gap-4">
                     <span><i class="fa-solid fa-code-branch"></i> main*</span>
-                    <span><i class="fa-regular fa-circle-xmark"></i> 0</span>
-                    <span><i class="fa-solid fa-triangle-exclamation"></i> 0</span>
                 </div>
                 <div>
                     <span>Solo Boss Battle</span>

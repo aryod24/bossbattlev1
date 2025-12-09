@@ -85,6 +85,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     // User Management
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+
+    // Research Reports
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::post('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
 });
 
 require __DIR__.'/auth.php';

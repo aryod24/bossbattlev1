@@ -87,7 +87,7 @@ class SoloBattleController extends Controller
             default => 'Boss'
         };
 
-        return view('solo.play', compact('soloRaid', 'session', 'questions', 'timeRemaining', 'deadline', 'bossName'));
+        return \Inertia\Inertia::render('Solo/Play', compact('soloRaid', 'session', 'questions', 'timeRemaining', 'deadline', 'bossName'));
     }
 
     public function action(Request $request, SoloRaid $soloRaid)

@@ -1,0 +1,124 @@
+/* Boss Battle Animations */
+@keyframes bounce-short {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-bounce-short {
+    animation: bounce-short 0.5s ease-in-out 1;
+}
+
+.animate-shake {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+.animate-pop {
+    animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.boss-hit {
+    filter: brightness(1.5) sepia(1) hue-rotate(-50deg) saturate(5);
+    transform: scale(0.95);
+}
+
+/* VS Code Theme Utils */
+.text-vscode-primary {
+    color: #f9d406;
+}
+
+.bg-vscode-primary {
+    background-color: #f9d406;
+}
+
+.bg-vscode-card {
+    background-color: #252526;
+}
+
+.border-vscode-border {
+    border-color: #454545;
+}
+
+.text-vscode-text {
+    color: #d4d4d4;
+}
+
+.text-vscode-muted {
+    color: #858585;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #4f4f4f;
+}

@@ -15,7 +15,7 @@ class SoloRaidController extends Controller
             ->orderBy('tanggal_selesai', 'desc')
             ->paginate(6);
             
-        return view('solo.index', compact('raids'));
+        return \Inertia\Inertia::render('Solo/Index', compact('raids'));
     }
 
     public function map(SoloRaid $soloRaid, \App\Services\SoloBattleService $battleService)

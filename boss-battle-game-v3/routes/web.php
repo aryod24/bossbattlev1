@@ -91,4 +91,23 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::post('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
 });
 
+// Dosen Routes
+Route::middleware(['auth', 'verified'])->prefix('dosen')->name('dosen.')->group(function () {
+    Route::get('/dashboard', \App\Http\Controllers\Dosen\DashboardController::class)->name('dashboard');
+
+    Route::get('/profile', [\App\Http\Controllers\Dosen\DosenProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [\App\Http\Controllers\Dosen\DosenProfileController::class, 'update'])->name('profile.update');
+    Route::put('password', [\App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('password.update');
+
+    // Event Management (same as solo-raids for dosen)
+    Route::resource('events', \App\Http\Controllers\Dosen\EventController::class);
+    Route::post('events/{soloRaid}/duplicate', [\App\Http\Controllers\Dosen\EventController::class, 'duplicate'])->name('events.duplicate');
+    Route::post('events/{soloRaid}/toggle-level', [\App\Http\Controllers\Dosen\EventController::class, 'toggleLevel'])->name('events.toggle-level');
+    
+    // Question Bank Management
+    Route::get('questions/template', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'downloadTemplate'])->name('questions.template');
+    Route::post('questions/bulk-upload', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'bulkUpload'])->name('questions.bulk-upload');
+    Route::resource('questions', \App\Http\Controllers\Dosen\QuestionBankController::class);
+});
+
 require __DIR__.'/auth.php';

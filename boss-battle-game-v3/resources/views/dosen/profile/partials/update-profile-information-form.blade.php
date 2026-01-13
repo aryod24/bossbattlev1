@@ -1,4 +1,4 @@
-<form method="post" action="{{ route('admin.profile.update') }}" class="space-y-6">
+<form method="post" action="{{ route('dosen.profile.update') }}" class="space-y-6">
     @csrf
     @method('patch')
 
@@ -63,8 +63,8 @@
     <div>
         <label class="block text-sm font-bold text-text-light-secondary mb-2">Account Role</label>
         <div class="px-4 py-2.5 rounded-xl border border-border bg-surface-light/50 text-text-primary font-medium inline-flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[20px]">admin_panel_settings</span>
-            Administrator
+            <span class="material-symbols-outlined text-success text-[20px]">school</span>
+            Dosen
         </div>
         <p class="text-xs text-text-muted mt-1.5">Your account role cannot be changed from this page.</p>
     </div>

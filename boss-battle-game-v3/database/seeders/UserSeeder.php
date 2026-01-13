@@ -35,6 +35,40 @@ class UserSeeder extends Seeder
             'password' => bcrypt('password')
         ]);
 
+        // 3 Dosen users
+        User::create([
+            'nim' => 'NIDN001',
+            'nama' => 'Dr. Ahmad Fauzi',
+            'email' => 'ahmad.fauzi@dosen.ac.id',
+            'kelas' => null,
+            'role' => 'dosen',
+            'total_xp' => 0,
+            'level' => 1,
+            'password' => bcrypt('password')
+        ]);
+
+        User::create([
+            'nim' => 'NIDN002',
+            'nama' => 'Siti Aminah, M.Kom',
+            'email' => 'siti.aminah@dosen.ac.id',
+            'kelas' => null,
+            'role' => 'dosen',
+            'total_xp' => 0,
+            'level' => 1,
+            'password' => bcrypt('password')
+        ]);
+
+        User::create([
+            'nim' => 'NIDN003',
+            'nama' => 'Budi Raharjo, S.Kom',
+            'email' => 'budi.raharjo@dosen.ac.id',
+            'kelas' => null,
+            'role' => 'dosen',
+            'total_xp' => 0,
+            'level' => 1,
+            'password' => bcrypt('password')
+        ]);
+
         // 10 Student users
         $students = [
             ['nim' => '2241760101', 'nama' => 'aryod', 'kelas' => 'TI-3A'],

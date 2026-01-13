@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama', 100);
             $table->string('email')->unique();
             $table->string('kelas', 50)->nullable();
-            $table->enum('role', ['admin', 'student'])->default('student');
+            $table->enum('role', ['admin', 'dosen', 'student'])->default('student');
             $table->integer('total_xp')->default(0);
             $table->integer('level')->default(1);
             $table->string('password');

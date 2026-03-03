@@ -79,6 +79,9 @@
                         </td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('dosen.events.monitoring', $raid) }}" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20 text-primary" title="Monitoring">
+                                    <span class="material-symbols-outlined text-base">monitoring</span>
+                                </a>
                                 <a href="{{ route('dosen.events.edit', $raid) }}" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20" title="Edit">
                                     <span class="material-symbols-outlined text-base">edit</span>
                                 </a>

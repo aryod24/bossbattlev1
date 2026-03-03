@@ -114,7 +114,7 @@
             <div>
                 <p class="text-[10px] font-bold uppercase tracking-widest text-error mb-1">⚠ FINAL BOSS</p>
                 <h2 class="text-3xl font-black text-text-primary mb-2">{{ $bossName }}</h2>
-                <p class="text-text-muted text-sm">HP: {{ $levelConfig['jumlah_soal'] }} — Kalahkan dengan menjawab soal dengan benar!</p>
+                <p class="text-text-muted text-sm">HP: {{ $levelConfig['boss_hp'] }} — Kalahkan dengan menjawab soal dengan benar!</p>
             </div>
 
             @if($bestSession)

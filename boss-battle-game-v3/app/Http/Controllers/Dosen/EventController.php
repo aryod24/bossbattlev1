@@ -215,4 +215,113 @@ class EventController extends Controller
 
         return back()->with('success', ucfirst($level) . ' level toggled.');
     }
+
+    public function monitoring(SoloRaid $soloRaid)
+    {
+        if ($soloRaid->created_by !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $soloRaid->load('nodes');
+        
+        $students = \App\Models\User::where('role', 'student')->get();
+        
+        $monitoringData = [];
+        
+        foreach ($students as $student) {
+            $progress = \App\Models\UserEventProgress::where('user_id', $student->id)
+                ->where('solo_raid_id', $soloRaid->id)
+                ->first();
+                
+            $completedNodesCount = \App\Models\UserNodeCompletion::where('user_id', $student->id)
+                ->whereIn('raid_node_id', $soloRaid->nodes->pluck('id'))
+                ->count();
+            
+            $lastSession = \App\Models\SessionSolo::where('user_id', $student->id)
+                ->where('solo_raid_id', $soloRaid->id)
+                ->latest('waktu_mulai')
+                ->first();
+
+            $attempts = \App\Models\SessionSolo::where('user_id', $student->id)
+                ->where('solo_raid_id', $soloRaid->id)
+                ->count();
+                
+            $monitoringData[] = [
+                'user' => $student,
+                'progress' => $progress ? $progress->status : 'belum mulai',
+                'completed_nodes_count' => $completedNodesCount,
+                'total_nodes' => $soloRaid->nodes->where('type', 'content')->count(),
+                'last_session' => $lastSession,
+                'attempts' => $attempts,
+                'last_active' => $lastSession ? $lastSession->waktu_mulai : ($progress ? $progress->updated_at : null),
+                'boss_defeated' => $lastSession ? $lastSession->boss_kalah : false
+            ];
+        }
+
+        $monitoringData = collect($monitoringData)->sortByDesc(function ($item) {
+            return $item['last_active'] ?? '0000-00-00 00:00:00';
+        })->values();
+
+        return view('dosen.events.monitoring.index', compact('soloRaid', 'monitoringData'));
+    }
+
+    public function monitoringDetail(SoloRaid $soloRaid, \App\Models\User $user)
+    {
+        if ($soloRaid->created_by !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $soloRaid->load('nodes');
+        
+        $nodeCompletions = \App\Models\UserNodeCompletion::with('node')
+            ->where('user_id', $user->id)
+            ->whereIn('raid_node_id', $soloRaid->nodes->pluck('id'))
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'type' => 'materi',
+                    'title' => 'Membaca materi: ' . ($item->node ? $item->node->title : 'Unknown'),
+                    'time' => $item->created_at,
+                    'status' => 'Selesai'
+                ];
+            });
+            
+        $quizSessions = \App\Models\SessionSolo::where('user_id', $user->id)
+            ->where('solo_raid_id', $soloRaid->id)
+            ->get()
+            ->flatMap(function ($session) {
+                $events = [
+                    [
+                        'type' => 'kuis_mulai',
+                        'title' => 'Memulai Kuis (Level ' . ucfirst($session->level) . ' - Percobaan #' . $session->attempt_number . ')',
+                        'time' => $session->waktu_mulai,
+                        'status' => 'Mulai'
+                    ]
+                ];
+                
+                if ($session->waktu_selesai) {
+                    $statusDetail = 'Skor: ' . round($session->skor_akhir) . '. Boss ' . ($session->boss_kalah ? 'Kalahkan' : 'Bertahan');
+                    if ($session->soloRaid && $session->soloRaid->type === 'learning') {
+                         $statusDetail = 'Skor: ' . round($session->skor_akhir);
+                    }
+
+                    $events[] = [
+                        'type' => 'kuis_selesai',
+                        'title' => 'Menyelesaikan Kuis (Level ' . ucfirst($session->level) . ' - Percobaan #' . $session->attempt_number . ')',
+                        'time' => $session->waktu_selesai,
+                        'status' => $statusDetail
+                    ];
+                }
+                
+                return $events;
+            });
+
+        $timeline = collect($nodeCompletions)->concat($quizSessions)->sortByDesc('time')->values();
+        
+        $progress = \App\Models\UserEventProgress::where('user_id', $user->id)
+            ->where('solo_raid_id', $soloRaid->id)
+            ->first();
+
+        return view('dosen.events.monitoring.detail', compact('soloRaid', 'user', 'timeline', 'progress'));
+    }
 }

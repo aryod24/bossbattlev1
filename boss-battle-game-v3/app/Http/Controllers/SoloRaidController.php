@@ -22,47 +22,67 @@ class SoloRaidController extends Controller
         }
 
         $currentSection = $user->current_section ?? 'Easy';
-        $sections       = ['Easy', 'Medium', 'Hard'];
+        $sections = ['Easy', 'Medium', 'Hard'];
+        $sectionRanks = ['Easy' => 1, 'Medium' => 2, 'Hard' => 3];
+        $userRank = $sectionRanks[$currentSection] ?? 1;
 
-        // Get all events in current section, ordered
-        $events = SoloRaid::where('status', 'active')
-            ->where('section', $currentSection)
-            ->ordered()
-            ->get();
+        $eventsBySection = [];
 
-        // Load UserEventProgress for each event
+        // Load UserEventProgress for all events to avoid N+1
         $progressMap = UserEventProgress::where('user_id', $user->id)
-            ->whereIn('solo_raid_id', $events->pluck('id'))
             ->get()
             ->keyBy('solo_raid_id');
 
-        // Determine which events are unlocked (linear unlock)
-        $unlockedIds = [];
-        foreach ($events as $i => $event) {
-            if ($i === 0) {
-                $unlockedIds[] = $event->id; // First always unlocked
-            } else {
-                $prevEvent = $events[$i - 1];
-                $prevProgress = $progressMap[$prevEvent->id] ?? null;
-                if ($prevProgress && $prevProgress->status === 'completed') {
-                    $unlockedIds[] = $event->id;
+        foreach ($sections as $sectionName) {
+            $events = SoloRaid::where('status', 'active')
+                ->where('section', $sectionName)
+                ->ordered()
+                ->get();
+
+            $sectionRank = $sectionRanks[$sectionName];
+            $isSectionUnlocked = $sectionRank <= $userRank;
+            
+            $unlockedIds = [];
+            
+            if ($isSectionUnlocked) {
+                // Determine linear progression unlocks within the section
+                foreach ($events as $i => $event) {
+                    if ($i === 0) {
+                        $unlockedIds[] = $event->id; // First event always unlocked if section is unlocked
+                    } else {
+                        $prevEvent = $events[$i - 1];
+                        $prevProgress = $progressMap[$prevEvent->id] ?? null;
+                        if ($prevProgress && $prevProgress->status === 'completed') {
+                            $unlockedIds[] = $event->id;
+                        }
+                    }
                 }
             }
+
+            // Attach progress & unlock status to each event
+            $events->each(function ($event) use ($progressMap, $unlockedIds) {
+                $event->progress = $progressMap[$event->id] ?? null;
+                $event->is_unlocked = in_array($event->id, $unlockedIds);
+            });
+
+            $eventsBySection[$sectionName] = [
+                'is_unlocked' => $isSectionUnlocked,
+                'events' => $events
+            ];
         }
 
-        // Attach progress & unlock status to each event
-        $events->each(function ($event) use ($progressMap, $unlockedIds) {
-            $event->progress   = $progressMap[$event->id] ?? null;
-            $event->is_unlocked = in_array($event->id, $unlockedIds);
-        });
-
-        return view('solo.index', compact('events', 'currentSection'));
+        return view('solo.index', compact('eventsBySection', 'currentSection'));
     }
 
     // ─── MAP ──────────────────────────────────────────────────────────────────
 
     public function map(SoloRaid $soloRaid, SoloBattleService $battleService)
     {
+        // Boss-type raids don't need the dungeon map — go straight to boss intro
+        if ($soloRaid->type === 'boss') {
+            return redirect()->route('solo.boss', $soloRaid);
+        }
+
         // Period validation
         if (now()->lt($soloRaid->tanggal_mulai) || now()->gt($soloRaid->tanggal_selesai)) {
             return redirect()->route('solo.index')->with('error', 'Periode event ini belum dimulai atau sudah berakhir.');
@@ -194,7 +214,7 @@ class SoloRaidController extends Controller
             return redirect()->route('solo.index')->with('error', 'Periode boss battle ini sudah berakhir.');
         }
 
-        $section = $user->current_section ?? 'Easy';
+        $section = $soloRaid->section ?? 'Easy';
 
         // Boss name based on section
         $bossName = match ($section) {

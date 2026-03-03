@@ -26,14 +26,6 @@
                                 </option>
                             @endforeach
                         </optgroup>
-
-                        <optgroup label="Multiplayer Events (Leaderboard)">
-                            @foreach($events as $event)
-                                <option value="event:{{ $event->event_id }}">
-                                    {{ $event->title }} ({{ $event->created_at->format('d M Y') }})
-                                </option>
-                            @endforeach
-                        </optgroup>
                     </select>
                 </div>
 

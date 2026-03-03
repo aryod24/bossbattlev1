@@ -81,6 +81,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::put('password', [\App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('password.update');
 
     Route::resource('solo-raids', SoloRaidAdminController::class);
+    Route::get('solo-raids/{soloRaid}/monitoring', [SoloRaidAdminController::class, 'monitoring'])->name('solo-raids.monitoring');
+    Route::get('solo-raids/{soloRaid}/monitoring/{user}', [SoloRaidAdminController::class, 'monitoringDetail'])->name('solo-raids.monitoring.detail');
     Route::post('solo-raids/{soloRaid}/duplicate', [SoloRaidAdminController::class, 'duplicate'])->name('solo-raids.duplicate');
     Route::post('solo-raids/{soloRaid}/toggle-level', [SoloRaidAdminController::class, 'toggleLevel'])->name('solo-raids.toggle-level');
     
@@ -116,6 +118,8 @@ Route::middleware(['auth', 'verified'])->prefix('dosen')->name('dosen.')->group(
 
     // Event Management (same as solo-raids for dosen)
     Route::resource('events', \App\Http\Controllers\Dosen\EventController::class);
+    Route::get('events/{soloRaid}/monitoring', [\App\Http\Controllers\Dosen\EventController::class, 'monitoring'])->name('events.monitoring');
+    Route::get('events/{soloRaid}/monitoring/{user}', [\App\Http\Controllers\Dosen\EventController::class, 'monitoringDetail'])->name('events.monitoring.detail');
     Route::post('events/{soloRaid}/duplicate', [\App\Http\Controllers\Dosen\EventController::class, 'duplicate'])->name('events.duplicate');
     Route::post('events/{soloRaid}/toggle-level', [\App\Http\Controllers\Dosen\EventController::class, 'toggleLevel'])->name('events.toggle-level');
     

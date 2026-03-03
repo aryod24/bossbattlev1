@@ -74,6 +74,9 @@
                         </td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.solo-raids.monitoring', $raid) }}" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20 text-primary" title="Monitoring">
+                                    <span class="material-symbols-outlined text-base">monitoring</span>
+                                </a>
                                 <a href="{{ route('admin.solo-raids.edit', $raid) }}"
                                    class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md hover:bg-primary/20 text-xs font-semibold
                                           {{ $raid->type === 'boss' ? 'text-red-400 hover:text-red-300' : 'text-primary hover:text-primary' }}"

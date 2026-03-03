@@ -37,7 +37,7 @@ class UserController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', 'min:8'],
-            'role' => ['required', 'string', 'in:student,admin'], // Adjust roles as needed
+            'role' => ['required', 'string', 'in:student,dosen,admin'], // Adjust roles as needed
             'nim' => ['nullable', 'string', 'max:20', 'unique:users'],
             'kelas' => ['nullable', 'string', 'max:20'],
         ]);
@@ -81,7 +81,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', 'string', 'in:student,admin'],
+            'role' => ['required', 'string', 'in:student,dosen,admin'],
             'nim' => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($user->id)],
             'kelas' => ['nullable', 'string', 'max:20'],
             'password' => ['nullable', 'confirmed', 'min:8'],

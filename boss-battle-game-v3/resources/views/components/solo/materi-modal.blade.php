@@ -43,12 +43,14 @@
                     Tutup
                 </button>
                 <button type="button" 
-                        @click="markNodeDone()"
-                        :disabled="isMarkingDone"
-                        class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 sm:px-6 py-2 sm:py-2.5 bg-success text-sm sm:text-base font-medium text-black hover:brightness-90 focus:outline-none transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                        @click="!isNodeAlreadyDone && markNodeDone()"
+                        :disabled="isMarkingDone || isNodeAlreadyDone"
+                        :class="isNodeAlreadyDone 
+                            ? 'inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 sm:px-6 py-2 sm:py-2.5 bg-surface-light text-sm sm:text-base font-medium text-text-muted cursor-not-allowed opacity-70 focus:outline-none'
+                            : 'inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 sm:px-6 py-2 sm:py-2.5 bg-success text-sm sm:text-base font-medium text-black hover:brightness-90 focus:outline-none transition-colors disabled:opacity-60 disabled:cursor-not-allowed'">
                     <span class="material-symbols-outlined" style="font-size: 20px;" x-show="!isMarkingDone">check_circle</span>
                     <span x-show="isMarkingDone" class="inline-block w-4 h-4 border-2 border-black/40 border-t-black rounded-full animate-spin"></span>
-                    <span x-text="isMarkingDone ? 'Menyimpan...' : '✓ Selesai Baca'"></span>
+                    <span x-text="isNodeAlreadyDone ? 'Sudah Dibaca' : (isMarkingDone ? 'Menyimpan...' : 'Selesai Baca')"></span>
                 </button>
             </div>
         </div>
@@ -56,6 +58,10 @@
 </div>
 
 <style>
+    .prose > :first-child {
+        margin-top: 0 !important;
+    }
+    
     /* Additional prose styling for mobile */
     @media (max-width: 640px) {
         .prose {

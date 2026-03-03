@@ -21,6 +21,7 @@
                 <label class="block text-sm font-bold text-text-light-secondary mb-2">Account Role</label>
                 <select name="role" class="w-full rounded-xl border-border bg-surface-dark text-text-primary focus:border-primary focus:ring-primary">
                     <option value="student" {{ old('role', $user->role ?? '') === 'student' ? 'selected' : '' }}>Student</option>
+                    <option value="dosen" {{ old('role', $user->role ?? '') === 'dosen' ? 'selected' : '' }}>Dosen</option>
                     <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>Administrator</option>
                 </select>
                 @error('role') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror

@@ -1,10 +1,12 @@
 <x-admin-layout>
     <!-- EasyMDE CSS -->
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <!-- EasyMDE JS -->
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <style>
         .EasyMDEContainer { background: #252526; }
         .EasyMDEContainer .CodeMirror { background: #1e1e1e; color: #d4d4d4; border: 1px solid #333; }
-        .EasyMDEContainer .CodeMirror-scroll { max-height: 400px; }
+        .EasyMDEContainer .CodeMirror-scroll { max-height: 300px; }
         .EasyMDEContainer .CodeMirror-fullscreen .CodeMirror-scroll { max-height: none; }
         .EasyMDEContainer .editor-toolbar { background: #252526; border-color: #333; }
         .EasyMDEContainer .editor-toolbar button { color: #858585 !important; }
@@ -135,14 +137,32 @@
                                         <label class="block text-xs font-medium text-text-muted mb-1">Title</label>
                                         <input type="text" x-model="node.title" class="block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary text-sm" required>
                                     </div>
-                                    <div x-show="node.type === 'content'">
+                                    <div x-show="node.type === 'content'"
+                                         x-init="$nextTick(() => {
+                                             const ta = $el.querySelector('textarea');
+                                             if (ta && !ta._easymde) {
+                                                 const easyMde = new EasyMDE({
+                                                     element: ta,
+                                                     initialValue: node.content,
+                                                     spellChecker: false,
+                                                     autosave: { enabled: false },
+                                                     toolbar: ['bold','italic','strikethrough','|','heading-1','heading-2','heading-3','|','code','quote','unordered-list','ordered-list','|','link','image','table','|','preview','side-by-side','fullscreen'],
+                                                     minHeight: '180px',
+                                                 });
+                                                 ta._easymde = easyMde;
+                                                 easyMde.codemirror.on('change', () => {
+                                                     node.content = easyMde.value();
+                                                 });
+                                             }
+                                         })">
                                         <label class="block text-xs font-medium text-text-muted mb-1">Content (Markdown)</label>
-                                        <textarea x-model="node.content" rows="6" placeholder="Tulis materi dalam format Markdown..." class="block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary font-mono text-sm"></textarea>
+                                        <textarea placeholder="Tulis materi dalam format Markdown..."></textarea>
                                     </div>
                                     <div x-show="node.type === 'quiz'">
                                         <p class="text-xs text-text-muted italic">Quiz akan menggunakan soal dari Question Bank yang dipilih, dengan konfigurasi level sesuai Section.</p>
                                     </div>
                                 </div>
+                                <input type="hidden" :name="'nodes[' + index + '][id]'" :value="node.id || ''">
                                 <input type="hidden" :name="'nodes[' + index + '][type]'" :value="node.type">
                                 <input type="hidden" :name="'nodes[' + index + '][title]'" :value="node.title">
                                 <input type="hidden" :name="'nodes[' + index + '][content]'" :value="node.content">
@@ -157,35 +177,7 @@
                 </div>
 
                 <!-- Boss Config (only for Boss type) -->
-                <div class="mb-6" x-show="eventType === 'boss'" x-cloak>
-                    <h3 class="text-lg font-medium text-text-primary mb-4">⚔️ Boss Configuration</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="border border-border p-4 rounded-md bg-background-dark">
-                            <div class="flex items-center mb-4">
-                                <input type="checkbox" name="easy_enabled" id="easy_enabled" value="1" {{ $soloRaid->easy_enabled ? 'checked' : '' }} class="h-4 w-4 text-primary focus:ring-primary border-border rounded bg-background-dark">
-                                <label for="easy_enabled" class="ml-2 block text-sm font-medium text-text-primary">Enable Easy</label>
-                            </div>
-                            <label for="boss_easy_name" class="block text-sm font-medium text-text-muted">Boss Name</label>
-                            <input type="text" name="boss_easy_name" id="boss_easy_name" value="{{ $soloRaid->boss_easy_name }}" class="mt-1 block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary">
-                        </div>
-                        <div class="border border-border p-4 rounded-md bg-background-dark">
-                            <div class="flex items-center mb-4">
-                                <input type="checkbox" name="medium_enabled" id="medium_enabled" value="1" {{ $soloRaid->medium_enabled ? 'checked' : '' }} class="h-4 w-4 text-primary focus:ring-primary border-border rounded bg-background-dark">
-                                <label for="medium_enabled" class="ml-2 block text-sm font-medium text-text-primary">Enable Medium</label>
-                            </div>
-                            <label for="boss_medium_name" class="block text-sm font-medium text-text-muted">Boss Name</label>
-                            <input type="text" name="boss_medium_name" id="boss_medium_name" value="{{ $soloRaid->boss_medium_name }}" class="mt-1 block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary">
-                        </div>
-                        <div class="border border-border p-4 rounded-md bg-background-dark">
-                            <div class="flex items-center mb-4">
-                                <input type="checkbox" name="hard_enabled" id="hard_enabled" value="1" {{ $soloRaid->hard_enabled ? 'checked' : '' }} class="h-4 w-4 text-primary focus:ring-primary border-border rounded bg-background-dark">
-                                <label for="hard_enabled" class="ml-2 block text-sm font-medium text-text-primary">Enable Hard</label>
-                            </div>
-                            <label for="boss_hard_name" class="block text-sm font-medium text-text-muted">Boss Name</label>
-                            <input type="text" name="boss_hard_name" id="boss_hard_name" value="{{ $soloRaid->boss_hard_name }}" class="mt-1 block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary">
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="flex justify-end">
                     <a href="{{ route('admin.solo-raids.index') }}" class="bg-border hover:bg-text-muted text-text-primary font-bold py-2 px-4 rounded mr-2">Cancel</a>

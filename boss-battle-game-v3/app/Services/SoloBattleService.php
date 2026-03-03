@@ -268,8 +268,11 @@ class SoloBattleService
         // 5. Update user XP & Check Level Up
         $levelUpResult = $this->xpService->addXP($session->user, $finalXP);
 
-        // 6. Check badges
-        $newBadges = $this->badgeService->checkAll($session->user, $session);
+        // 6. Check badges (only for boss-type raids, not latihan soal)
+        $newBadges = [];
+        if ($session->soloRaid && $session->soloRaid->type === 'boss') {
+            $newBadges = $this->badgeService->checkAll($session->user, $session);
+        }
 
         // 7. Track event progress (Adaptive Learning)
         $sectionUpgrade = null;

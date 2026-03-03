@@ -340,6 +340,7 @@
                 completedNodeIds: @json($completedNodeIds),
                 currentNodeId: null,
                 isMarkingDone: false,
+                isNodeAlreadyDone: false,
                 // Modal state
                 showInfoModal: false,
                 infoTitle: '',
@@ -369,6 +370,7 @@
                             this.currentNodeId = data.id;
                             this.infoTitle = data.title;
                             this.renderedContent = marked.parse(data.content || 'Belum ada materi.');
+                            this.isNodeAlreadyDone = this.completedNodeIds.includes(data.id);
                             this.showInfoModal = true;
                             this.isMarkingDone = false;
                         })

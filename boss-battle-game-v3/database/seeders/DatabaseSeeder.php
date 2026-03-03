@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             SoloRaidSeeder::class,
             QuestionBankSeeder::class,   // Bank 1: PHP Basics (74 questions)
             QuestionBankSeeder2::class,  // Bank 2: PHP Advanced (75 questions)
-            QuestionBankSeeder3::class,  // Bank 3: JavaScript (75 questions)
+            BadgeSeeder::class,
         ]);
     }
 }

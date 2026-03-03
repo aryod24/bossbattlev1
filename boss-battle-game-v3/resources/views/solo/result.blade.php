@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battle Result - {{ $bossName }}</title>
+    <title>Result - {{ $session->soloRaid->type === 'learning' ? 'Latihan Soal' : $bossName }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -86,23 +86,41 @@
 
             <!-- Result Output -->
             <div class="mb-8">
-                <div class="mb-2">
-                    <span class="text-vscode-muted">[INFO]</span> Analyzing battle data...
-                </div>
-                <div class="mb-2">
-                    <span class="text-vscode-muted">[INFO]</span> Target: <span class="text-vscode-string">'{{ $bossName }}'</span>
-                </div>
-                
-                @if($session->boss_kalah)
-                    <div class="mt-6 mb-6 p-4 border-l-4 border-success-green bg-vscode-bg/50">
-                        <h1 class="text-2xl md:text-3xl font-bold text-success-green mb-2">BUILD SUCCESSFUL</h1>
-                        <p class="text-vscode-text">Target eliminated. Mission accomplished.</p>
+                @if($session->soloRaid->type === 'learning')
+                    <div class="mb-2">
+                        <span class="text-vscode-muted">[INFO]</span> Evaluasi Latihan Soal selesai...
                     </div>
+                    
+                    @if($session->boss_kalah)
+                        <div class="mt-6 mb-6 p-4 border-l-4 border-success-green bg-vscode-bg/50">
+                            <h1 class="text-2xl md:text-3xl font-bold text-success-green mb-2">LULUS</h1>
+                            <p class="text-vscode-text">Selamat! Anda telah memahami materi dengan baik.</p>
+                        </div>
+                    @else
+                        <div class="mt-6 mb-6 p-4 border-l-4 border-boss-red bg-vscode-bg/50">
+                            <h1 class="text-2xl md:text-3xl font-bold text-boss-red mb-2">TIDAK LULUS</h1>
+                            <p class="text-vscode-text">Skor Anda belum memenuhi batas kelulusan. Silakan pelajari kembali materi.</p>
+                        </div>
+                    @endif
                 @else
-                    <div class="mt-6 mb-6 p-4 border-l-4 border-boss-red bg-vscode-bg/50">
-                        <h1 class="text-2xl md:text-3xl font-bold text-boss-red mb-2">BUILD FAILED</h1>
-                        <p class="text-vscode-text">Target remains active. Mission failed.</p>
+                    <div class="mb-2">
+                        <span class="text-vscode-muted">[INFO]</span> Analyzing battle data...
                     </div>
+                    <div class="mb-2">
+                        <span class="text-vscode-muted">[INFO]</span> Target: <span class="text-vscode-string">'{{ $bossName }}'</span>
+                    </div>
+                    
+                    @if($session->boss_kalah)
+                        <div class="mt-6 mb-6 p-4 border-l-4 border-success-green bg-vscode-bg/50">
+                            <h1 class="text-2xl md:text-3xl font-bold text-success-green mb-2">BUILD SUCCESSFUL</h1>
+                            <p class="text-vscode-text">Target eliminated. Mission accomplished.</p>
+                        </div>
+                    @else
+                        <div class="mt-6 mb-6 p-4 border-l-4 border-boss-red bg-vscode-bg/50">
+                            <h1 class="text-2xl md:text-3xl font-bold text-boss-red mb-2">BUILD FAILED</h1>
+                            <p class="text-vscode-text">Target remains active. Mission failed.</p>
+                        </div>
+                    @endif
                 @endif
             </div>
 

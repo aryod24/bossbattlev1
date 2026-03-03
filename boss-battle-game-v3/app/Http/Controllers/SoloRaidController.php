@@ -2,155 +2,232 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RaidNode;
 use App\Models\SoloRaid;
+use App\Models\UserEventProgress;
+use App\Models\UserNodeCompletion;
 use Illuminate\Http\Request;
+use App\Services\SoloBattleService;
 
 class SoloRaidController extends Controller
 {
+    // ─── INDEX ────────────────────────────────────────────────────────────────
+
     public function index()
     {
-        // Show all active raids, including expired ones
-        $raids = SoloRaid::where('status', 'active')
-            ->whereDate('tanggal_mulai', '<=', now())
-            ->orderBy('tanggal_selesai', 'desc')
-            ->paginate(6);
-            
-        return view('solo.index', compact('raids'));
+        $user = auth()->user();
+
+        if ($user->needsPretest()) {
+            return redirect()->route('pretest.index');
+        }
+
+        $currentSection = $user->current_section ?? 'Easy';
+        $sections       = ['Easy', 'Medium', 'Hard'];
+
+        // Get all events in current section, ordered
+        $events = SoloRaid::where('status', 'active')
+            ->where('section', $currentSection)
+            ->ordered()
+            ->get();
+
+        // Load UserEventProgress for each event
+        $progressMap = UserEventProgress::where('user_id', $user->id)
+            ->whereIn('solo_raid_id', $events->pluck('id'))
+            ->get()
+            ->keyBy('solo_raid_id');
+
+        // Determine which events are unlocked (linear unlock)
+        $unlockedIds = [];
+        foreach ($events as $i => $event) {
+            if ($i === 0) {
+                $unlockedIds[] = $event->id; // First always unlocked
+            } else {
+                $prevEvent = $events[$i - 1];
+                $prevProgress = $progressMap[$prevEvent->id] ?? null;
+                if ($prevProgress && $prevProgress->status === 'completed') {
+                    $unlockedIds[] = $event->id;
+                }
+            }
+        }
+
+        // Attach progress & unlock status to each event
+        $events->each(function ($event) use ($progressMap, $unlockedIds) {
+            $event->progress   = $progressMap[$event->id] ?? null;
+            $event->is_unlocked = in_array($event->id, $unlockedIds);
+        });
+
+        return view('solo.index', compact('events', 'currentSection'));
     }
 
-    public function map(SoloRaid $soloRaid, \App\Services\SoloBattleService $battleService)
+    // ─── MAP ──────────────────────────────────────────────────────────────────
+
+    public function map(SoloRaid $soloRaid, SoloBattleService $battleService)
     {
         // Period validation
         if (now()->lt($soloRaid->tanggal_mulai) || now()->gt($soloRaid->tanggal_selesai)) {
-            return redirect()->route('solo.index')->with('error', 'Periode raid ini belum dimulai atau sudah berakhir.');
+            return redirect()->route('solo.index')->with('error', 'Periode event ini belum dimulai atau sudah berakhir.');
         }
 
-        // Check for active session (any raid)
-        $activeSession = \App\Models\SessionSolo::where('user_id', auth()->id())
+        $user = auth()->user();
+
+        // Check for active session (handle expired)
+        $activeSession = \App\Models\SessionSolo::where('user_id', $user->id)
             ->whereNull('waktu_selesai')
             ->with('soloRaid')
             ->first();
 
-        // Handle Expired Session (e.g. Laptop died / Browser closed)
         if ($activeSession) {
-            $config = \App\Services\SoloBattleService::LEVEL_CONFIG[$activeSession->level] ?? \App\Services\SoloBattleService::LEVEL_CONFIG['Easy'];
+            $config   = SoloBattleService::LEVEL_CONFIG[$activeSession->level] ?? SoloBattleService::LEVEL_CONFIG['Easy'];
             $deadline = $activeSession->waktu_mulai->addMinutes($config['timer_minutes']);
-            
             if (now()->greaterThan($deadline)) {
                 $battleService->finishSession($activeSession->id, $deadline);
                 return redirect()->route('solo.result', $activeSession->id);
             }
         }
 
-        // Fetch User Stats
-        $userStats = [
-            'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                ->where('solo_raid_id', $soloRaid->id)
-                ->count(),
-            'best_score' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                ->where('solo_raid_id', $soloRaid->id)
-                ->max('skor_akhir') ?? 0,
-            'total_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                ->where('solo_raid_id', $soloRaid->id)
-                ->sum('xp_diperoleh') ?? 0,
-            'completed_levels' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                ->where('solo_raid_id', $soloRaid->id)
-                ->where('boss_kalah', true)
-                ->distinct('level')
-                ->count('level'),
-            'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                ->where('solo_raid_id', $soloRaid->id)
-                ->max('xp_diperoleh') ?? 0,
-        ];
+        // Load nodes ordered
+        $nodes = $soloRaid->nodes()->get();
 
-        // Fetch Session History
-        $sessionHistory = \App\Models\SessionSolo::where('user_id', auth()->id())
+        // Load completed node IDs for this event's nodes
+        $nodeIds = $nodes->pluck('id');
+        $completedNodeIds = UserNodeCompletion::where('user_id', $user->id)
+            ->whereIn('raid_node_id', $nodeIds)
+            ->pluck('raid_node_id')
+            ->toArray();
+
+        // Session history (for info panel)
+        $sessionHistory = \App\Models\SessionSolo::where('user_id', $user->id)
             ->where('solo_raid_id', $soloRaid->id)
             ->orderBy('waktu_mulai', 'desc')
             ->get();
 
-        // Per-level stats for modal
-        $levelStats = [
-            'easy' => [
-                'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                    ->where('solo_raid_id', $soloRaid->id)
-                    ->where('level', 'Easy')
-                    ->whereNotNull('waktu_selesai')
-                    ->count(),
-                'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                    ->where('solo_raid_id', $soloRaid->id)
-                    ->where('level', 'Easy')
-                    ->whereNotNull('waktu_selesai')
-                    ->max('xp_diperoleh') ?? 0,
-            ],
-            'medium' => [
-                'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                    ->where('solo_raid_id', $soloRaid->id)
-                    ->where('level', 'Medium')
-                    ->whereNotNull('waktu_selesai')
-                    ->count(),
-                'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                    ->where('solo_raid_id', $soloRaid->id)
-                    ->where('level', 'Medium')
-                    ->whereNotNull('waktu_selesai')
-                    ->max('xp_diperoleh') ?? 0,
-            ],
-            'hard' => [
-                'attempts' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                    ->where('solo_raid_id', $soloRaid->id)
-                    ->where('level', 'Hard')
-                    ->whereNotNull('waktu_selesai')
-                    ->count(),
-                'max_xp' => \App\Models\SessionSolo::where('user_id', auth()->id())
-                    ->where('solo_raid_id', $soloRaid->id)
-                    ->where('level', 'Hard')
-                    ->whereNotNull('waktu_selesai')
-                    ->max('xp_diperoleh') ?? 0,
-            ],
+        $userStats = [
+            'attempts'  => $sessionHistory->count(),
+            'completed_nodes' => count($completedNodeIds),
+            'total_nodes'     => $nodes->where('type', 'content')->count(),
         ];
 
-        return view('solo.map', compact('soloRaid', 'userStats', 'sessionHistory', 'levelStats', 'activeSession'));
+        return view('solo.map', compact(
+            'soloRaid', 'nodes', 'completedNodeIds', 'activeSession', 'sessionHistory', 'userStats'
+        ));
     }
 
+    // ─── COMPLETE NODE ────────────────────────────────────────────────────────
+
+    public function completeNode(RaidNode $node)
+    {
+        $user = auth()->user();
+
+        // Mark content node as completed (idempotent)
+        UserNodeCompletion::firstOrCreate([
+            'user_id'      => $user->id,
+            'raid_node_id' => $node->id,
+        ]);
+
+        // Check if ALL content nodes for this event are now done
+        $soloRaid    = $node->soloRaid;
+        $contentNodes = RaidNode::where('solo_raid_id', $soloRaid->id)
+            ->where('type', 'content')
+            ->pluck('id');
+
+        $completedCount = UserNodeCompletion::where('user_id', $user->id)
+            ->whereIn('raid_node_id', $contentNodes)
+            ->count();
+
+        $allDone = $completedCount >= $contentNodes->count();
+
+        // Ensure UserEventProgress exists
+        UserEventProgress::firstOrCreate(
+            ['user_id' => $user->id, 'solo_raid_id' => $soloRaid->id],
+            ['status' => 'in_progress']
+        );
+
+        // Find order of next node
+        $nextNode = RaidNode::where('solo_raid_id', $soloRaid->id)
+            ->where('order', '>', $node->order)
+            ->orderBy('order')
+            ->first();
+
+        return response()->json([
+            'success'      => true,
+            'all_done'     => $allDone,
+            'next_order'   => $nextNode?->order,
+        ]);
+    }
+
+    // ─── MATERI (JSON for modal) ───────────────────────────────────────────────
 
     public function materi(SoloRaid $soloRaid, $nodeId)
     {
-        $content = match($nodeId) {
-            '1' => $soloRaid->materi_node_1,
-            '2' => $soloRaid->materi_node_2,
-            '3' => $soloRaid->materi_node_3,
-            default => null
-        };
+        $node = RaidNode::where('solo_raid_id', $soloRaid->id)
+            ->where('order', $nodeId)
+            ->where('type', 'content')
+            ->first();
 
-        if (!$content) {
+        if (!$node) {
             return response()->json(['error' => 'Materi tidak ditemukan'], 404);
         }
 
+        // Track progress
+        $user = auth()->user();
+        UserEventProgress::firstOrCreate(
+            ['user_id' => $user->id, 'solo_raid_id' => $soloRaid->id],
+            ['status' => 'in_progress']
+        );
+
         return response()->json([
-            'title' => "Materi Node $nodeId",
-            'content' => $content
+            'id'      => $node->id,
+            'title'   => $node->title,
+            'content' => $node->content,
+            'order'   => $node->order,
         ]);
     }
+
+    // ─── BOSS INFO PAGE ───────────────────────────────────────────────────────
+
+    public function boss(SoloRaid $soloRaid)
+    {
+        $user = auth()->user();
+
+        // Period validation
+        if (now()->lt($soloRaid->tanggal_mulai) || now()->gt($soloRaid->tanggal_selesai)) {
+            return redirect()->route('solo.index')->with('error', 'Periode boss battle ini sudah berakhir.');
+        }
+
+        $section = $user->current_section ?? 'Easy';
+
+        // Boss name based on section
+        $bossName = match ($section) {
+            'Easy'   => $soloRaid->boss_easy_name,
+            'Medium' => $soloRaid->boss_medium_name,
+            'Hard'   => $soloRaid->boss_hard_name,
+            default  => $soloRaid->boss_easy_name,
+        };
+
+        $levelConfig = SoloBattleService::LEVEL_CONFIG[$section] ?? SoloBattleService::LEVEL_CONFIG['Easy'];
+
+        // Session history for this boss
+        $sessionHistory = \App\Models\SessionSolo::where('user_id', $user->id)
+            ->where('solo_raid_id', $soloRaid->id)
+            ->orderBy('waktu_mulai', 'desc')
+            ->get();
+
+        $bestSession = $sessionHistory->where('boss_kalah', true)->first();
+
+        return view('solo.boss', compact(
+            'soloRaid', 'bossName', 'section', 'levelConfig', 'sessionHistory', 'bestSession'
+        ));
+    }
+
+    // ─── LEVEL SELECT (kept for compatibility) ────────────────────────────────
 
     public function levelSelect(SoloRaid $soloRaid)
     {
         $levels = [
-            'easy' => [
-                'enabled' => $soloRaid->easy_enabled,
-                'available' => $soloRaid->easy_enabled && now()->between($soloRaid->easy_start_date ?? $soloRaid->tanggal_mulai, $soloRaid->easy_end_date ?? $soloRaid->tanggal_selesai),
-                'start' => $soloRaid->easy_start_date ?? $soloRaid->tanggal_mulai,
-                'end' => $soloRaid->easy_end_date ?? $soloRaid->tanggal_selesai,
-            ],
-            'medium' => [
-                'enabled' => $soloRaid->medium_enabled,
-                'available' => $soloRaid->medium_enabled && now()->between($soloRaid->medium_start_date ?? $soloRaid->tanggal_mulai, $soloRaid->medium_end_date ?? $soloRaid->tanggal_selesai),
-            ],
-            'hard' => [
-                'enabled' => $soloRaid->hard_enabled,
-                'available' => $soloRaid->hard_enabled && now()->between($soloRaid->hard_start_date ?? $soloRaid->tanggal_mulai, $soloRaid->hard_end_date ?? $soloRaid->tanggal_selesai),
-            ],
+            'easy'   => ['enabled' => $soloRaid->easy_enabled,   'available' => $soloRaid->easy_enabled],
+            'medium' => ['enabled' => $soloRaid->medium_enabled, 'available' => $soloRaid->medium_enabled],
+            'hard'   => ['enabled' => $soloRaid->hard_enabled,   'available' => $soloRaid->hard_enabled],
         ];
-
         return response()->json($levels);
     }
 }

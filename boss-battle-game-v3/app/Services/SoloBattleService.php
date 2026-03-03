@@ -150,16 +150,22 @@ class SoloBattleService
             ->where('question_id', $data['question_id'])
             ->first();
 
+        $isLearning = $session->soloRaid->type === 'learning';
+
         if ($existingAnswer && $existingAnswer->jawaban_user) {
             // Already answered! Return existing result without re-processing damage.
+            $msg = $isLearning
+                ? ($existingAnswer->is_correct ? "Jawaban sudah tersimpan." : "Jawaban salah tersimpan.")
+                : ($existingAnswer->is_correct 
+                    ? "Jawaban sudah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+                    : "Jawaban salah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}");
+
             return [
                 'is_correct' => $existingAnswer->is_correct,
                 'damage' => 0, // No new damage
                 'boss_hp_current' => $session->boss_hp_akhir,
                 'boss_hp_max' => $session->boss_hp_awal,
-                'feedback_message' => $existingAnswer->is_correct
-                    ? "Jawaban sudah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
-                    : "Jawaban salah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+                'feedback_message' => $msg
             ];
         }
 
@@ -200,24 +206,33 @@ class SoloBattleService
             ]);
         }
 
+        $msg = $isLearning
+            ? ($isCorrect ? "Benar!" : "Salah!")
+            : ($isCorrect
+                ? "Benar! Damage {$damage} ke Boss. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+                : "Salah! Boss HP tetap: {$session->boss_hp_akhir}/{$session->boss_hp_awal}");
+
         // 8. Return response
         return [
             'is_correct' => $isCorrect,
             'damage' => $damage,
             'boss_hp_current' => $session->boss_hp_akhir,
             'boss_hp_max' => $session->boss_hp_awal,
-            'feedback_message' => $isCorrect
-                ? "Benar! Damage {$damage} ke Boss. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
-                : "Salah! Boss HP tetap: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+            'feedback_message' => $msg
         ];
     }
 
     public function finishSession($sessionId, $forcedEndTime = null)
     {
-        $session = SessionSolo::with('user')->findOrFail($sessionId);
+        $session = SessionSolo::with('user', 'soloRaid')->findOrFail($sessionId);
         
         if ($session->waktu_selesai) {
             return $session; // Already finished
+        }
+
+        // Skip normal flow for pre-test sessions
+        if ($session->is_pretest) {
+            return $session;
         }
 
         // 1. Calculate duration & Validate End Time
@@ -239,7 +254,7 @@ class SoloBattleService
             ? ($session->jumlah_benar / $session->jumlah_soal) * 100 
             : 0;
 
-        // 3. Determine if boss defeated
+        // 3. Determine if boss defeated / quiz passed
         $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
         $minDamage = $config['min_correct'];
         $session->boss_kalah = ($session->jumlah_benar >= $minDamage) || ($session->skor_akhir >= 100);
@@ -256,6 +271,17 @@ class SoloBattleService
         // 6. Check badges
         $newBadges = $this->badgeService->checkAll($session->user, $session);
 
+        // 7. Track event progress (Adaptive Learning)
+        $sectionUpgrade = null;
+        if ($session->soloRaid && $session->boss_kalah) {
+            $this->trackEventProgress($session);
+            
+            // If boss battle won, upgrade section
+            if ($session->soloRaid->isBoss()) {
+                $sectionUpgrade = $this->upgradeSectionIfBossDefeated($session);
+            }
+        }
+
         return [
             'pemenang' => $session->boss_kalah ? 'Player' : 'Boss',
             'boss_kalah' => $session->boss_kalah,
@@ -265,8 +291,58 @@ class SoloBattleService
             'xp_diperoleh' => $finalXP,
             'durasi' => gmdate("H:i:s", $session->durasi_detik),
             'level_up' => $levelUpResult,
-            'new_badges' => $newBadges
+            'new_badges' => $newBadges,
+            'section_upgrade' => $sectionUpgrade,
         ];
+    }
+
+    /**
+     * Track event progress when a quiz/battle is completed successfully.
+     */
+    private function trackEventProgress(SessionSolo $session): void
+    {
+        \App\Models\UserEventProgress::updateOrCreate(
+            [
+                'user_id' => $session->user_id,
+                'solo_raid_id' => $session->solo_raid_id,
+            ],
+            [
+                'status' => 'completed',
+                'completed_at' => now(),
+            ]
+        );
+    }
+
+    /**
+     * Upgrade user's current_section when Boss Battle is defeated.
+     * Easy → Medium → Hard (no upgrade after Hard).
+     */
+    private function upgradeSectionIfBossDefeated(SessionSolo $session): ?array
+    {
+        $sectionOrder = ['Easy', 'Medium', 'Hard'];
+        $currentSection = $session->soloRaid->section;
+        $currentIndex = array_search($currentSection, $sectionOrder);
+
+        // If already at Hard or section not found, no upgrade
+        if ($currentIndex === false || $currentIndex >= count($sectionOrder) - 1) {
+            return null;
+        }
+
+        $nextSection = $sectionOrder[$currentIndex + 1];
+        $user = $session->user;
+
+        // Only upgrade if user's current section matches the boss's section
+        if ($user->current_section === $currentSection) {
+            $user->update(['current_section' => $nextSection]);
+            return [
+                'upgraded' => true,
+                'from' => $currentSection,
+                'to' => $nextSection,
+                'message' => "🎉 Section {$nextSection} telah terbuka!",
+            ];
+        }
+
+        return null;
     }
 
     public function autoFinishExpiredSessions()

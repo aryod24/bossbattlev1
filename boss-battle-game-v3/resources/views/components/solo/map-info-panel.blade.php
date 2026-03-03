@@ -60,11 +60,11 @@
     <!-- Progress Bar -->
     <div class="mb-8">
         <div class="flex justify-between items-center mb-2">
-            <span class="text-text-primary font-semibold">Raid Progress</span>
-            <span class="text-text-muted font-medium">{{ $stats['completed_levels'] }}/3 Completed</span>
+            <span class="text-text-primary font-semibold">Node Progress</span>
+            <span class="text-text-muted font-medium">{{ $stats['completed_nodes'] }}/{{ $stats['total_nodes'] }} Dibaca</span>
         </div>
         <div class="w-full bg-border rounded-full h-3 overflow-hidden">
-            <div class="bg-gradient-to-r from-primary to-accent-hover h-full rounded-full" style="width: {{ ($stats['completed_levels'] / 3) * 100 }}%"></div>
+            <div class="bg-gradient-to-r from-primary to-accent-hover h-full rounded-full" style="width: {{ $stats['total_nodes'] > 0 ? ($stats['completed_nodes'] / $stats['total_nodes']) * 100 : 0 }}%"></div>
         </div>
     </div>
 

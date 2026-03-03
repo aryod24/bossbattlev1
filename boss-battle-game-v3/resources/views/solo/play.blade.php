@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Solo Boss Battle - {{ $bossName }}</title>
+    <title>{{ $soloRaid->type === 'learning' ? 'Latihan Soal - ' . $soloRaid->nama : 'Boss Battle - ' . $bossName }}</title>
     
     <!-- Tailwind CSS -->
     <!-- Vite Assets (Optimized) -->
@@ -82,6 +82,7 @@
         <!-- STATUS BAR (Top border decoration) -->
         <div class="absolute top-0 left-0 w-full h-1 bg-vscode-primary z-50"></div>
 
+        @if($soloRaid->type !== 'learning')
         <!-- LEFT PANEL: BATTLE ARENA (40%) -->
         <div class="lg:w-2/5 w-full bg-[#1e1e1e] relative flex flex-col border-b lg:border-b-0 lg:border-r border-vscode-border">
             
@@ -91,8 +92,6 @@
                     <span class="bg-vscode-primary/20 text-vscode-primary border border-vscode-primary/30 text-xs font-mono font-bold px-3 py-1 rounded-sm uppercase tracking-wider">
                         Level: {{ $session->level }}
                     </span>
-                    <!-- Attempt count could be dynamic if passed, for now static or removed -->
-                    <!-- <span class="text-vscode-muted text-xs font-mono">Attempt #1</span> -->
                 </div>
                 
                 <!-- Timer Badge -->
@@ -102,6 +101,7 @@
                 </div>
             </div>
 
+            <!-- Boss Battle: Full boss UI -->
             <!-- Main Boss Stage -->
             <div class="flex-1 flex flex-col items-center justify-center p-8 relative mt-12 lg:mt-0">
                 
@@ -161,17 +161,26 @@
                 Ln <span x-text="currentQuestionIndex + 1"></span>, Col 12 &nbsp;&nbsp; UTF-8 &nbsp;&nbsp; JavaScript
             </div>
         </div>
+        @endif
 
-        <!-- RIGHT PANEL: CONSOLE (60%) -->
-        <div class="lg:w-3/5 w-full bg-vscode-bg flex flex-col relative z-0">
+        <!-- RIGHT PANEL: CONSOLE (full width for latihan soal, 60% for boss) -->
+        <div class="{{ $soloRaid->type === 'learning' ? 'w-full' : 'lg:w-3/5 w-full' }} bg-vscode-bg flex flex-col relative z-0">
             
             <!-- Tabs / Breadcrumbs -->
-            <div class="flex items-center bg-vscode-card border-b border-vscode-border">
+            <div class="flex items-center justify-between bg-vscode-card border-b border-vscode-border pr-4">
                 <div class="px-4 py-3 bg-[#1e1e1e] border-t-2 border-t-vscode-primary text-sm font-mono text-vscode-text flex items-center gap-2">
                     <i class="fa-brands fa-js text-yellow-500"></i>
                     soal_<span x-text="(currentQuestionIndex + 1).toString().padStart(2, '0')"></span>
                     <i class="fa-solid fa-xmark ml-2 text-vscode-muted hover:text-white cursor-pointer"></i>
                 </div>
+                
+                @if($soloRaid->type === 'learning')
+                <!-- Timer Badge (Since Left Panel is hidden) -->
+                <div class="flex items-center gap-2 bg-[#1e1e1e] px-3 py-1.5 rounded-sm border border-vscode-border shadow-sm">
+                    <i class="fa-solid fa-clock text-vscode-primary" :class="timeRemaining < 30 ? 'animate-pulse text-boss-red' : ''"></i>
+                    <span class="font-bold text-vscode-text font-mono text-sm" x-text="formatTimer(timeRemaining)"></span>
+                </div>
+                @endif
             </div>
 
             <!-- Progress Bar -->
@@ -191,15 +200,15 @@
                 
                 <!-- Question Block -->
                 <div class="mb-6">
-                    <div class="font-mono text-vscode-muted mb-2 text-sm">// Pertanyaan:</div>
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="font-mono text-vscode-muted text-sm">// Pertanyaan:</div>
+                        <!-- KUNCI JAWABAN (UNTUK TESTING) -->
+                        <div class="font-mono text-yellow-500 font-bold border border-yellow-500/30 bg-[#1e1e1e] px-2 py-1 rounded text-xs uppercase shadow-sm">
+                            <i class="fa-solid fa-key mr-1"></i> Jawaban: <span x-text="currentQuestion.jawaban_benar"></span>
+                        </div>
+                    </div>
                     <div class="font-medium text-lg lg:text-xl leading-relaxed text-[#d4d4d4] prose prose-invert max-w-none"
                          x-html="currentQuestion.soal_text">
-                    </div>
-                    
-                    <!-- Debug / Cheat Sheet -->
-                    <div class="mt-2 p-2 bg-[#2d2d2d] border border-dashed border-[#444] rounded text-xs text-[#858585] font-mono inline-block">
-                        <i class="fa-solid fa-bug text-yellow-500 mr-1"></i> 
-                        Using Cheat: Answer is <span x-text="currentQuestion.jawaban_benar" class="font-bold text-[#ce9178]"></span>
                     </div>
                 </div>
 
@@ -248,7 +257,7 @@
                     <span><i class="fa-solid fa-code-branch"></i> main*</span>
                 </div>
                 <div>
-                    <span>Solo Boss Battle</span>
+                    <span>{{ $soloRaid->type === 'learning' ? 'Latihan Soal' : 'Solo Boss Battle' }}</span>
                 </div>
             </div>
         </div>

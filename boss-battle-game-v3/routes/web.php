@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\SoloRaidAdminController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\PreTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SoloRaidController;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,11 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     $user = Auth::user();
     
+    // Redirect students to pre-test if not completed
+    if ($user->needsPretest()) {
+        return redirect()->route('pretest.index');
+    }
+
     // Get latest badge
     $latestBadge = $user->userBadges()->with('badge')->latest()->first();
     
@@ -26,7 +32,7 @@ Route::get('/dashboard', function () {
     // Get active event (prioritize ongoing, then upcoming)
     $activeEvent = \App\Models\Event::where('status', 'ongoing')->latest()->first();
     if (!$activeEvent) {
-         $activeEvent = \App\Models\Event::where('status', 'draft')->latest()->first(); // Or upcoming logic
+         $activeEvent = \App\Models\Event::where('status', 'draft')->latest()->first();
     }
 
     return view('dashboard', compact('latestBadge', 'lastRaidSession', 'activeEvent'));
@@ -35,7 +41,14 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); // Disabled for students
+
+    // Pre-test Routes
+    Route::get('/pretest', [PreTestController::class, 'index'])->name('pretest.index');
+    Route::post('/pretest/start', [PreTestController::class, 'start'])->name('pretest.start');
+    Route::get('/pretest/play/{session}', [PreTestController::class, 'play'])->name('pretest.play');
+    Route::post('/pretest/action', [PreTestController::class, 'action'])->name('pretest.action');
+    Route::post('/pretest/finish/{session}', [PreTestController::class, 'finish'])->name('pretest.finish');
+    Route::get('/pretest/result/{session}', [PreTestController::class, 'result'])->name('pretest.result');
 
     // Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
@@ -43,7 +56,9 @@ Route::middleware('auth')->group(function () {
     // Player Routes
     Route::get('/solo', [SoloRaidController::class, 'index'])->name('solo.index');
     Route::get('/solo/{soloRaid}/map', [SoloRaidController::class, 'map'])->name('solo.map');
+    Route::get('/solo/{soloRaid}/boss', [SoloRaidController::class, 'boss'])->name('solo.boss');
     Route::get('/solo/{soloRaid}/materi/{nodeId}', [SoloRaidController::class, 'materi'])->name('solo.materi');
+    Route::post('/solo/node/{node}/complete', [SoloRaidController::class, 'completeNode'])->name('solo.node.complete');
     Route::get('/solo/{soloRaid}/level-select', [SoloRaidController::class, 'levelSelect'])->name('solo.level-select');
     
     // Battle Routes

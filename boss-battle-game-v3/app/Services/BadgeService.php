@@ -94,7 +94,10 @@ class BadgeService
                 case 'solo_victory_count':
                     $query = SessionSolo::query()
                         ->where('user_id', $user->id)
-                        ->where('boss_kalah', true);
+                        ->where('boss_kalah', true)
+                        ->whereHas('soloRaid', function($q) {
+                            $q->where('type', 'boss');
+                        });
                     
                     if (isset($rule['difficulty'])) {
                          $query->whereIn('level', (array)$rule['difficulty']);
@@ -118,6 +121,9 @@ class BadgeService
                         $hasWin = SessionSolo::where('user_id', $user->id)
                             ->where('level', $lvl)
                             ->where('boss_kalah', true)
+                            ->whereHas('soloRaid', function($q) {
+                                $q->where('type', 'boss');
+                            })
                             ->exists();
                         if (!$hasWin) {
                             $pass = false;
@@ -156,9 +162,12 @@ class BadgeService
     // 1. Boss Novice: Kalahkan 1 boss any level
     public function checkBossNovice(User $user)
     {
-        // Check Solo Sessions
+        // Check Solo Sessions (hanya yang tipe boss)
         $soloWin = SessionSolo::where('user_id', $user->id)
             ->where('boss_kalah', true)
+            ->whereHas('soloRaid', function($q) {
+                $q->where('type', 'boss');
+            })
             ->exists();
             
         if ($soloWin) return true;
@@ -171,7 +180,7 @@ class BadgeService
         return $eventWin;
     }
 
-    // 2. Boss Veteran: Win Easy, Medium, AND Hard in Solo
+    // 2. Boss Veteran: Win Easy, Medium, AND Hard in Solo (hanya boss events)
     public function checkBossVeteran(User $user)
     {
         $levels = ['Easy', 'Medium', 'Hard'];
@@ -179,6 +188,9 @@ class BadgeService
             $hasWin = SessionSolo::where('user_id', $user->id)
                 ->where('level', $level)
                 ->where('boss_kalah', true)
+                ->whereHas('soloRaid', function($q) {
+                    $q->where('type', 'boss');
+                })
                 ->exists();
             if (!$hasWin) return false;
         }

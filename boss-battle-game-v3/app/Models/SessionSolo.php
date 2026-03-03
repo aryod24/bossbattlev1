@@ -13,7 +13,8 @@ class SessionSolo extends Model
         'jumlah_soal', 'jumlah_benar', 'jumlah_salah',
         'boss_hp_awal', 'boss_hp_akhir', 'boss_kalah',
         'skor_akhir', 'xp_diperoleh',
-        'attempt_number', 'is_counted_research', 'is_first_attempt'
+        'attempt_number', 'is_counted_research', 'is_first_attempt',
+        'is_pretest'
     ];
     protected $casts = [
         'waktu_mulai' => 'datetime',
@@ -21,6 +22,7 @@ class SessionSolo extends Model
         'boss_kalah' => 'boolean',
         'is_counted_research' => 'boolean',
         'is_first_attempt' => 'boolean',
+        'is_pretest' => 'boolean',
     ];
 
     // Relationships

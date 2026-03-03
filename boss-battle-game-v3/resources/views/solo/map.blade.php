@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $soloRaid->nama }} - Dungeon Map</title>
     
     <!-- Fonts & Icons -->
@@ -211,7 +212,7 @@
         
         <!-- Left Section: Info Panel (Light Theme) -->
         <x-solo.map-info-panel :solo-raid="$soloRaid" :stats="$userStats" :sessions="$sessionHistory" :active-session="$activeSession" />
-        <x-solo.map-visual :solo-raid="$soloRaid" />
+        <x-solo.map-visual :solo-raid="$soloRaid" :nodes="$nodes" :completed-node-ids="$completedNodeIds" />
     </div>
 
     <!-- Materi Modal Component -->
@@ -335,50 +336,41 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('dungeonMap', (raidId) => ({
                 raidId: raidId,
-                levels: {
-                    easy: { available: false },
-                    medium: { available: false },
-                    hard: { available: false }
-                },
+                // Node state
+                completedNodeIds: @json($completedNodeIds),
+                currentNodeId: null,
+                isMarkingDone: false,
+                // Modal state
                 showInfoModal: false,
                 infoTitle: '',
                 infoContent: '',
                 renderedContent: '',
+                // Battle/session state
                 showStartModal: false,
                 showActiveSessionModal: false,
                 selectedLevel: '',
-                levelStats: @json($levelStats),
                 activeSession: @json($activeSession),
                 currentRaidId: {{ $soloRaid->id }},
+                // Quiz auto-level from user section
+                userSection: '{{ auth()->user()->current_section ?? "Easy" }}',
 
                 init() {
-                    // Force reload on back navigation to update session state
                     window.addEventListener('pageshow', (event) => {
                         if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
                             window.location.reload();
                         }
                     });
-                    
-                    this.fetchLevels();
                 },
 
-                fetchLevels() {
-                    fetch(`/solo/${this.raidId}/level-select`)
+                openInfo(nodeOrder) {
+                    fetch(`/solo/${this.raidId}/materi/${nodeOrder}`)
                         .then(res => res.json())
                         .then(data => {
-                            this.levels = data;
-                        });
-                },
-
-                openInfo(nodeId) {
-                    fetch(`/solo/${this.raidId}/materi/${nodeId}`)
-                        .then(res => res.json())
-                        .then(data => {
+                            this.currentNodeId = data.id;
                             this.infoTitle = data.title;
-                            this.infoContent = data.content || ''; 
-                            // Render markdown to HTML
                             this.renderedContent = marked.parse(data.content || 'Belum ada materi.');
                             this.showInfoModal = true;
+                            this.isMarkingDone = false;
                         })
                         .catch(err => {
                             console.error('Error loading materi:', err);
@@ -388,33 +380,38 @@
                         });
                 },
 
-                checkLevel(level) {
-                    // 1. Check for ANY active session
-                    if (this.activeSession) {
-                        // If clicking the SAME level as active session -> Continue
-                        if (this.activeSession.level.toLowerCase() === level.toLowerCase()) {
-                            this.continueActiveSession();
-                            return;
+                markNodeDone() {
+                    if (!this.currentNodeId || this.isMarkingDone) return;
+                    this.isMarkingDone = true;
+
+                    fetch(`/solo/node/${this.currentNodeId}/complete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         }
-                        
-                        // If clicking a DIFFERENT level -> Block with Warning
-                        this.showActiveSessionModal = true;
-                        return;
-                    }
-                    
-                    // 2. Normal Flow (No active session)
-                    if (this.levels[level].available) {
-                        this.selectedLevel = level;
-                        this.showStartModal = true;
-                    } else {
-                        alert('This level is currently locked or unavailable.');
-                    }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update local state so next node unlocks without reload
+                            if (!this.completedNodeIds.includes(this.currentNodeId)) {
+                                this.completedNodeIds.push(this.currentNodeId);
+                            }
+                        }
+                        this.showInfoModal = false;
+                        this.isMarkingDone = false;
+                        // Reload to re-render map-visual with updated state
+                        window.location.reload();
+                    })
+                    .catch(() => {
+                        this.isMarkingDone = false;
+                    });
                 },
 
-                startBattle() {
-                    if (this.selectedLevel) {
-                        window.location.href = `/solo/${this.raidId}/battle/init/${this.selectedLevel}`;
-                    }
+                startLatihan() {
+                    // Latihan soal uses user's section as level (Easy/Medium/Hard)
+                    window.location.href = `/solo/${this.raidId}/battle/init/${this.userSection}`;
                 },
 
                 continueActiveSession() {

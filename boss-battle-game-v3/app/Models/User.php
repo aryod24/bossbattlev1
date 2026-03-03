@@ -19,7 +19,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'nim', 'nama', 'email', 'kelas', 'role',
-        'total_xp', 'level', 'password'
+        'total_xp', 'level', 'password',
+        'pretest_score', 'current_section'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -50,5 +51,21 @@ class User extends Authenticatable
     public function userBadges()
     {
         return $this->hasMany(UserBadge::class);
+    }
+
+    public function eventProgress()
+    {
+        return $this->hasMany(UserEventProgress::class);
+    }
+
+    // Helpers
+    public function hasCompletedPretest(): bool
+    {
+        return $this->pretest_score !== null;
+    }
+
+    public function needsPretest(): bool
+    {
+        return $this->role === 'student' && !$this->hasCompletedPretest();
     }
 }

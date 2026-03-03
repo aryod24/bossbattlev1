@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\RaidNode;
 use App\Models\SoloRaid;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SoloRaidAdminController extends Controller
 {
@@ -31,9 +33,9 @@ class SoloRaidAdminController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'question_bank_id' => 'required|integer',
-            'materi_node_1' => 'nullable|string',
-            'materi_node_2' => 'nullable|string',
-            'materi_node_3' => 'nullable|string',
+            'type' => 'required|in:learning,boss',
+            'section' => 'required|in:Easy,Medium,Hard',
+            'section_order' => 'required|integer|min:1|max:6',
             'boss_easy_name' => 'nullable|string',
             'boss_medium_name' => 'nullable|string',
             'boss_hard_name' => 'nullable|string',
@@ -41,6 +43,12 @@ class SoloRaidAdminController extends Controller
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
+            // Dynamic nodes
+            'nodes' => 'nullable|array',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
+            'nodes.*.title' => 'required_with:nodes|string|max:150',
+            'nodes.*.content' => 'nullable|string',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
         ]);
 
         $validated['created_by'] = auth()->id();
@@ -48,7 +56,23 @@ class SoloRaidAdminController extends Controller
         $validated['medium_enabled'] = $request->has('medium_enabled');
         $validated['hard_enabled'] = $request->has('hard_enabled');
 
-        SoloRaid::create($validated);
+        DB::transaction(function () use ($validated, $request) {
+            $nodes = $validated['nodes'] ?? [];
+            unset($validated['nodes']);
+
+            $raid = SoloRaid::create($validated);
+
+            // Create associated nodes
+            foreach ($nodes as $nodeData) {
+                RaidNode::create([
+                    'solo_raid_id' => $raid->id,
+                    'type' => $nodeData['type'],
+                    'title' => $nodeData['title'],
+                    'content' => $nodeData['content'] ?? null,
+                    'order' => $nodeData['order'],
+                ]);
+            }
+        });
 
         return redirect()->route('admin.solo-raids.index')->with('success', 'Solo Raid created successfully.');
     }
@@ -59,6 +83,7 @@ class SoloRaidAdminController extends Controller
             ->distinct()
             ->orderBy('bank_group')
             ->get();
+        $soloRaid->load('nodes');
         return view('admin.solo-raids.edit', compact('soloRaid', 'banks'));
     }
 
@@ -70,9 +95,9 @@ class SoloRaidAdminController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'question_bank_id' => 'required|integer',
-            'materi_node_1' => 'nullable|string',
-            'materi_node_2' => 'nullable|string',
-            'materi_node_3' => 'nullable|string',
+            'type' => 'required|in:learning,boss',
+            'section' => 'required|in:Easy,Medium,Hard',
+            'section_order' => 'required|integer|min:1|max:6',
             'boss_easy_name' => 'nullable|string',
             'boss_medium_name' => 'nullable|string',
             'boss_hard_name' => 'nullable|string',
@@ -80,13 +105,37 @@ class SoloRaidAdminController extends Controller
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
+            // Dynamic nodes
+            'nodes' => 'nullable|array',
+            'nodes.*.id' => 'nullable|integer',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
+            'nodes.*.title' => 'required_with:nodes|string|max:150',
+            'nodes.*.content' => 'nullable|string',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
         ]);
 
         $validated['easy_enabled'] = $request->has('easy_enabled');
         $validated['medium_enabled'] = $request->has('medium_enabled');
         $validated['hard_enabled'] = $request->has('hard_enabled');
 
-        $soloRaid->update($validated);
+        DB::transaction(function () use ($validated, $soloRaid) {
+            $nodes = $validated['nodes'] ?? [];
+            unset($validated['nodes']);
+
+            $soloRaid->update($validated);
+
+            // Sync nodes: delete old ones and create fresh
+            $soloRaid->nodes()->delete();
+            foreach ($nodes as $nodeData) {
+                RaidNode::create([
+                    'solo_raid_id' => $soloRaid->id,
+                    'type' => $nodeData['type'],
+                    'title' => $nodeData['title'],
+                    'content' => $nodeData['content'] ?? null,
+                    'order' => $nodeData['order'],
+                ]);
+            }
+        });
 
         return redirect()->route('admin.solo-raids.index')->with('success', 'Solo Raid updated successfully.');
     }
@@ -105,12 +154,19 @@ class SoloRaidAdminController extends Controller
         $newRaid->created_by = auth()->id();
         $newRaid->save();
 
+        // Duplicate nodes
+        foreach ($soloRaid->nodes as $node) {
+            $newNode = $node->replicate();
+            $newNode->solo_raid_id = $newRaid->id;
+            $newNode->save();
+        }
+
         return redirect()->route('admin.solo-raids.edit', $newRaid->id)->with('success', 'Solo Raid duplicated. Please update details.');
     }
 
     public function toggleLevel(Request $request, SoloRaid $soloRaid)
     {
-        $level = $request->level; // easy, medium, hard
+        $level = $request->level;
         $field = $level . '_enabled';
         
         if (in_array($field, ['easy_enabled', 'medium_enabled', 'hard_enabled'])) {

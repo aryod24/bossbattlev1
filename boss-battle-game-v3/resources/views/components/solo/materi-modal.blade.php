@@ -36,12 +36,19 @@
             </div>
             
             <!-- Modal Footer -->
-            <div class="bg-background-dark px-4 sm:px-6 py-3 sm:py-4 border-t border-border flex justify-end">
+            <div class="bg-background-dark px-4 sm:px-6 py-3 sm:py-4 border-t border-border flex justify-between items-center">
                 <button type="button" 
                         @click="showInfoModal = false" 
-                        class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 sm:px-6 py-2 sm:py-2.5 bg-primary text-sm sm:text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
-                    <span>Got it</span>
+                        class="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm text-text-muted hover:text-text-primary transition-colors">
+                    Tutup
+                </button>
+                <button type="button" 
+                        @click="markNodeDone()"
+                        :disabled="isMarkingDone"
+                        class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 sm:px-6 py-2 sm:py-2.5 bg-success text-sm sm:text-base font-medium text-black hover:brightness-90 focus:outline-none transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                    <span class="material-symbols-outlined" style="font-size: 20px;" x-show="!isMarkingDone">check_circle</span>
+                    <span x-show="isMarkingDone" class="inline-block w-4 h-4 border-2 border-black/40 border-t-black rounded-full animate-spin"></span>
+                    <span x-text="isMarkingDone ? 'Menyimpan...' : '✓ Selesai Baca'"></span>
                 </button>
             </div>
         </div>

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
+use App\Models\RaidNode;
 use App\Models\SoloRaid;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -25,7 +27,6 @@ class EventController extends Controller
      */
     public function create()
     {
-        // Dosen can use ANY question bank (not just their own)
         $banks = \App\Models\QuestionBank::select('bank_group', 'bank_name')
             ->distinct()
             ->orderBy('bank_group')
@@ -44,9 +45,9 @@ class EventController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'question_bank_id' => 'required|integer',
-            'materi_node_1' => 'nullable|string',
-            'materi_node_2' => 'nullable|string',
-            'materi_node_3' => 'nullable|string',
+            'type' => 'required|in:learning,boss',
+            'section' => 'required|in:Easy,Medium,Hard',
+            'section_order' => 'required|integer|min:1|max:6',
             'boss_easy_name' => 'nullable|string',
             'boss_medium_name' => 'nullable|string',
             'boss_hard_name' => 'nullable|string',
@@ -54,6 +55,11 @@ class EventController extends Controller
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
+            'nodes' => 'nullable|array',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
+            'nodes.*.title' => 'required_with:nodes|string|max:150',
+            'nodes.*.content' => 'nullable|string',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
         ]);
 
         $validated['created_by'] = auth()->id();
@@ -61,7 +67,22 @@ class EventController extends Controller
         $validated['medium_enabled'] = $request->has('medium_enabled');
         $validated['hard_enabled'] = $request->has('hard_enabled');
 
-        SoloRaid::create($validated);
+        DB::transaction(function () use ($validated) {
+            $nodes = $validated['nodes'] ?? [];
+            unset($validated['nodes']);
+
+            $raid = SoloRaid::create($validated);
+
+            foreach ($nodes as $nodeData) {
+                RaidNode::create([
+                    'solo_raid_id' => $raid->id,
+                    'type' => $nodeData['type'],
+                    'title' => $nodeData['title'],
+                    'content' => $nodeData['content'] ?? null,
+                    'order' => $nodeData['order'],
+                ]);
+            }
+        });
 
         return redirect()->route('dosen.events.index')->with('success', 'Solo Raid created successfully.');
     }
@@ -71,16 +92,15 @@ class EventController extends Controller
      */
     public function edit(SoloRaid $soloRaid)
     {
-        // Ensure only creator can edit
         if ($soloRaid->created_by !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Dosen can use ANY question bank (not just their own)
         $banks = \App\Models\QuestionBank::select('bank_group', 'bank_name')
             ->distinct()
             ->orderBy('bank_group')
             ->get();
+        $soloRaid->load('nodes');
         return view('dosen.events.edit', compact('soloRaid', 'banks'));
     }
 
@@ -89,7 +109,6 @@ class EventController extends Controller
      */
     public function update(Request $request, SoloRaid $soloRaid)
     {
-        // Ensure only creator can update
         if ($soloRaid->created_by !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
@@ -100,9 +119,9 @@ class EventController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'question_bank_id' => 'required|integer',
-            'materi_node_1' => 'nullable|string',
-            'materi_node_2' => 'nullable|string',
-            'materi_node_3' => 'nullable|string',
+            'type' => 'required|in:learning,boss',
+            'section' => 'required|in:Easy,Medium,Hard',
+            'section_order' => 'required|integer|min:1|max:6',
             'boss_easy_name' => 'nullable|string',
             'boss_medium_name' => 'nullable|string',
             'boss_hard_name' => 'nullable|string',
@@ -110,13 +129,35 @@ class EventController extends Controller
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
+            'nodes' => 'nullable|array',
+            'nodes.*.id' => 'nullable|integer',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
+            'nodes.*.title' => 'required_with:nodes|string|max:150',
+            'nodes.*.content' => 'nullable|string',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
         ]);
 
         $validated['easy_enabled'] = $request->has('easy_enabled');
         $validated['medium_enabled'] = $request->has('medium_enabled');
         $validated['hard_enabled'] = $request->has('hard_enabled');
 
-        $soloRaid->update($validated);
+        DB::transaction(function () use ($validated, $soloRaid) {
+            $nodes = $validated['nodes'] ?? [];
+            unset($validated['nodes']);
+
+            $soloRaid->update($validated);
+
+            $soloRaid->nodes()->delete();
+            foreach ($nodes as $nodeData) {
+                RaidNode::create([
+                    'solo_raid_id' => $soloRaid->id,
+                    'type' => $nodeData['type'],
+                    'title' => $nodeData['title'],
+                    'content' => $nodeData['content'] ?? null,
+                    'order' => $nodeData['order'],
+                ]);
+            }
+        });
 
         return redirect()->route('dosen.events.index')->with('success', 'Solo Raid updated successfully.');
     }
@@ -126,7 +167,6 @@ class EventController extends Controller
      */
     public function destroy(SoloRaid $soloRaid)
     {
-        // Ensure only creator can delete
         if ($soloRaid->created_by !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
@@ -147,6 +187,12 @@ class EventController extends Controller
         $newRaid->created_by = auth()->id();
         $newRaid->save();
 
+        foreach ($soloRaid->nodes as $node) {
+            $newNode = $node->replicate();
+            $newNode->solo_raid_id = $newRaid->id;
+            $newNode->save();
+        }
+
         return redirect()->route('dosen.events.edit', $newRaid->id)->with('success', 'Solo Raid duplicated. Please update details.');
     }
 
@@ -155,12 +201,11 @@ class EventController extends Controller
      */
     public function toggleLevel(Request $request, SoloRaid $soloRaid)
     {
-        // Ensure only creator can toggle
         if ($soloRaid->created_by !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        $level = $request->level; // easy, medium, hard
+        $level = $request->level;
         $field = $level . '_enabled';
         
         if (in_array($field, ['easy_enabled', 'medium_enabled', 'hard_enabled'])) {

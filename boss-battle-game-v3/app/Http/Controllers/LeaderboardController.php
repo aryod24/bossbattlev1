@@ -11,14 +11,25 @@ class LeaderboardController extends Controller
 {
     public function index()
     {
+        $excludePretest = function ($query) {
+            $query->where(function ($subQuery) {
+                $subQuery->whereNull('is_pretest')
+                    ->orWhere('is_pretest', false);
+            })->where(function ($subQuery) {
+                $subQuery->whereNull('jumlah_soal')
+                    ->orWhere('jumlah_soal', '!=', 30);
+            });
+        };
+
         // Fetch top students ordered by XP
         $users = User::where('role', 'student')
             ->orderBy('total_xp', 'desc')
-            ->withCount(['sessionSolos as total_games'])
-            ->withSum(['sessionSolos as total_wins' => function ($query) {
+            ->withCount(['sessionSolos as total_games' => $excludePretest])
+            ->withSum(['sessionSolos as total_wins' => function ($query) use ($excludePretest) {
+                $excludePretest($query);
                 $query->where('boss_kalah', true);
             }], 'boss_kalah') // Assuming boss_kalah is boolean (1/0), sum works as count of true
-            ->withAvg('sessionSolos as avg_score', 'skor_akhir')
+            ->withAvg(['sessionSolos as avg_score' => $excludePretest], 'skor_akhir')
             ->paginate(100);
 
         // Process users to calculate rates and ranks

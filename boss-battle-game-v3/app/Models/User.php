@@ -59,6 +59,19 @@ class User extends Authenticatable
     }
 
     // Helpers
+    public function dashboardRouteName(): string
+    {
+        if ($this->role === 'admin') {
+            return 'admin.dashboard';
+        }
+
+        if ($this->role === 'dosen') {
+            return 'dosen.dashboard';
+        }
+
+        return 'dashboard';
+    }
+
     public function hasCompletedPretest(): bool
     {
         return $this->pretest_score !== null;

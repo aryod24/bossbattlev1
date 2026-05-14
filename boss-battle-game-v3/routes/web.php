@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect()->route('dashboard');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        return redirect()->route($user->dashboardRouteName());
     }
     return view('welcome');
 });

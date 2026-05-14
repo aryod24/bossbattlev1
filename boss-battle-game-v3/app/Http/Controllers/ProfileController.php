@@ -24,7 +24,7 @@ class ProfileController extends Controller
         // Get all badge definitions from DB
         $allBadges = \App\Models\Badge::all();
 
-        return view('profile.edit', [
+        return view('profile.mhs', [
             'user' => $user,
             'unlockedBadges' => $unlockedBadges,
             'allBadges' => $allBadges,

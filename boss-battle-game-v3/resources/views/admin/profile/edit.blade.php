@@ -22,7 +22,7 @@
                 </h2>
                 <p class="text-sm text-text-muted mt-1">Update your account's profile information and email address.</p>
             </div>
-            <div class="p-6">
+            <div class="pt-3 px-6 pb-6">
                 @include('admin.profile.partials.update-profile-information-form')
             </div>
         </div>
@@ -36,7 +36,7 @@
                 </h2>
                 <p class="text-sm text-text-muted mt-1">Ensure your account is using a long, random password to stay secure.</p>
             </div>
-            <div class="p-6">
+            <div class="pt-3 px-6 pb-6">
                 @include('profile.partials.update-password-form', ['action' => route('admin.password.update')])
             </div>
         </div>
@@ -50,7 +50,7 @@
                 </h2>
                 <p class="text-sm text-text-muted mt-1">Once your account is deleted, all of its resources and data will be permanently deleted.</p>
             </div>
-            <div class="p-6">
+            <div class="pt-3 px-6 pb-6">
                 @include('profile.partials.delete-user-form', ['action' => route('admin.profile.destroy')])
             </div>
         </div>

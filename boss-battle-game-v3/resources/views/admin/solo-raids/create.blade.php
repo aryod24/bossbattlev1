@@ -118,7 +118,7 @@
                                         <div class="grid grid-cols-1 gap-3">
                                             <div>
                                                 <label class="block text-xs font-medium text-text-muted mb-1">Title</label>
-                                                <input type="text" x-model="node.title" :placeholder="node.type === 'content' ? 'Judul Materi' : 'Quiz Akhir'" class="block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary text-sm" required>
+                                                <input type="text" x-model="node.title" :placeholder="node.type === 'content' ? 'Judul Materi' : 'Quiz Akhir'" class="block w-full rounded-md bg-card border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary text-sm" x-bind:required="eventType === 'learning'">
                                             </div>
                                             <div x-show="node.type === 'content'"
                                                  x-init="$nextTick(() => {

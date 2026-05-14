@@ -44,11 +44,11 @@ class SoloRaidAdminController extends Controller
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
             // Dynamic nodes
-            'nodes' => 'nullable|array',
-            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
-            'nodes.*.title' => 'required_with:nodes|string|max:150',
-            'nodes.*.content' => 'nullable|string',
-            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
+            'nodes' => 'nullable|array|exclude_if:type,boss',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz|exclude_if:type,boss',
+            'nodes.*.title' => 'required_with:nodes|string|max:150|exclude_if:type,boss',
+            'nodes.*.content' => 'nullable|string|exclude_if:type,boss',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
         $validated['created_by'] = auth()->id();
@@ -106,12 +106,12 @@ class SoloRaidAdminController extends Controller
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
             // Dynamic nodes
-            'nodes' => 'nullable|array',
-            'nodes.*.id' => 'nullable|integer',
-            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
-            'nodes.*.title' => 'required_with:nodes|string|max:150',
-            'nodes.*.content' => 'nullable|string',
-            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
+            'nodes' => 'nullable|array|exclude_if:type,boss',
+            'nodes.*.id' => 'nullable|integer|exclude_if:type,boss',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz|exclude_if:type,boss',
+            'nodes.*.title' => 'required_with:nodes|string|max:150|exclude_if:type,boss',
+            'nodes.*.content' => 'nullable|string|exclude_if:type,boss',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
         $validated['easy_enabled'] = $request->has('easy_enabled');

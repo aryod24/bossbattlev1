@@ -59,7 +59,7 @@
         </div>
 
         <!-- Profile Information & Stats Cards (2 Columns) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Left Card: Profile Information -->
             <div class="bg-card shadow-xl sm:rounded-2xl border border-border p-6 sm:p-8">
                 <header class="mb-6">
@@ -133,6 +133,18 @@
                     <div class="flex justify-between items-center pt-2 border-t border-border">
                         <span class="text-text-muted text-sm">Rank</span>
                         <span class="font-bold text-text-primary">{{ $rankName }}</span>
+                    </div>
+                    <div class="pt-2 border-t border-border">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-text-muted text-sm">Winrate</span>
+                                <span class="font-bold text-text-primary">{{ $winRate }}% <span class="text-xs text-text-muted">({{ $totalGames }} games)</span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-text-muted text-sm">Avg Score</span>
+                                <span class="font-bold text-text-primary">{{ $avgScoreFormatted }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

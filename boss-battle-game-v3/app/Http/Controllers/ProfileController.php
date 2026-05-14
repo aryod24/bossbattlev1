@@ -17,6 +17,22 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         $user = $request->user();
+
+        $excludePretest = function ($query) {
+            $query->where(function ($subQuery) {
+                $subQuery->whereNull('is_pretest')
+                    ->orWhere('is_pretest', false);
+            })->where(function ($subQuery) {
+                $subQuery->whereNull('jumlah_soal')
+                    ->orWhere('jumlah_soal', '!=', 30);
+            });
+        };
+
+        $totalGames = $user->sessionSolos()->where($excludePretest)->count();
+        $totalWins = $user->sessionSolos()->where($excludePretest)->where('boss_kalah', true)->count();
+        $avgScore = $user->sessionSolos()->where($excludePretest)->avg('skor_akhir');
+        $winRate = $totalGames > 0 ? round(($totalWins / $totalGames) * 100) : 0;
+        $avgScoreFormatted = number_format($avgScore ?? 0, 0);
         
         // Load user's unlocked badges
         $unlockedBadges = $user->userBadges->keyBy('badge_id');
@@ -28,6 +44,9 @@ class ProfileController extends Controller
             'user' => $user,
             'unlockedBadges' => $unlockedBadges,
             'allBadges' => $allBadges,
+            'winRate' => $winRate,
+            'avgScoreFormatted' => $avgScoreFormatted,
+            'totalGames' => $totalGames,
         ]);
     }
 

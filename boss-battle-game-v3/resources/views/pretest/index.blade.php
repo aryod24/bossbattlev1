@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto py-8 px-4">
         <!-- Header as small centered card (like result) -->
-        <div class="mb-8 flex justify-center">
+        <div class="mb-8">
             <div class="bg-card p-4 rounded-lg border border-border shadow-sm flex items-center gap-4">
                 <span class="material-symbols-outlined text-4xl text-primary">quiz</span>
                 <div class="text-left">

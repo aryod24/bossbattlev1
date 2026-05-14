@@ -6,6 +6,12 @@
         <h1 class="text-3xl font-black text-text-primary">Session Details #{{ $session->id }}</h1>
     </div>
 
+    @if($session->is_pretest || (int) ($session->jumlah_soal ?? 0) === 30)
+        <div class="mb-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold">Pre-Test session (boss HP not applicable)</span>
+        </div>
+    @endif
+
     <!-- Session Info Card -->
     <div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark p-6 mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -51,10 +57,14 @@
         <div class="mt-6 pt-6 border-t border-border-light dark:border-border-dark grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <div class="text-sm text-text-muted mb-1">Boss HP</div>
-                <div class="font-bold text-text-primary">{{ $session->boss_hp_akhir }} / {{ $session->boss_hp_awal }}</div>
-                <div class="w-full bg-background-light dark:bg-background-dark h-2 rounded-full mt-2 overflow-hidden">
-                    <div class="h-full bg-red-500" style="width: {{ ($session->boss_hp_akhir / $session->boss_hp_awal) * 100 }}%"></div>
-                </div>
+                @if($session->boss_hp_awal && $session->boss_hp_awal > 0)
+                    <div class="font-bold text-text-primary">{{ $session->boss_hp_akhir }} / {{ $session->boss_hp_awal }}</div>
+                    <div class="w-full bg-background-light dark:bg-background-dark h-2 rounded-full mt-2 overflow-hidden">
+                        <div class="h-full bg-red-500" style="width: {{ round(($session->boss_hp_akhir / $session->boss_hp_awal) * 100, 2) }}%"></div>
+                    </div>
+                @else
+                    <div class="text-text-muted font-bold">Not applicable for Pre-Test</div>
+                @endif
             </div>
             <div>
                 <div class="text-sm text-text-muted mb-1">Duration</div>

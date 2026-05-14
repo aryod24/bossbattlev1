@@ -105,7 +105,7 @@
                     </nav>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="{{ route('profile.edit') }}">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="{{ route('admin.profile.edit') }}">
                         <span class="material-symbols-outlined">settings</span>Pengaturan
                     </a>
                     <form method="POST" action="{{ route('logout') }}">

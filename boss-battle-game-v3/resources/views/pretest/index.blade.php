@@ -1,21 +1,20 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto py-8 px-4">
-        <!-- Header split into two cards -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-            <div class="bg-card p-6 rounded-lg border border-border shadow-sm flex items-center gap-4">
-                <span class="material-symbols-outlined text-6xl text-primary">quiz</span>
-                <div>
-                    <h1 class="text-3xl lg:text-4xl font-black text-text-primary mb-1">Pre-test Penempatan</h1>
+        <!-- Header as small centered card (like result) -->
+        <div class="mb-8 flex justify-center">
+            <div class="bg-card p-4 rounded-lg border border-border shadow-sm flex items-center gap-4">
+                <span class="material-symbols-outlined text-4xl text-primary">quiz</span>
+                <div class="text-left">
+                    <h1 class="text-2xl font-black text-text-primary mb-0">Pre-test Penempatan</h1>
                     <p class="text-text-secondary text-sm">30 Menit • 30 Soal • PHP Only</p>
                 </div>
             </div>
+        </div>
 
-            <div class="bg-card p-6 rounded-lg border border-border shadow-sm flex items-center">
-                <div>
-                    <h2 class="text-lg font-bold text-text-primary mb-2">Sebelum memulai perjalanan belajar</h2>
-                    <p class="text-text-secondary">Selesaikan pre-test ini untuk menentukan Section awal Anda. Hasil penempatan akan membantu menyarankan materi yang sesuai dengan tingkat kemampuan Anda.</p>
-                </div>
-            </div>
+        <!-- Short intro card (kept as single full-width card) -->
+        <div class="bg-card p-6 rounded-lg border border-border shadow-sm mb-6">
+            <h2 class="text-lg font-bold text-text-primary mb-2">Sebelum memulai perjalanan belajar</h2>
+            <p class="text-text-secondary">Selesaikan pre-test ini untuk menentukan Section awal Anda. Hasil penempatan akan membantu menyarankan materi yang sesuai dengan tingkat kemampuan Anda.</p>
         </div>
 
         <!-- Info Cards -->

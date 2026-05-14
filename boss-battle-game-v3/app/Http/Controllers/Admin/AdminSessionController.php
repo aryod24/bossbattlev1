@@ -31,6 +31,16 @@ class AdminSessionController extends Controller
             ->latest('waktu_mulai')
             ->paginate(10, ['*'], 'solo_page');
 
+        // Mark sessions that look like pre-tests (30 questions) so frontend can treat them accordingly
+        $soloSessions->getCollection()->transform(function ($session) {
+            if ((int) ($session->jumlah_soal ?? 0) === 30) {
+                $session->is_pretest = true;
+                $session->boss_hp_awal = null;
+                $session->boss_hp_akhir = null;
+            }
+            return $session;
+        });
+
         $eventParticipants = [];
         if (Schema::hasTable('event_participant')) {
             $eventParticipants = \App\Models\EventParticipant::with(['user', 'event'])
@@ -46,6 +56,12 @@ class AdminSessionController extends Controller
     public function show($id)
     {
         $session = \App\Models\SessionSolo::with(['user', 'soloRaid', 'answers.question'])->findOrFail($id);
+        // If this session is a pre-test (30 questions), mark and hide boss HP for frontend
+        if ((int) ($session->jumlah_soal ?? 0) === 30) {
+            $session->is_pretest = true;
+            $session->boss_hp_awal = null;
+            $session->boss_hp_akhir = null;
+        }
         return view('admin.sessions.show', compact('session'));
     }
 

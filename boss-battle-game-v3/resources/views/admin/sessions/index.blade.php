@@ -138,6 +138,11 @@
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                                         {{ $session->level }}
                                     </span>
+                                    @if($session->is_pretest || (int) ($session->jumlah_soal ?? 0) === 30)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200 ml-2">
+                                            Pre-Test
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($session->waktu_selesai)

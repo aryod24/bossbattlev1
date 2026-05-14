@@ -86,6 +86,7 @@ class PreTestController extends Controller
                 'pilihan_b' => $answer->question->pilihan_b,
                 'pilihan_c' => $answer->question->pilihan_c,
                 'pilihan_d' => $answer->question->pilihan_d,
+                'jawaban_benar' => $answer->question->jawaban_benar, // For debugging
                 'urutan' => $answer->urutan_soal,
                 'is_answered' => $answer->jawaban_user !== null,
                 'level' => $answer->question->level,

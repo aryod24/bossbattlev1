@@ -130,103 +130,131 @@ class SoloBattleService
 
     public function submitAnswer(int $sessionId, array $data)
     {
-        // 1. Validate session exists & not finished
-        $session = SessionSolo::findOrFail($sessionId);
-        if ($session->waktu_selesai) {
-            return ['error' => 'Session already finished'];
-        }
-        // 2. Security: Check Deadline (Prevent Infinite Time Exploit)
-        $isPretest = (bool) ($session->is_pretest ?? false);
+        // Use database transaction with pessimistic locking to prevent race conditions
+        return DB::transaction(function () use ($sessionId, $data) {
+            // 1. Validate session exists & not finished (with row lock)
+            $session = SessionSolo::lockForUpdate()->findOrFail($sessionId);
+            if ($session->waktu_selesai) {
+                return ['error' => 'Session already finished'];
+            }
+            
+            // 2. Security: Check Deadline (Prevent Infinite Time Exploit)
+            $isPretest = (bool) ($session->is_pretest ?? false);
 
-        if ($isPretest) {
-            // Pre-test uses 30 minutes for all questions
-            $deadline = $session->waktu_mulai->copy()->addSeconds(30 * 60);
-        } else {
-            $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
-            $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
-        }
+            if ($isPretest) {
+                // Pre-test uses 30 minutes for all questions
+                $deadline = $session->waktu_mulai->copy()->addSeconds(30 * 60);
+            } else {
+                $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
+                $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
+            }
 
-        // Add small buffer (e.g. 5 seconds) for network latency
-        if (now()->greaterThan($deadline->addSeconds(5))) {
-            return ['error' => 'Time expired'];
-        }
+            // Add small buffer (e.g. 5 seconds) for network latency
+            if (now()->greaterThan($deadline->addSeconds(5))) {
+                return ['error' => 'Time expired'];
+            }
 
-        // 3. Idempotency: Check if already answered (Prevent Double Scoring)
-        $existingAnswer = SessionAnswer::where('session_id', $sessionId)
-            ->where('session_type', 'solo')
-            ->where('question_id', $data['question_id'])
-            ->first();
+            // 3. Idempotency: Check if already answered with row lock (Prevent Double Scoring)
+            $existingAnswer = SessionAnswer::lockForUpdate()
+                ->where('session_id', $sessionId)
+                ->where('session_type', 'solo')
+                ->where('question_id', $data['question_id'])
+                ->first();
 
-        $isLearning = $session->soloRaid && isset($session->soloRaid->type) && $session->soloRaid->type === 'learning';
+            $isLearning = $session->soloRaid && isset($session->soloRaid->type) && $session->soloRaid->type === 'learning';
 
-        if ($existingAnswer && $existingAnswer->jawaban_user) {
-            // Already answered! Return existing result without re-processing damage.
-            $msg = $isLearning
-                ? ($existingAnswer->is_correct ? "Jawaban sudah tersimpan." : "Jawaban salah tersimpan.")
-                : ($existingAnswer->is_correct 
-                    ? "Jawaban sudah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
-                    : "Jawaban salah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}");
+            if ($existingAnswer && $existingAnswer->jawaban_user !== null) {
+                // Already answered! Return existing result without re-processing damage.
+                if ($isPretest) {
+                    $msg = $existingAnswer->is_correct ? "Jawaban sudah tersimpan." : "Jawaban salah tersimpan.";
+                } elseif ($isLearning) {
+                    $msg = $existingAnswer->is_correct ? "Jawaban sudah tersimpan." : "Jawaban salah tersimpan.";
+                } else {
+                    $msg = $existingAnswer->is_correct 
+                        ? "Jawaban sudah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+                        : "Jawaban salah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}";
+                }
 
+                return [
+                    'is_correct' => $existingAnswer->is_correct,
+                    'damage' => 0, // No new damage
+                    'boss_hp_current' => $session->boss_hp_akhir,
+                    'boss_hp_max' => $session->boss_hp_awal,
+                    'feedback_message' => $msg
+                ];
+            }
+
+            // 4. Get question & validate answer
+            $question = QuestionBank::findOrFail($data['question_id']);
+            $isCorrect = $this->validateAnswer($question, $data['jawaban_user']);
+
+            // 5. Calculate damage (only for boss battles, not pre-test)
+            $damage = ($isCorrect && !$isPretest) ? 1 : 0;
+
+            // 6. Update counters using atomic operations to prevent race conditions
+            if ($isCorrect) {
+                $session->increment('jumlah_benar');
+                // Only update boss HP for non-pretest sessions
+                if (!$isPretest && $session->boss_hp_akhir !== null) {
+                    $session->decrement('boss_hp_akhir', $damage);
+                }
+            } else {
+                $session->increment('jumlah_salah');
+            }
+            
+            // Refresh to get updated values
+            $session->refresh();
+            
+            // Ensure boss HP doesn't go below 0 (only for boss battles)
+            if (!$isPretest && $session->boss_hp_akhir !== null && $session->boss_hp_akhir < 0) {
+                $session->boss_hp_akhir = 0;
+                $session->save();
+            }
+
+            // 7. Save answer to session_answer
+            if ($existingAnswer) {
+                $existingAnswer->update([
+                    'jawaban_user' => $data['jawaban_user'],
+                    'is_correct' => $isCorrect,
+                    'waktu_jawab_detik' => $data['waktu_jawab_detik'] ?? 0,
+                    'answered_at' => now(),
+                ]);
+            } else {
+                // Fallback if not found (should not happen if init works correctly)
+                SessionAnswer::create([
+                    'session_id' => $sessionId,
+                    'session_type' => 'solo',
+                    'question_id' => $question->id,
+                    'urutan_soal' => $data['urutan_soal'],
+                    'jawaban_user' => $data['jawaban_user'],
+                    'is_correct' => $isCorrect,
+                    'waktu_jawab_detik' => $data['waktu_jawab_detik'] ?? 0,
+                    'attempt_number' => $session->attempt_number,
+                    'is_counted_research' => $session->is_counted_research,
+                    'answered_at' => now()
+                ]);
+            }
+
+            // 8. Build feedback message based on session type
+            if ($isPretest) {
+                $msg = $isCorrect ? "Benar!" : "Salah!";
+            } elseif ($isLearning) {
+                $msg = $isCorrect ? "Benar!" : "Salah!";
+            } else {
+                $msg = $isCorrect
+                    ? "Benar! Damage {$damage} ke Boss. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
+                    : "Salah! Boss HP tetap: {$session->boss_hp_akhir}/{$session->boss_hp_awal}";
+            }
+
+            // 9. Return response
             return [
-                'is_correct' => $existingAnswer->is_correct,
-                'damage' => 0, // No new damage
+                'is_correct' => $isCorrect,
+                'damage' => $damage,
                 'boss_hp_current' => $session->boss_hp_akhir,
                 'boss_hp_max' => $session->boss_hp_awal,
                 'feedback_message' => $msg
             ];
-        }
-
-        // 4. Get question & validate answer
-        $question = QuestionBank::findOrFail($data['question_id']);
-        $isCorrect = $this->validateAnswer($question, $data['jawaban_user']);
-
-        // 5. Calculate damage
-        $damage = $isCorrect ? 1 : 0;
-
-        // 6. Update boss HP
-        $session->boss_hp_akhir = max(0, $session->boss_hp_akhir - $damage);
-        $session->jumlah_benar += $isCorrect ? 1 : 0;
-        $session->jumlah_salah += $isCorrect ? 0 : 1;
-        $session->save();
-
-        // 7. Save answer to session_answer
-        if ($existingAnswer) {
-            $existingAnswer->update([
-                'jawaban_user' => $data['jawaban_user'],
-                'is_correct' => $isCorrect,
-                'waktu_jawab_detik' => $data['waktu_jawab_detik'] ?? 0,
-                'answered_at' => now(),
-            ]);
-        } else {
-            // Fallback if not found (should not happen if init works correctly)
-            SessionAnswer::create([
-                'session_id' => $sessionId,
-                'session_type' => 'solo',
-                'question_id' => $question->id,
-                'urutan_soal' => $data['urutan_soal'],
-                'jawaban_user' => $data['jawaban_user'],
-                'is_correct' => $isCorrect,
-                'waktu_jawab_detik' => $data['waktu_jawab_detik'] ?? 0,
-                'attempt_number' => $session->attempt_number,
-                'is_counted_research' => $session->is_counted_research,
-                'answered_at' => now()
-            ]);
-        }
-
-        $msg = $isLearning
-            ? ($isCorrect ? "Benar!" : "Salah!")
-            : ($isCorrect
-                ? "Benar! Damage {$damage} ke Boss. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
-                : "Salah! Boss HP tetap: {$session->boss_hp_akhir}/{$session->boss_hp_awal}");
-
-        // 8. Return response
-        return [
-            'is_correct' => $isCorrect,
-            'damage' => $damage,
-            'boss_hp_current' => $session->boss_hp_akhir,
-            'boss_hp_max' => $session->boss_hp_awal,
-            'feedback_message' => $msg
-        ];
+        });
     }
 
     public function finishSession($sessionId, $forcedEndTime = null)

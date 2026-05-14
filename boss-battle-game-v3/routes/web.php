@@ -50,7 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/pretest', [PreTestController::class, 'index'])->name('pretest.index');
     Route::post('/pretest/start', [PreTestController::class, 'start'])->name('pretest.start');
     Route::get('/pretest/play/{session}', [PreTestController::class, 'play'])->name('pretest.play');
-    Route::post('/pretest/action', [PreTestController::class, 'action'])->name('pretest.action');
+    Route::post('/pretest/action', [PreTestController::class, 'action'])
+        ->middleware('throttle:60,1') // Max 60 requests per minute per user
+        ->name('pretest.action');
     Route::post('/pretest/finish/{session}', [PreTestController::class, 'finish'])->name('pretest.finish');
     Route::get('/pretest/result/{session}', [PreTestController::class, 'result'])->name('pretest.result');
 
@@ -68,7 +70,9 @@ Route::middleware('auth')->group(function () {
     // Battle Routes
     Route::get('/solo/{soloRaid}/battle/init/{level}', [\App\Http\Controllers\SoloBattleController::class, 'init'])->name('solo.battle.init');
     Route::get('/solo/{soloRaid}/battle/{session?}', [\App\Http\Controllers\SoloBattleController::class, 'index'])->name('solo.battle');
-    Route::post('/solo/{soloRaid}/battle/action', [\App\Http\Controllers\SoloBattleController::class, 'action'])->name('solo.battle.action');
+    Route::post('/solo/{soloRaid}/battle/action', [\App\Http\Controllers\SoloBattleController::class, 'action'])
+        ->middleware('throttle:60,1') // Max 60 requests per minute per user
+        ->name('solo.battle.action');
     Route::post('/solo/{soloRaid}/battle/finish/{session}', [\App\Http\Controllers\SoloBattleController::class, 'finish'])->name('solo.battle.finish');
     Route::get('/solo/result/{session}', [\App\Http\Controllers\SoloBattleController::class, 'result'])->name('solo.result');
 

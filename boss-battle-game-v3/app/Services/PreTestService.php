@@ -47,15 +47,15 @@ class PreTestService
         }
 
         return DB::transaction(function () use ($user) {
-            // Create pre-test session (no raid association, level mixed)
+            // Create pre-test session (no raid association, no boss HP)
             $session = SessionSolo::create([
                 'user_id' => $user->id,
                 'solo_raid_id' => null, // No raid associated (pre-test is standalone)
                 'level' => 'Easy', // Default, not really used for pre-test
                 'waktu_mulai' => now(),
                 'jumlah_soal' => self::TOTAL_QUESTIONS,
-                'boss_hp_awal' => self::TOTAL_QUESTIONS,
-                'boss_hp_akhir' => self::TOTAL_QUESTIONS,
+                'boss_hp_awal' => null, // Pre-test has no boss
+                'boss_hp_akhir' => null, // Pre-test has no boss
                 'attempt_number' => 1,
                 'is_counted_research' => true,
                 'is_first_attempt' => true,

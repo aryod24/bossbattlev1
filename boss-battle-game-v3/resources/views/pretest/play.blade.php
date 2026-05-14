@@ -61,15 +61,17 @@
                 </div>
             </div>
 
-            <!-- Progress Bar -->
+            <!-- Progress Bar (Segmented) -->
             <div class="px-6 pb-3">
                 <div class="flex items-center justify-between mb-1 font-mono text-xs">
                     <span class="text-vscode-muted">PROGRESS</span>
                     <span class="text-purple-400" x-text="`${currentQuestionIndex + 1} / ${questions.length}`"></span>
                 </div>
-                <div class="w-full bg-[#333] h-1 rounded-full overflow-hidden">
-                    <div class="bg-purple-500 h-full shadow-[0_0_10px_#a855f7] transition-all duration-300"
-                         :style="`width: ${((currentQuestionIndex + 1) / questions.length) * 100}%`"></div>
+                <div class="w-full flex gap-[2px] h-2 rounded-sm overflow-hidden">
+                    <template x-for="(q, idx) in questions" :key="idx">
+                        <div class="flex-1 rounded-[1px] transition-all duration-300"
+                             :style="idx < currentQuestionIndex || (answerResults[idx] !== null) ? 'background-color: #3b82f6; box-shadow: 0 0 4px #3b82f6;' : (idx === currentQuestionIndex && answerResults[idx] === null ? 'background-color: #60a5fa; box-shadow: 0 0 6px #60a5fa;' : 'background-color: #333;')"></div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -170,6 +172,7 @@
                 timeRemaining: 0,
                 
                 currentQuestionIndex: 0,
+                answerResults: [],
                 selectedAnswer: '',
                 shortAnswerInput: '',
                 isSubmitting: false,
@@ -187,6 +190,9 @@
                 },
 
                 init() {
+                    // Initialize answer results array (null = unanswered)
+                    this.answerResults = this.questions.map(q => q.is_answered ? 'answered' : null);
+                    
                     this.updateTimer();
                     this.startTimer();
                     this.startTime = Date.now();
@@ -253,6 +259,7 @@
 
                         this.feedbackCorrect = data.is_correct;
                         this.feedbackMessage = data.is_correct ? 'Jawaban benar!' : 'Jawaban salah.';
+                        this.answerResults[this.currentQuestionIndex] = data.is_correct ? 'correct' : 'incorrect';
 
                         setTimeout(() => {
                             this.showModal = true;

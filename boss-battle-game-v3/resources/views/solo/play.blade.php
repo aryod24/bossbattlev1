@@ -186,7 +186,7 @@
             <!-- Progress Bar -->
             <div class="px-8 pt-6 pb-2">
                 <div class="flex items-center justify-between mb-2 font-mono text-xs">
-                    <span class="text-vscode-muted">PROGRESS_SESI</span>
+                    <span class="text-vscode-muted">PROGRESS</span>
                     <span class="text-vscode-primary" x-text="`${currentQuestionIndex + 1} / ${questions.length} Completed`"></span>
                 </div>
                 <div class="w-full bg-[#333] h-1 rounded-full overflow-hidden">

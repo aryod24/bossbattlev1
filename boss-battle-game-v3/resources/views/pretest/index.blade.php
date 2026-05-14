@@ -1,51 +1,72 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto py-8 px-4">
-        <!-- Header -->
-        <div class="text-center mb-10">
-            <span class="material-symbols-outlined text-6xl text-primary mb-4 block">quiz</span>
-            <h1 class="text-4xl font-black text-text-dark-primary mb-3">Pre-test Penempatan</h1>
-            <p class="text-text-dark-secondary text-lg max-w-xl mx-auto">
-                Sebelum memulai perjalanan belajar, selesaikan pre-test ini untuk menentukan Section awal Anda.
-            </p>
+    <div class="max-w-5xl mx-auto py-8 px-4">
+        <!-- Header split into two cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <div class="bg-card p-6 rounded-lg border border-border shadow-sm flex items-center gap-4">
+                <span class="material-symbols-outlined text-6xl text-primary">quiz</span>
+                <div>
+                    <h1 class="text-3xl lg:text-4xl font-black text-text-primary mb-1">Pre-test Penempatan</h1>
+                    <p class="text-text-secondary text-sm">30 Menit • 30 Soal • PHP Only</p>
+                </div>
+            </div>
+
+            <div class="bg-card p-6 rounded-lg border border-border shadow-sm flex items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-text-primary mb-2">Sebelum memulai perjalanan belajar</h2>
+                    <p class="text-text-secondary">Selesaikan pre-test ini untuk menentukan Section awal Anda. Hasil penempatan akan membantu menyarankan materi yang sesuai dengan tingkat kemampuan Anda.</p>
+                </div>
+            </div>
         </div>
 
         <!-- Info Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-surface-dark rounded-lg border border-border-dark p-5 text-center">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-8">
+            <div class="bg-card rounded-lg border border-border p-5 text-center shadow-sm">
                 <span class="material-symbols-outlined text-3xl text-green-400 mb-2 block">timer</span>
-                <p class="text-text-dark-primary font-bold text-lg">30 Menit</p>
-                <p class="text-text-dark-secondary text-sm">Waktu Pengerjaan</p>
+                <p class="text-text-primary font-bold text-lg">30 Menit</p>
+                <p class="text-text-secondary text-sm">Waktu Pengerjaan</p>
             </div>
-            <div class="bg-surface-dark rounded-lg border border-border-dark p-5 text-center">
+            <div class="bg-card rounded-lg border border-border p-5 text-center shadow-sm">
                 <span class="material-symbols-outlined text-3xl text-primary mb-2 block">help</span>
-                <p class="text-text-dark-primary font-bold text-lg">30 Soal</p>
-                <p class="text-text-dark-secondary text-sm">10 Easy + 10 Medium + 10 Hard</p>
+                <p class="text-text-primary font-bold text-lg">30 Soal</p>
+                <p class="text-text-secondary text-sm">10 Easy + 10 Medium + 10 Hard</p>
             </div>
-            <div class="bg-surface-dark rounded-lg border border-border-dark p-5 text-center">
+            <div class="bg-card rounded-lg border border-border p-5 text-center shadow-sm">
                 <span class="material-symbols-outlined text-3xl text-purple-400 mb-2 block">school</span>
-                <p class="text-text-dark-primary font-bold text-lg">PHP Only</p>
-                <p class="text-text-dark-secondary text-sm">Pemrograman PHP</p>
+                <p class="text-text-primary font-bold text-lg">PHP Only</p>
+                <p class="text-text-secondary text-sm">Pemrograman PHP</p>
             </div>
         </div>
 
-        <!-- Placement Info -->
-        <div class="bg-surface-dark rounded-lg border border-border-dark p-6 mb-8">
-            <h3 class="text-text-dark-primary font-bold text-lg mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary">info</span>
-                Sistem Penempatan
-            </h3>
-            <div class="space-y-3">
-                <div class="flex items-center gap-3">
-                    <span class="bg-green-500/20 text-green-400 text-xs font-bold px-3 py-1 rounded-full">0 - 40%</span>
-                    <span class="text-text-dark-secondary">→ Section 1: <span class="text-text-dark-primary font-semibold">Easy</span></span>
+        <!-- Placement Info split into two cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="bg-card rounded-lg border border-border p-6 shadow-sm">
+                <h3 class="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                    Sistem Penempatan
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="bg-green-500/20 text-green-400 text-xs font-bold px-3 py-1 rounded-full">0 - 40%</span>
+                        <span class="text-text-secondary">→ Section 1: <span class="text-text-primary font-semibold">Easy</span></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-yellow-500/20 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full">41 - 70%</span>
+                        <span class="text-text-secondary">→ Section 2: <span class="text-text-primary font-semibold">Medium</span></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full">71 - 100%</span>
+                        <span class="text-text-secondary">→ Section 3: <span class="text-text-primary font-semibold">Hard</span></span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="bg-yellow-500/20 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full">41 - 70%</span>
-                    <span class="text-text-dark-secondary">→ Section 2: <span class="text-text-dark-primary font-semibold">Medium</span></span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full">71 - 100%</span>
-                    <span class="text-text-dark-secondary">→ Section 3: <span class="text-text-dark-primary font-semibold">Hard</span></span>
+            </div>
+
+            <div class="bg-card rounded-lg border border-border p-6 shadow-sm flex items-center">
+                <div class="flex items-start gap-4">
+                    <span class="material-symbols-outlined text-3xl text-primary">campaign</span>
+                    <div>
+                        <h4 class="text-text-primary font-bold mb-2">Kerjakan dengan sungguh-sungguh</h4>
+                        <p class="text-text-secondary">Jawablah setiap soal sejujurnya dan perhatikan waktu. Hasil yang akurat membantu sistem menempatkan Anda di Section yang sesuai.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -54,7 +75,7 @@
         <div class="text-center">
             @if($activeSession)
                 <a href="{{ route('pretest.play', $activeSession->id) }}" 
-                   class="inline-flex items-center gap-2 rounded-lg h-12 px-8 bg-primary text-black font-bold text-base hover:brightness-95 transition-all shadow-lg shadow-primary/30">
+                   class="inline-flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:-translate-y-0.5">
                     <span class="material-symbols-outlined">play_arrow</span>
                     Lanjutkan Pre-test
                 </a>
@@ -62,7 +83,7 @@
                 <form action="{{ route('pretest.start') }}" method="POST">
                     @csrf
                     <button type="submit" 
-                            class="inline-flex items-center gap-2 rounded-lg h-12 px-8 bg-primary text-black font-bold text-base hover:brightness-95 transition-all shadow-lg shadow-primary/30">
+                            class="inline-flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white gap-2 text-sm font-bold shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:-translate-y-0.5">
                         <span class="material-symbols-outlined">rocket_launch</span>
                         Mulai Pre-test
                     </button>

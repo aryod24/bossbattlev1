@@ -135,22 +135,29 @@ class SoloBattleService
         if ($session->waktu_selesai) {
             return ['error' => 'Session already finished'];
         }
-
         // 2. Security: Check Deadline (Prevent Infinite Time Exploit)
-        $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
-        $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
-        
+        $isPretest = (bool) ($session->is_pretest ?? false);
+
+        if ($isPretest) {
+            // Pre-test uses 30 minutes for all questions
+            $deadline = $session->waktu_mulai->copy()->addSeconds(30 * 60);
+        } else {
+            $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
+            $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
+        }
+
         // Add small buffer (e.g. 5 seconds) for network latency
         if (now()->greaterThan($deadline->addSeconds(5))) {
-             return ['error' => 'Time expired'];
+            return ['error' => 'Time expired'];
         }
 
         // 3. Idempotency: Check if already answered (Prevent Double Scoring)
         $existingAnswer = SessionAnswer::where('session_id', $sessionId)
+            ->where('session_type', 'solo')
             ->where('question_id', $data['question_id'])
             ->first();
 
-        $isLearning = $session->soloRaid->type === 'learning';
+        $isLearning = $session->soloRaid && isset($session->soloRaid->type) && $session->soloRaid->type === 'learning';
 
         if ($existingAnswer && $existingAnswer->jawaban_user) {
             // Already answered! Return existing result without re-processing damage.

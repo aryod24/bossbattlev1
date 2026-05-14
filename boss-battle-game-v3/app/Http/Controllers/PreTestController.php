@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SessionSolo;
 use App\Models\QuestionBank;
+use App\Models\User;
 use App\Services\PreTestService;
 use App\Services\SoloBattleService;
 use Illuminate\Http\Request;
@@ -119,9 +120,14 @@ class PreTestController extends Controller
             'urutan_soal' => 'integer'
         ]);
 
-        // Reuse the existing answer submission logic
-        $result = $this->battleService->submitAnswer($data['session_id'], $data);
-        return response()->json($result);
+        // Reuse the existing answer submission logic, but guard for unexpected exceptions
+        try {
+            $result = $this->battleService->submitAnswer($data['session_id'], $data);
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            logger()->error('PreTest action error: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Server error'], 500);
+        }
     }
 
     /**

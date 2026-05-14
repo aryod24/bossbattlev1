@@ -131,7 +131,7 @@
                         <span class="material-symbols-outlined text-primary">military_tech</span>
                         Badge Terbaru
                     </h3>
-                    <a href="#" class="text-sm text-primary hover:underline">Lihat Semua</a>
+                    <a href="/profile" class="text-sm text-primary hover:underline">Lihat Semua</a>
                 </header>
                 
                 <div class="p-6 flex items-center gap-6">
@@ -173,7 +173,14 @@
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-base font-bold text-text-primary mb-1">{{ $lastRaidSession->soloRaid->nama }}</h4>
+                                @if($lastRaidSession->soloRaid)
+                                    <h4 class="text-base font-bold text-text-primary mb-1">{{ $lastRaidSession->soloRaid->nama }}</h4>
+                                @elseif($lastRaidSession->is_pretest)
+                                    <h4 class="text-base font-bold text-text-primary mb-1">Pre-test</h4>
+                                @else
+                                    <h4 class="text-base font-bold text-text-primary mb-1"></h4>
+                                @endif
+
                                 <div class="flex items-center gap-3 text-xs text-text-secondary">
                                     <span class="flex items-center gap-1">
                                         <span class="material-symbols-outlined text-[14px]">calendar_today</span>
@@ -185,9 +192,15 @@
                                     </span>
                                 </div>
                             </div>
-                            <a href="{{ route('solo.result', $lastRaidSession->id) }}" class="p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-full transition-colors" title="Lihat Hasil">
-                                <span class="material-symbols-outlined text-text-primary">chevron_right</span>
-                            </a>
+                            @if($lastRaidSession->is_pretest)
+                                <a href="{{ route('pretest.result', $lastRaidSession->id) }}" class="p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-full transition-colors" title="Lihat Hasil">
+                                    <span class="material-symbols-outlined text-text-primary">chevron_right</span>
+                                </a>
+                            @else
+                                <a href="{{ route('solo.result', $lastRaidSession->id) }}" class="p-2 hover:bg-surface-light dark:hover:bg-surface-dark rounded-full transition-colors" title="Lihat Hasil">
+                                    <span class="material-symbols-outlined text-text-primary">chevron_right</span>
+                                </a>
+                            @endif
                         </div>
                     @else
                         <div class="flex flex-col items-center justify-center w-full py-4 text-center">

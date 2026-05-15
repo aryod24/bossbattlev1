@@ -14,6 +14,7 @@ class BadgeSeeder extends Seeder
     public function run(): void
     {
         $badges = [
+            // ID 1: Boss Novice - Tetap sama
             [
                 'id' => 1,
                 'slug' => 'boss-novice',
@@ -21,35 +22,35 @@ class BadgeSeeder extends Seeder
                 'emoji' => '🎮',
                 'description' => 'Kalahkan 1 boss level apapun (Solo/Event)',
                 'is_system' => true,
-                // Legacy logic handles complex OR condition (Solo OR Event win)
-                'requirements' => null, 
+                'requirements' => null, // Legacy check via checkBossNovice()
             ],
+            // ID 2: Boss Slayer - Sekarang = kalahkan 2 boss
             [
                 'id' => 2,
-                'slug' => 'boss-veteran', 
-                // User asked for "Boss Slayer" but "Boss Veteran" exists with this logic. 
-                // I'll keep slug consistent but update name if needed, or just add requirements.
-                // User said "is boss defeated 3 easy medium hard = Boss Slayer". 
-                // I will rename it to align with user request.
-                'name' => 'Boss Slayer', 
-                'emoji' => '⭐',
-                'description' => 'Kalahkan Boss di 3 level Solo Raid (Easy, Medium, Hard)',
+                'slug' => 'boss-slayer',
+                'name' => 'Boss Slayer',
+                'emoji' => '⚔️',
+                'description' => 'Kalahkan 2 Boss Solo Raid',
                 'is_system' => true,
                 'requirements' => [
-                    'type' => 'complete_difficulties',
-                    'levels' => ['Easy', 'Medium', 'Hard']
-                ]
+                    'type' => 'solo_victory_count',
+                    'count' => 2,
+                ],
             ],
+            // ID 3: Im the Boss - Sekarang = kalahkan 3 boss
             [
                 'id' => 3,
-                'slug' => 'top-3-challenger',
-                'name' => 'Top 3 Challenger',
-                'emoji' => '🏆',
-                'description' => 'Raih peringkat 1-3 di Event Multiplayer',
+                'slug' => 'im-the-boss',
+                'name' => 'Im the Boss',
+                'emoji' => '👑',
+                'description' => 'Kalahkan 3 Boss Solo Raid',
                 'is_system' => true,
-                // Legacy logic specific to leaderboard
-                'requirements' => null,
+                'requirements' => [
+                    'type' => 'solo_victory_count',
+                    'count' => 3,
+                ],
             ],
+            // ID 4: Perfect Strike - Tetap sama
             [
                 'id' => 4,
                 'slug' => 'perfect-strike',
@@ -58,41 +59,46 @@ class BadgeSeeder extends Seeder
                 'description' => 'Jawab 100% benar di satu sesi game',
                 'is_system' => true,
                 'requirements' => [
-                    'type' => 'perfect_score'
-                ]
+                    'type' => 'perfect_score',
+                ],
             ],
+            // ID 5: Triple Perfect - Ganti dari Top 3 Challenger
             [
                 'id' => 5,
-                'slug' => 'event-warrior',
-                'name' => 'Event Warrior',
-                'emoji' => '⚔️',
-                'description' => 'Berpartisipasi dalam minimal 2 Event Multiplayer',
+                'slug' => 'triple-perfect',
+                'name' => 'Triple Perfect',
+                'emoji' => '🌟',
+                'description' => 'Jawab 100% benar dalam 3 sesi game',
                 'is_system' => true,
                 'requirements' => [
-                    'type' => 'event_participation_count',
-                    'count' => 2
-                ]
+                    'type' => 'perfect_score_count',
+                    'count' => 3,
+                ],
             ],
+            // ID 6: Knowledge Master - Ganti dari Event Warrior
             [
                 'id' => 6,
-                'slug' => 'im-the-boss',
-                'name' => 'Im the boss',
-                'emoji' => '👑',
-                'description' => 'Menyelesaikan 6 Boss Solo Raid yang berbeda',
+                'slug' => 'knowledge-master',
+                'name' => 'Knowledge Master',
+                'emoji' => '📚',
+                'description' => 'Selesaikan 10 materi (content node)',
                 'is_system' => true,
                 'requirements' => [
-                    'type' => 'solo_victory_count',
-                    'count' => 6,
-                    'unique_raid' => true
-                ]
+                    'type' => 'node_completion_count',
+                    'count' => 10,
+                ],
             ],
         ];
 
         foreach ($badges as $badge) {
             Badge::updateOrCreate(
-                ['slug' => $badge['slug']], // Check by slug
+                ['id' => $badge['id']],
                 $badge
             );
         }
+
+        // Hapus badge lama yang tidak dipakai (slug berbeda dari 6 badge di atas)
+        $validSlugs = array_column($badges, 'slug');
+        Badge::where('is_system', true)->whereNotIn('slug', $validSlugs)->delete();
     }
 }

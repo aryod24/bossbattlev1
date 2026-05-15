@@ -7,6 +7,7 @@ use App\Models\UserBadge;
 use App\Models\Badge;
 use App\Models\SessionSolo;
 use App\Models\EventParticipant;
+use App\Models\UserNodeCompletion;
 use Carbon\Carbon;
 
 class BadgeService
@@ -14,17 +15,8 @@ class BadgeService
     // Badge Slugs
     public const SLUG_BOSS_NOVICE = 'boss-novice';
     public const SLUG_BOSS_VETERAN = 'boss-veteran';
-    public const SLUG_TOP_3_CHALLENGER = 'top-3-challenger';
     public const SLUG_PERFECT_STRIKE = 'perfect-strike';
-    public const SLUG_EVENT_WARRIOR = 'event-warrior';
 
-    /**
-     * Check all badges for a user.
-     * 
-     * @param User $user
-     * @param mixed $currentSession - Instance of SessionSolo or EventParticipant (optional)
-     * @return array - List of newly unlocked badge models
-     */
     /**
      * Check all badges for a user.
      * 
@@ -53,16 +45,10 @@ class BadgeService
                     case self::SLUG_BOSS_VETERAN:
                         $isUnlocked = $this->checkBossVeteran($user);
                         break;
-                    case self::SLUG_TOP_3_CHALLENGER:
-                        $isUnlocked = $this->checkTop3Challenger($user);
-                        break;
                     case self::SLUG_PERFECT_STRIKE:
                         if ($currentSession) {
                             $isUnlocked = $this->checkPerfectStrike($user, $currentSession);
                         }
-                        break;
-                    case self::SLUG_EVENT_WARRIOR:
-                        $isUnlocked = $this->checkEventWarrior($user);
                         break;
                 }
             }
@@ -132,10 +118,27 @@ class BadgeService
                     }
                     break;
 
-                case 'event_participation_count':
-                    $count = EventParticipant::where('user_id', $user->id)->count();
-                    $target = $rule['count'] ?? 1;
-                    $pass = $count >= $target;
+                case 'perfect_score_count':
+                    // Hitung berapa kali user pernah jawab 100% benar di semua session
+                    $target = $rule['count'] ?? 3;
+                    $perfectCount = SessionSolo::where('user_id', $user->id)
+                        ->whereNotNull('jumlah_soal')
+                        ->where('jumlah_soal', '>', 0)
+                        ->whereColumn('jumlah_benar', 'jumlah_soal')
+                        ->whereNotNull('waktu_selesai')
+                        ->count();
+                    $pass = $perfectCount >= $target;
+                    break;
+
+                case 'node_completion_count':
+                    // Hitung jumlah content node yang sudah diselesaikan user
+                    $target = $rule['count'] ?? 10;
+                    $completedCount = UserNodeCompletion::where('user_id', $user->id)
+                        ->whereHas('node', function($q) {
+                            $q->where('type', 'content');
+                        })
+                        ->count();
+                    $pass = $completedCount >= $target;
                     break;
                     
                 case 'perfect_score':
@@ -197,14 +200,6 @@ class BadgeService
         return true;
     }
 
-    // 3. Top 3 Challenger: Rank 1-3 in Event
-    public function checkTop3Challenger(User $user)
-    {
-        return EventParticipant::where('user_id', $user->id)
-            ->whereIn('peringkat_leaderboard', [1, 2, 3])
-            ->exists();
-    }
-
     // 4. Perfect Strike: 100% correct in a session
     public function checkPerfectStrike(User $user, $session)
     {
@@ -213,12 +208,6 @@ class BadgeService
         if ($session->jumlah_soal == 0) return false;
 
         return $session->jumlah_benar === $session->jumlah_soal;
-    }
-
-    // 5. Event Warrior: Join 2+ events
-    public function checkEventWarrior(User $user)
-    {
-        return EventParticipant::where('user_id', $user->id)->count() >= 2;
     }
 
     /**

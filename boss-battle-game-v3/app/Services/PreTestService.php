@@ -47,13 +47,16 @@ class PreTestService
         }
 
         return DB::transaction(function () use ($user) {
+            $config = \App\Http\Controllers\Admin\PreTestConfigController::getConfig();
+            $totalQuestions = $config['total_questions'] ?? self::TOTAL_QUESTIONS;
+
             // Create pre-test session (no raid association, no boss HP)
             $session = SessionSolo::create([
                 'user_id' => $user->id,
                 'solo_raid_id' => null, // No raid associated (pre-test is standalone)
                 'level' => 'Easy', // Default, not really used for pre-test
                 'waktu_mulai' => now(),
-                'jumlah_soal' => self::TOTAL_QUESTIONS,
+                'jumlah_soal' => $totalQuestions,
                 'boss_hp_awal' => null, // Pre-test has no boss
                 'boss_hp_akhir' => null, // Pre-test has no boss
                 'attempt_number' => 1,
@@ -75,10 +78,19 @@ class PreTestService
     private function assignPretestQuestions(SessionSolo $session): void
     {
         $allQuestions = collect();
+        $config = \App\Http\Controllers\Admin\PreTestConfigController::getConfig();
+        $composition = $config['composition'] ?? self::PRETEST_COMPOSITION;
+        $bankGroup = $config['bank_group'] ?? null;
 
-        foreach (self::PRETEST_COMPOSITION as $level => $count) {
-            $questions = QuestionBank::where('level', $level)
-                ->inRandomOrder()
+        foreach ($composition as $level => $count) {
+            if ($count <= 0) continue;
+
+            $query = QuestionBank::where('level', $level);
+            if (!empty($bankGroup)) {
+                $query->where('bank_group', $bankGroup);
+            }
+
+            $questions = $query->inRandomOrder()
                 ->limit($count)
                 ->get();
             $allQuestions = $allQuestions->merge($questions);

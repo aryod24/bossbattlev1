@@ -90,8 +90,8 @@
                         <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.users.index') }}">
                             <span class="material-symbols-outlined">group</span>Manajemen User
                         </a>
-                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-primary/20" href="#">
-                            <span class="material-symbols-outlined">book</span>Konten
+                        <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.pretest.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.pretest.edit') }}">
+                            <span class="material-symbols-outlined">assignment</span>Pre-Test
                         </a>
                         <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.reports.*') ? 'bg-primary/30' : 'hover:bg-primary/20' }}" href="{{ route('admin.reports.index') }}">
                             <span class="material-symbols-outlined">monitoring</span>Research Reports

@@ -114,6 +114,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Research Reports
     Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::post('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
+
+    // Pre-test Config
+    Route::get('pretest-config', [\App\Http\Controllers\Admin\PreTestConfigController::class, 'edit'])->name('pretest.edit');
+    Route::put('pretest-config', [\App\Http\Controllers\Admin\PreTestConfigController::class, 'update'])->name('pretest.update');
 });
 
 // Dosen Routes

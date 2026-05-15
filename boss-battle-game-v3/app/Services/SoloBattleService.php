@@ -324,8 +324,10 @@ class SoloBattleService
 
         $session->save();
 
-        // 5. Update user XP & Check Level Up
-        $levelUpResult = $this->xpService->addXP($session->user, $finalXP);
+        // 5. Update user XP & Check Level Up (only if XP earned)
+        $levelUpResult = $finalXP > 0 
+            ? $this->xpService->addXP($session->user, $finalXP)
+            : ['leveled_up' => false];
 
         // 6. Check badges (only for boss-type raids, not latihan soal)
         $newBadges = [];

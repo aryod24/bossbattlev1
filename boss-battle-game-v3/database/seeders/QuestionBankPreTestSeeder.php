@@ -28,7 +28,7 @@ class QuestionBankPreTestSeeder extends Seeder
             ],
             [
                 'level'         => 'Easy',
-                'soal_text'     => 'PHP adalah singkatan dari...',
+                'soal_text'     => 'PHP adalah singkatan dari PHP: ...',
                 'tipe'          => 'short_answer',
                 'jawaban_benar' => 'Hypertext Preprocessor',
                 'bobot_xp'      => 10,

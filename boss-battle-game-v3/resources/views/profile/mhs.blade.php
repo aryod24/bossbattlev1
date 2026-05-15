@@ -8,7 +8,7 @@
                         <span class="material-symbols-outlined text-4xl text-primary">military_tech</span>
                         Koleksi Badge
                     </h3>
-                    <p class="text-text-muted mt-2 text-lg">Pencapaian dan tonggak sejarah Anda di arena Boss Battle.</p>
+                    <p class="text-text-muted mt-2 text-lg">Pencapaian Anda di arena Boss Battle.</p>
                 </div>
                 <div class="text-right mt-4 sm:mt-0 bg-surface-dark px-6 py-3 rounded-xl border border-border">
                     <span class="text-4xl font-bold text-primary">{{ count($unlockedBadges) }}</span>

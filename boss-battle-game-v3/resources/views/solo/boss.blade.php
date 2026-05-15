@@ -32,72 +32,140 @@
 <body class="min-h-screen bg-background flex flex-col md:flex-row" x-data="{ showConfirmModal: false }">
 
     {{-- Left: Info Panel --}}
-    <div class="w-full md:w-1/2 bg-card p-8 md:p-12 flex flex-col justify-start border-b md:border-b-0 md:border-r border-border">
-
-        {{-- Back + Logo --}}
-        <div class="flex justify-between items-center mb-10 bg-surface rounded-xl p-4 border border-border">
-            <a href="{{ route('solo.index') }}" class="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors text-sm font-bold group">
-                <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
-                Kembali ke List
-            </a>
-            <div class="flex items-center gap-2">
-                <h2 class="text-sm font-bold text-text-primary hidden sm:block">CodeBossArena</h2>
-                <div class="w-7 h-7"><img src="{{ asset('assets/logo.png') }}" alt="Logo" class="w-full h-full object-contain"></div>
-            </div>
-        </div>
-
-        {{-- Event Info --}}
+    <div class="w-full md:w-1/2 bg-background p-6 md:p-10 flex flex-col justify-start overflow-y-auto custom-scrollbar border-r border-border">
+        
+        {{-- Header --}}
         <div class="mb-8">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-error/20 text-error border border-error/30 uppercase tracking-wider flex items-center gap-1.5">
+            <div class="flex justify-between items-center bg-surface p-4 rounded-xl border border-border shadow-lg">
+                <a href="{{ route('solo.index') }}" class="group inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors text-xs font-bold uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+                    Keluar Misi
+                </a>
+
+                <div class="flex items-center gap-3">
+                    <h2 class="text-lg font-bold text-text-primary hidden sm:block">CodeBossArena</h2>
+                    <div class="w-8 h-8">
+                        <img src="{{ asset('assets/logo.png') }}" alt="Logo" class="w-full h-full object-contain">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Mission Briefing --}}
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="px-3 py-1 rounded text-[10px] font-black bg-error/20 text-error border border-error/30 uppercase tracking-[0.2em] flex items-center gap-1.5">
                     <span class="material-symbols-outlined" style="font-size:14px">skull</span>
-                    Boss Battle — Section {{ $section }}
+                    BOSS BATTLE — SECTION {{ strtoupper($section) }}
                 </span>
+                <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">ID: #BB-{{ str_pad($soloRaid->id, 3, '0', STR_PAD_LEFT) }}</span>
             </div>
-            <h1 class="text-3xl md:text-4xl font-bold text-text-primary mb-3">{{ $soloRaid->nama }}</h1>
-            <p class="text-text-muted text-base leading-relaxed">{{ $soloRaid->deskripsi }}</p>
+            <h1 class="text-4xl font-black text-white mb-4 tracking-tight">{{ $soloRaid->nama }}</h1>
+            
+            <div class="relative group mb-6">
+                <div class="absolute -left-4 top-0 bottom-0 w-1 bg-error/30 rounded-full group-hover:bg-error transition-colors"></div>
+                <p class="text-text-muted text-sm leading-relaxed pl-2 italic">
+                    "{{ $soloRaid->deskripsi }}"
+                </p>
+            </div>
         </div>
 
-        {{-- Level Config Stats --}}
+        {{-- Tactical Stats --}}
         <div class="mb-8 grid grid-cols-3 gap-4">
-            <div class="bg-surface-light rounded-xl p-4 border border-border text-center">
-                <p class="text-2xl font-black text-text-primary">{{ $levelConfig['questions'] }}</p>
-                <p class="text-xs text-text-muted mt-1">Soal</p>
+            <div class="bg-surface border border-border rounded-xl p-4 text-center group hover:border-primary/50 transition-all shadow-inner">
+                <p class="text-2xl font-black text-white group-hover:text-primary transition-colors">{{ $levelConfig['questions'] }}</p>
+                <p class="text-[9px] font-black text-text-muted mt-1 uppercase tracking-widest">Soal</p>
             </div>
-            <div class="bg-surface-light rounded-xl p-4 border border-border text-center">
-                <p class="text-2xl font-black text-text-primary">{{ $levelConfig['timer_minutes'] }}'</p>
-                <p class="text-xs text-text-muted mt-1">Menit</p>
+            <div class="bg-surface border border-border rounded-xl p-4 text-center group hover:border-primary/50 transition-all shadow-inner">
+                <p class="text-2xl font-black text-white group-hover:text-primary transition-colors">{{ $levelConfig['timer_minutes'] }}'</p>
+                <p class="text-[9px] font-black text-text-muted mt-1 uppercase tracking-widest">Menit</p>
             </div>
-            <div class="bg-surface-light rounded-xl p-4 border border-border text-center">
-                <p class="text-2xl font-black text-text-primary">{{ $levelConfig['min_correct'] }}</p>
-                <p class="text-xs text-text-muted mt-1">Min. Benar</p>
+            <div class="bg-surface border border-border rounded-xl p-4 text-center group hover:border-primary/50 transition-all shadow-inner">
+                <p class="text-2xl font-black text-white group-hover:text-primary transition-colors">{{ $levelConfig['min_correct'] }}</p>
+                <p class="text-[9px] font-black text-text-muted mt-1 uppercase tracking-widest">Min. Benar</p>
             </div>
         </div>
 
-        {{-- Previous Attempts --}}
-        @if($sessionHistory->count() > 0)
-        <div>
-            <h3 class="text-text-muted font-semibold mb-3 flex items-center gap-2 text-sm">
-                <span class="material-symbols-outlined text-primary">history</span>
-                Riwayat Percobaan ({{ $sessionHistory->count() }}x)
+        {{-- Rewards Intel --}}
+        <div class="mb-10 bg-surface/50 border border-border rounded-xl p-5 border-dashed">
+            <h3 class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-warning text-sm">stars</span>
+                Potensi Hadiah Misi
             </h3>
-            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                @foreach($sessionHistory->take(5) as $sess)
-                <div class="bg-surface-light rounded-lg p-3 border border-border flex justify-between items-center text-xs">
-                    <span class="text-text-muted">{{ \Carbon\Carbon::parse($sess->waktu_mulai)->format('d M, H:i') }}</span>
-                    @if(!$sess->waktu_selesai)
-                        <span class="font-bold text-yellow-500 animate-pulse">● Berjalan</span>
-                    @else
-                        <span class="font-bold {{ $sess->boss_kalah ? 'text-success' : 'text-error' }}">
-                            {{ $sess->boss_kalah ? '✓ Menang' : '✗ Kalah' }}
-                            — {{ number_format($sess->skor_akhir, 0) }}%
-                        </span>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20">
+                        <span class="text-xs font-black text-primary">XP</span>
+                    </div>
+                    <div>
+                        @php
+                            $maxXP = ($levelConfig['questions'] * ($section === 'Easy' ? 10 : ($section === 'Medium' ? 15 : 20))) + ($section === 'Easy' ? 50 : ($section === 'Medium' ? 75 : 100));
+                        @endphp
+                        <p class="text-xs font-black text-text-primary uppercase tracking-tight">Hingga +{{ $maxXP }} XP</p>
+                        <p class="text-[9px] text-text-muted font-bold uppercase">Poin Pengalaman</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-warning/10 flex items-center justify-center border border-warning/20">
+                        <span class="material-symbols-outlined text-warning text-lg">workspace_premium</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black text-text-primary uppercase tracking-tight">Badge Khusus</p>
+                        <p class="text-[9px] text-text-muted font-bold uppercase">Reward Pencapaian</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Riwayat Percobaan --}}
+        <div class="mb-6">
+            <h3 class="text-text-muted font-black mb-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em]">
+                <span class="material-symbols-outlined text-primary text-sm">history</span>
+                Log Aktivitas ({{ $sessionHistory->count() }} Entri)
+            </h3>
+            
+            @if($sessionHistory->count() > 0)
+                <div class="space-y-3">
+                    @foreach($sessionHistory->take(3) as $sess)
+                        <div class="group bg-surface/30 rounded-lg p-3 border border-border hover:border-primary/50 transition-all flex justify-between items-center">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] text-text-muted font-bold uppercase tracking-tight">{{ \Carbon\Carbon::parse($sess->waktu_mulai)->format('d M Y, H:i') }}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-black text-text-primary uppercase tracking-widest">Percobaan #{{ $sess->attempt_number }}</span>
+                                    <span class="w-1 h-1 rounded-full bg-border"></span>
+                                    <span class="text-[10px] font-bold text-error uppercase">{{ $section }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right">
+                                @if(!$sess->waktu_selesai)
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
+                                        <span class="text-[10px] font-black text-yellow-500 uppercase tracking-widest">Aktif</span>
+                                    </div>
+                                @else
+                                    <div class="text-xs font-black {{ $sess->boss_kalah ? 'text-success' : 'text-error' }} uppercase">
+                                        {{ $sess->boss_kalah ? 'Berhasil' : 'Gagal' }}
+                                    </div>
+                                    <div class="text-[10px] font-bold text-text-muted">Akurasi {{ number_format($sess->skor_akhir, 0) }}%</div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                    @if($sessionHistory->count() > 3)
+                        <div class="text-center">
+                            <span class="text-[9px] font-bold text-text-muted uppercase tracking-widest">... {{ $sessionHistory->count() - 3 }} entri lainnya disembunyikan ...</span>
+                        </div>
                     @endif
                 </div>
-                @endforeach
-            </div>
+            @else
+                <div class="text-center py-10 border-2 border-dashed border-border rounded-xl">
+                    <span class="material-symbols-outlined text-3xl text-border mb-2 block">folder_open</span>
+                    <p class="text-[10px] font-black text-text-muted uppercase tracking-[0.2em]">Belum Ada Rekaman Aktivitas</p>
+                </div>
+            @endif
         </div>
-        @endif
+    </div>
     </div>
 
     {{-- Right: Boss Visual + Start --}}

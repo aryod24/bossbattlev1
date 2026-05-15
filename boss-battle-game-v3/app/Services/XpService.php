@@ -58,6 +58,11 @@ class XpService
      */
     public function calculateSessionXP(SessionSolo $session)
     {
+        // 0. Skip XP for learning sessions
+        if ($session->soloRaid && $session->soloRaid->isLearning()) {
+            return 0;
+        }
+
         // 1. Config based on level
         $levelConfig = [
             'Easy' => ['xp_per_soal' => 10, 'boss_bonus' => 50],

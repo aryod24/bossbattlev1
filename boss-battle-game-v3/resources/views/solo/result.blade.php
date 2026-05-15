@@ -144,10 +144,12 @@
                         {{ number_format($session->skor_akhir, 1) }}%
                     </span>
                 </div>
+                @if($session->soloRaid->type !== 'learning')
                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
                     <span class="text-vscode-muted">XP Diperoleh</span>
                     <span class="text-vscode-primary">+{{ $session->xp_diperoleh }} XP</span>
                 </div>
+                @endif
                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
                     <span class="text-vscode-muted">Benar/Total</span>
                     <span>{{ $session->jumlah_benar }} / {{ $session->jumlah_soal }}</span>

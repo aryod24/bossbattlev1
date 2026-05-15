@@ -211,7 +211,7 @@
     <div class="flex flex-col md:flex-row min-h-screen">
         
         <!-- Left Section: Info Panel (Light Theme) -->
-        <x-solo.map-info-panel :solo-raid="$soloRaid" :stats="$userStats" :sessions="$sessionHistory" :active-session="$activeSession" />
+        <x-solo.map-info-panel :solo-raid="$soloRaid" :stats="$userStats" :sessions="$sessionHistory" :active-session="$activeSession" :nodes="$nodes" :completed-node-ids="$completedNodeIds" />
         <x-solo.map-visual :solo-raid="$soloRaid" :nodes="$nodes" :completed-node-ids="$completedNodeIds" />
     </div>
 

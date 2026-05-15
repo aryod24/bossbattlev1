@@ -30,7 +30,7 @@ class LeaderboardController extends Controller
                 $query->where('boss_kalah', true);
             }], 'boss_kalah') // Assuming boss_kalah is boolean (1/0), sum works as count of true
             ->withAvg(['sessionSolos as avg_score' => $excludePretest], 'skor_akhir')
-            ->paginate(100);
+            ->paginate(10);
 
         // Process users to calculate rates and ranks
         // Since pagination is used, rank needs to be calculated based on page
@@ -78,6 +78,12 @@ class LeaderboardController extends Controller
                 ->first();
         }
 
-        return view('leaderboard.index', compact('users', 'currentUser', 'currentUserRank', 'targetUser'));
+        // Get Top 3 explicitly for podium
+        $topUsers = User::where('role', 'student')
+            ->orderBy('total_xp', 'desc')
+            ->take(3)
+            ->get();
+
+        return view('leaderboard.index', compact('users', 'currentUser', 'currentUserRank', 'targetUser', 'topUsers'));
     }
 }

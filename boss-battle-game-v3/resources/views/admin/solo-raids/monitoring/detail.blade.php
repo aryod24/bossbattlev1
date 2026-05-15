@@ -20,16 +20,25 @@
                 @foreach($timeline as $event)
                     <div class="relative items-start">
                         <!-- Timeline Dot -->
-                        <div class="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full bg-card border-2 
-                            {{ $event['type'] === 'materi' ? 'border-primary' : ($event['type'] === 'kuis_selesai' ? 'border-status-green-text' : 'border-status-red-text') }}">
-                        </div>
+                        @php
+                            $dotColor = 'border-primary';
+                            if ($event['type'] === 'kuis_mulai') $dotColor = 'border-status-red-text';
+                            elseif ($event['type'] === 'kuis_selesai') $dotColor = ($event['won'] ?? false) ? 'border-status-green-text' : 'border-status-red-text';
+                        @endphp
+                        <div class="absolute -left-[31px] top-1.5 h-4 w-4 rounded-full bg-card border-2 {{ $dotColor }}"></div>
                         
                         <div class="space-y-1">
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="text-sm font-semibold text-text-primary">{{ $event['title'] }}</span>
                                 <span class="text-xs px-2 py-0.5 rounded-full bg-border text-text-muted font-medium">{{ \Carbon\Carbon::parse($event['time'])->format('d M Y, H:i:s') }}</span>
                             </div>
-                            <p class="text-sm text-text-muted">{{ $event['status'] }}</p>
+                            @if($event['type'] === 'kuis_selesai')
+                                <p class="text-sm font-semibold {{ ($event['won'] ?? false) ? 'text-status-green-text' : 'text-status-red-text' }}">
+                                    {{ $event['status'] }}
+                                </p>
+                            @else
+                                <p class="text-sm text-text-muted">{{ $event['status'] }}</p>
+                            @endif
                         </div>
                     </div>
                 @endforeach

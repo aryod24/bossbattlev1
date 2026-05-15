@@ -353,7 +353,8 @@
                 showActiveSessionModal: false,
                 activeSession: @json($activeSession),
                 currentRaidId: {{ $soloRaid->id }},
-                // Quiz auto-level from user section
+                // Quiz level — always use the raid's section for learning events
+                raidSection: '{{ $soloRaid->section ?? "Easy" }}',
                 userSection: '{{ auth()->user()->current_section ?? "Easy" }}',
 
                 init() {
@@ -426,7 +427,8 @@
 
                 doStartLatihan() {
                     this.showConfirmModal = false;
-                    window.location.href = `/solo/${this.raidId}/battle/init/${this.userSection}`;
+                    // Use raid's section level — NOT the user's adaptive level
+                    window.location.href = `/solo/${this.raidId}/battle/init/${this.raidSection}`;
                 },
 
                 startBoss() {

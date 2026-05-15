@@ -237,7 +237,10 @@ class SoloRaidAdminController extends Controller
                 'last_session' => $lastSession,
                 'attempts' => $attempts,
                 'last_active' => $lastSession ? $lastSession->waktu_mulai : ($progress ? $progress->updated_at : null),
-                'boss_defeated' => $lastSession ? $lastSession->boss_kalah : false
+                'boss_defeated' => \App\Models\SessionSolo::where('user_id', $student->id)
+                    ->where('solo_raid_id', $soloRaid->id)
+                    ->where('boss_kalah', true)
+                    ->exists()
             ];
         }
 
@@ -270,27 +273,39 @@ class SoloRaidAdminController extends Controller
         // Fetch quiz sessions
         $quizSessions = \App\Models\SessionSolo::where('user_id', $user->id)
             ->where('solo_raid_id', $soloRaid->id)
+            ->with('soloRaid')
             ->get()
             ->flatMap(function ($session) {
+                // For learning events, use the raid's section as the display level
+                // because startLatihan() may have used the user's adaptive level instead
+                $displayLevel = ($session->soloRaid && $session->soloRaid->type === 'learning')
+                    ? ($session->soloRaid->section ?? $session->level)
+                    : $session->level;
+
                 $events = [
                     [
                         'type' => 'kuis_mulai',
-                        'title' => 'Memulai Kuis (Level ' . ucfirst($session->level) . ' - Percobaan #' . $session->attempt_number . ')',
+                        'title' => 'Memulai Kuis (Level ' . ucfirst($displayLevel) . ' - Percobaan #' . $session->attempt_number . ')',
                         'time' => $session->waktu_mulai,
                         'status' => 'Mulai'
                     ]
                 ];
                 
                 if ($session->waktu_selesai) {
-                    $statusDetail = 'Skor: ' . round($session->skor_akhir) . '. Boss ' . ($session->boss_kalah ? 'Kalahkan' : 'Bertahan');
+                    $bossWon = (bool) $session->boss_kalah;
                     if ($session->soloRaid && $session->soloRaid->type === 'learning') {
-                         $statusDetail = 'Skor: ' . round($session->skor_akhir);
+                        $lulus = $session->skor_akhir >= 60;
+                        $statusDetail = 'Skor: ' . round($session->skor_akhir) . ($lulus ? ' — Lulus' : ' — Tidak Lulus');
+                        $bossWon = $lulus;
+                    } else {
+                        $statusDetail = 'Skor: ' . round($session->skor_akhir) . '. Boss ' . ($bossWon ? 'Kalahkan' : 'Bertahan');
                     }
 
                     $events[] = [
-                        'type' => 'kuis_selesai',
-                        'title' => 'Menyelesaikan Kuis (Level ' . ucfirst($session->level) . ' - Percobaan #' . $session->attempt_number . ')',
-                        'time' => $session->waktu_selesai,
+                        'type'  => 'kuis_selesai',
+                        'won'   => $bossWon,
+                        'title' => 'Menyelesaikan Kuis (Level ' . ucfirst($displayLevel) . ' - Percobaan #' . $session->attempt_number . ')',
+                        'time'  => $session->waktu_selesai,
                         'status' => $statusDetail
                     ];
                 }

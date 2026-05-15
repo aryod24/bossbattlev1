@@ -6,7 +6,7 @@
                         <p class="text-text-primary text-4xl font-black leading-tight tracking-[-0.033em]">Leaderboard Global</p>
                         <p class="text-text-secondary text-base font-normal leading-normal">Lihat posisi Anda di antara semua mahasiswa</p>
                     </div>
-                    <!-- 
+                    <!--
                     <div class="flex flex-col items-end gap-4">
                         <div class="flex items-center gap-2">
                              Search and Filter can be implemented later 
@@ -16,11 +16,10 @@
                 </div>
             </header>
 
-            <!-- PODIUM SECTION -->
             <section class="relative mt-8 flex items-end justify-center gap-4 px-4 h-96">
                 <!-- Rank 2 -->
-                @if($users->count() >= 2)
-                    @php $user2 = $users[1]; @endphp
+                @if($topUsers->count() >= 2)
+                    @php $user2 = $topUsers[1]; @endphp
                     <div class="relative flex w-1/4 flex-col items-center">
                         <span class="material-symbols-outlined text-4xl text-gray-400" style="filter: drop-shadow(0 0 10px #C0C0C0);">workspace_premium</span>
                         <div class="h-28 w-28 rounded-full border-4 border-gray-400 bg-cover bg-center drop-shadow-lg"
@@ -35,8 +34,8 @@
                 @endif
 
                 <!-- Rank 1 -->
-                @if($users->count() >= 1)
-                    @php $user1 = $users[0]; @endphp
+                @if($topUsers->count() >= 1)
+                    @php $user1 = $topUsers[0]; @endphp
                     <div class="relative flex w-1/3 flex-col items-center">
                         <span class="material-symbols-outlined text-5xl text-yellow-400 absolute -top-12 z-10 drop-shadow-xl" style="filter: drop-shadow(0 0 15px #FFD700);">emoji_events</span>
                         <div class="h-36 w-36 rounded-full border-4 border-yellow-400 bg-cover bg-center drop-shadow-xl"
@@ -51,8 +50,8 @@
                 @endif
 
                 <!-- Rank 3 -->
-                @if($users->count() >= 3)
-                    @php $user3 = $users[2]; @endphp
+                @if($topUsers->count() >= 3)
+                    @php $user3 = $topUsers[2]; @endphp
                     <div class="relative flex w-1/4 flex-col items-center">
                         <span class="material-symbols-outlined text-4xl text-orange-400" style="filter: drop-shadow(0 0 10px #CD7F32);">workspace_premium</span>
                         <div class="h-28 w-28 rounded-full border-4 border-orange-400 bg-cover bg-center drop-shadow-lg"

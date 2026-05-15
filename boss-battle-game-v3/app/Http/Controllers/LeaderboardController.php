@@ -47,15 +47,6 @@ class LeaderboardController extends Controller
             // Format Avg Score
             $user->avg_score_formatted = number_format($user->avg_score ?? 0, 0);
 
-            // Assign Badge Label based on Level (using logic similar to dashboard)
-            $user->rank_label = match(true) {
-                $user->level >= 5 => 'Master',
-                $user->level >= 4 => 'Advanced',
-                $user->level >= 3 => 'Gold',
-                $user->level >= 2 => 'Silver',
-                default => 'Novice'
-            };
-            
             return $user;
         });
 

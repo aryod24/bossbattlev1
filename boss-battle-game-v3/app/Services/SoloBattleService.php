@@ -177,13 +177,18 @@ class SoloBattleService
                         : "Jawaban salah tersimpan. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}";
                 }
 
-                return [
+                $response = [
                     'is_correct' => $existingAnswer->is_correct,
-                    'damage' => 0, // No new damage
-                    'boss_hp_current' => $session->boss_hp_akhir,
-                    'boss_hp_max' => $session->boss_hp_awal,
                     'feedback_message' => $msg
                 ];
+
+                if (!$isPretest && !$isLearning) {
+                    $response['damage'] = 0;
+                    $response['boss_hp_current'] = $session->boss_hp_akhir;
+                    $response['boss_hp_max'] = $session->boss_hp_awal;
+                }
+
+                return $response;
             }
 
             // 4. Get question & validate answer
@@ -256,15 +261,20 @@ class SoloBattleService
             }
 
             // 9. Return response
-            return [
+            $response = [
                 'is_correct' => $isCorrect,
-                'damage' => $damage,
-                'boss_hp_current' => $session->boss_hp_akhir,
-                'boss_hp_max' => $session->boss_hp_awal,
-                'player_hp_current' => $session->player_hp_akhir,
-                'player_hp_max' => $session->player_hp_awal,
                 'feedback_message' => $msg
             ];
+
+            if (!$isPretest && !$isLearning) {
+                $response['damage'] = $damage;
+                $response['boss_hp_current'] = $session->boss_hp_akhir;
+                $response['boss_hp_max'] = $session->boss_hp_awal;
+                $response['player_hp_current'] = $session->player_hp_akhir;
+                $response['player_hp_max'] = $session->player_hp_awal;
+            }
+
+            return $response;
         });
     }
 

@@ -6,14 +6,14 @@
                 <div>
                     <h3 class="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                         <span class="material-symbols-outlined text-4xl text-primary">military_tech</span>
-                        Badge Collection
+                        Koleksi Badge
                     </h3>
-                    <p class="text-text-muted mt-2 text-lg">Your achievements and milestones in the Boss Battle arena.</p>
+                    <p class="text-text-muted mt-2 text-lg">Pencapaian dan tonggak sejarah Anda di arena Boss Battle.</p>
                 </div>
                 <div class="text-right mt-4 sm:mt-0 bg-surface-dark px-6 py-3 rounded-xl border border-border">
                     <span class="text-4xl font-bold text-primary">{{ count($unlockedBadges) }}</span>
                     <span class="text-xl text-text-muted">/ {{ count($allBadges) }}</span>
-                    <div class="text-xs font-bold uppercase tracking-wider text-text-muted mt-1">Unlocked</div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-text-muted mt-1">Terbuka</div>
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
                                 </div>
                             @else
                                 <div class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-surface-dark text-text-muted border border-border">
-                                    <span class="material-symbols-outlined text-[10px] mr-1">lock</span> Locked
+                                    <span class="material-symbols-outlined text-[10px] mr-1">lock</span> Terkunci
                                 </div>
                             @endif
                         </div>
@@ -65,7 +65,7 @@
                 <header class="mb-6">
                     <h3 class="text-2xl font-bold text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">person</span>
-                        Profile Information
+                        Informasi Profil
                     </h3>
                     <p class="mt-1 text-sm text-text-muted">{{ __('Perbarui informasi profil Anda. Email tidak dapat diubah.') }}</p>
                 </header>
@@ -80,9 +80,9 @@
                 <header class="mb-6">
                     <h3 class="text-2xl font-bold text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">bar_chart</span>
-                        Your Stats
+                        Statistik Anda
                     </h3>
-                    <p class="mt-1 text-sm text-text-muted">Progress and rank based on XP.</p>
+                    <p class="mt-1 text-sm text-text-muted">Kemajuan dan peringkat berdasarkan XP.</p>
                 </header>
 
                 @php
@@ -96,7 +96,7 @@
                         $nextThreshold = $thresholds[$maxLevel];
                         $prevThreshold = $thresholds[$maxLevel-1];
                         $progress = 100;
-                        $nextThresholdText = "Max Level";
+                        $nextThresholdText = "Level Maksimal";
                     } else {
                         $nextThreshold = $thresholds[$nextLevel];
                         $prevThreshold = $thresholds[$level];
@@ -106,12 +106,7 @@
                         $nextThresholdText = "{$xp} / {$nextThreshold} XP";
                     }
 
-                    $rankName = match(true) {
-                        $level >= 5 => 'Champion',
-                        $level >= 3 => 'Gold',
-                        $level >= 2 => 'Silver',
-                        default => 'Novice'
-                    };
+                    $rankName = $user->rank_label;
                 @endphp
 
                 <div class="space-y-4">
@@ -122,7 +117,7 @@
 
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span class="text-text-muted">Progress to Lvl {{ $level < 5 ? $level + 1 : 'Max' }}</span>
+                            <span class="text-text-muted">Kemajuan ke Lvl {{ $level < 5 ? $level + 1 : 'Maks' }}</span>
                             <span class="text-text-primary font-bold">{{ $nextThresholdText }}</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
@@ -131,17 +126,24 @@
                     </div>
 
                     <div class="flex justify-between items-center pt-2 border-t border-border">
-                        <span class="text-text-muted text-sm">Rank</span>
-                        <span class="font-bold text-text-primary">{{ $rankName }}</span>
+                        <span class="text-text-muted text-sm">Peringkat</span>
+                        <span class="
+                            px-3 py-1 rounded-full text-xs font-bold
+                            {{ $user->rank_label == 'Master' ? 'bg-red-900 text-red-300' : '' }}
+                            {{ $user->rank_label == 'Advanced' ? 'bg-purple-900 text-purple-300' : '' }}
+                            {{ $user->rank_label == 'Gold' ? 'bg-yellow-900 text-yellow-300' : '' }}
+                            {{ $user->rank_label == 'Silver' ? 'bg-gray-700 text-gray-300' : '' }}
+                            {{ $user->rank_label == 'Novice' ? 'bg-blue-900 text-blue-300' : '' }}
+                        ">{{ $user->rank_label }}</span>
                     </div>
                     <div class="pt-2 border-t border-border">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="flex justify-between items-center">
-                                <span class="text-text-muted text-sm">Winrate</span>
-                                <span class="font-bold text-text-primary">{{ $winRate }}% <span class="text-xs text-text-muted">({{ $totalGames }} games)</span></span>
+                                <span class="text-text-muted text-sm">Persentase Kemenangan</span>
+                                <span class="font-bold text-text-primary">{{ $winRate }}% <span class="text-xs text-text-muted">({{ $totalGames }} permainan)</span></span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-text-muted text-sm">Avg Score</span>
+                                <span class="text-text-muted text-sm">Skor Rata-rata</span>
                                 <span class="font-bold text-text-primary">{{ $avgScoreFormatted }}</span>
                             </div>
                         </div>

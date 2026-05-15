@@ -23,13 +23,9 @@
             $nextThresholdText = "{$xp} / {$nextThreshold} XP";
         }
 
-        // Rank Logic
-        $rankName = match(true) {
-            $level >= 5 => 'Champion',
-            $level >= 3 => 'Gold',
-            $level >= 2 => 'Silver',
-            default => 'Novice'
-        };
+        // rankName variable is used below, but we can just use auth()->user()->rank_label directly
+        // However, some code below might use $rankName, so let's keep the variable for compatibility
+        $rankName = auth()->user()->rank_label;
     @endphp
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -71,7 +67,14 @@
 
                 <div class="flex justify-between items-center pt-2 border-t border-border">
                     <span class="text-text-muted text-sm">Rank</span>
-                    <span class="font-bold text-text-primary">{{ $rankName }}</span>
+                    <span class="
+                        px-3 py-1 rounded-full text-xs font-bold
+                        {{ auth()->user()->rank_label == 'Master' ? 'bg-red-900 text-red-300' : '' }}
+                        {{ auth()->user()->rank_label == 'Advanced' ? 'bg-purple-900 text-purple-300' : '' }}
+                        {{ auth()->user()->rank_label == 'Gold' ? 'bg-yellow-900 text-yellow-300' : '' }}
+                        {{ auth()->user()->rank_label == 'Silver' ? 'bg-gray-700 text-gray-300' : '' }}
+                        {{ auth()->user()->rank_label == 'Novice' ? 'bg-blue-900 text-blue-300' : '' }}
+                    ">{{ auth()->user()->rank_label }}</span>
                 </div>
             </div>
         </div>

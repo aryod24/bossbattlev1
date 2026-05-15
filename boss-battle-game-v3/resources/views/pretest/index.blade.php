@@ -2,11 +2,11 @@
     <div class="max-w-5xl mx-auto py-8 px-4">
         <!-- Header as small centered card (like result) -->
         <div class="mb-8">
-            <div class="bg-card p-4 rounded-lg border border-border shadow-sm flex items-center gap-4">
+            <div class="bg-card p-4 rounded-lg border border-border shadow-sm flex flex-col items-center justify-center text-center gap-2">
                 <span class="material-symbols-outlined text-4xl text-primary">quiz</span>
-                <div class="text-left">
+                <div>
                     <h1 class="text-2xl font-black text-text-primary mb-0">Pre-test Penempatan</h1>
-                    <p class="text-text-secondary text-sm">30 Menit • 30 Soal • PHP Only</p>
+                    <p class="text-text-secondary text-sm">30 Menit • 30 Soal • PHP</p>
                 </div>
             </div>
         </div>
@@ -31,28 +31,28 @@
             </div>
             <div class="bg-card rounded-lg border border-border p-5 text-center shadow-sm">
                 <span class="material-symbols-outlined text-3xl text-purple-400 mb-2 block">school</span>
-                <p class="text-text-primary font-bold text-lg">PHP Only</p>
+                <p class="text-text-primary font-bold text-lg">Bahasa</p>
                 <p class="text-text-secondary text-sm">Pemrograman PHP</p>
             </div>
         </div>
 
         <!-- Placement Info split into two cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div class="bg-card rounded-lg border border-border p-6 shadow-sm">
-                <h3 class="text-text-primary font-bold text-lg mb-4 flex items-center gap-2">
+            <div class="bg-card rounded-lg border border-border p-6 shadow-sm flex flex-col items-center text-center">
+                <h3 class="text-text-primary font-bold text-lg mb-4 flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-primary">info</span>
                     Sistem Penempatan
                 </h3>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3">
+                <div class="space-y-3 flex flex-col items-center">
+                    <div class="flex items-center justify-center gap-3">
                         <span class="bg-green-500/20 text-green-400 text-xs font-bold px-3 py-1 rounded-full">0 - 40%</span>
                         <span class="text-text-secondary">→ Section 1: <span class="text-text-primary font-semibold">Easy</span></span>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center gap-3">
                         <span class="bg-yellow-500/20 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full">41 - 70%</span>
                         <span class="text-text-secondary">→ Section 2: <span class="text-text-primary font-semibold">Medium</span></span>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center gap-3">
                         <span class="bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full">71 - 100%</span>
                         <span class="text-text-secondary">→ Section 3: <span class="text-text-primary font-semibold">Hard</span></span>
                     </div>

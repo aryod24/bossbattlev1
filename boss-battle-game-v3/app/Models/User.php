@@ -81,4 +81,15 @@ class User extends Authenticatable
     {
         return $this->role === 'student' && !$this->hasCompletedPretest();
     }
+
+    public function getRankLabelAttribute(): string
+    {
+        return match(true) {
+            $this->level >= 5 => 'Master',
+            $this->level >= 4 => 'Advanced',
+            $this->level >= 3 => 'Gold',
+            $this->level >= 2 => 'Silver',
+            default => 'Novice'
+        };
+    }
 }

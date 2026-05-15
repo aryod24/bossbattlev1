@@ -12,7 +12,7 @@
         {{-- Header --}}
         <div class="text-center mb-6 w-full">
             <h1 class="text-xl font-extrabold uppercase tracking-wider text-text-primary mb-2">
-                {{ $soloRaid->type === 'boss' ? 'Boss Battle' : 'Dungeon Map' }}
+                {{ $soloRaid->nama }}
             </h1>
             <div class="flex justify-center items-center gap-2">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-success/20 text-success border border-success/30">ACTIVE</span>

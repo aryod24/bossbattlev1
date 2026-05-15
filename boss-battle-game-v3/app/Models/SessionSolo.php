@@ -12,6 +12,7 @@ class SessionSolo extends Model
         'waktu_mulai', 'waktu_selesai', 'durasi_detik',
         'jumlah_soal', 'jumlah_benar', 'jumlah_salah',
         'boss_hp_awal', 'boss_hp_akhir', 'boss_kalah',
+        'player_hp_awal', 'player_hp_akhir',
         'skor_akhir', 'xp_diperoleh',
         'attempt_number', 'is_counted_research', 'is_first_attempt',
         'is_pretest'

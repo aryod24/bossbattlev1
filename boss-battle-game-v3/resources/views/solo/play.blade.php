@@ -37,6 +37,30 @@
         .animate-bounce-short { animation: bounce-short 0.5s ease-in-out 1; }
         .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        /* Damage Flash Animation */
+        @keyframes damage-flash {
+            0% { box-shadow: inset 0 0 0 0 rgba(220, 38, 38, 0); }
+            50% { box-shadow: inset 0 0 100px 20px rgba(220, 38, 38, 0.5); }
+            100% { box-shadow: inset 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        .damage-flash { animation: damage-flash 0.5s ease-out; }
+        
+        /* Screen Shake */
+        @keyframes screen-shake {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5px,-5px); }
+            20% { transform: translate(5px,5px); }
+            30% { transform: translate(-5px,5px); }
+            40% { transform: translate(5px,-5px); }
+            50% { transform: translate(-5px,-5px); }
+            60% { transform: translate(5px,5px); }
+            70% { transform: translate(-5px,5px); }
+            80% { transform: translate(5px,-5px); }
+            90% { transform: translate(-5px,-5px); }
+            100% { transform: translate(0,0); }
+        }
+        .screen-shake { animation: screen-shake 0.4s ease-in-out; }
     </style>
     <style>
         body {
@@ -77,7 +101,8 @@
       x-init="init()">
 
     <!-- MAIN DASHBOARD CONTAINER -->
-    <div class="w-full max-w-6xl bg-vscode-card rounded-xl shadow-2xl border border-vscode-border overflow-hidden relative animate-pop flex flex-col lg:flex-row h-auto lg:h-[85vh]">
+    <div class="w-full max-w-6xl bg-vscode-card rounded-xl shadow-2xl border border-vscode-border overflow-hidden relative animate-pop flex flex-col lg:flex-row h-auto lg:h-[85vh]"
+         :class="isPlayerHit ? 'screen-shake damage-flash' : ''">
         
         <!-- STATUS BAR (Top border decoration) -->
         <div class="absolute top-0 left-0 w-full h-1 bg-vscode-primary z-50"></div>
@@ -137,20 +162,34 @@
                     </div>
                 </div>
 
-                <div class="text-center mt-8 z-20">
+                <div class="text-center mt-8 z-20 w-full px-4">
                     <h2 class="text-2xl font-bold text-vscode-text tracking-tight mb-2 font-mono">{{ $bossName }}</h2>
                     
-                    <!-- HP Bar Container -->
-                    <div class="w-64 lg:w-72 mx-auto">
+                    <!-- Boss HP Bar -->
+                    <div class="w-64 lg:w-72 mx-auto mb-3">
                         <div class="flex justify-between text-xs font-bold text-vscode-muted mb-1 uppercase tracking-wider font-mono">
-                            <span>HP Status</span>
+                            <span>Boss HP</span>
                             <span x-text="`${bossHpCurrent}/${bossHpMax}`"></span>
                         </div>
                         <div class="w-full bg-[#333333] h-4 rounded-sm border border-[#444] p-[1px] relative overflow-hidden">
-                            <!-- HP Fill -->
-                            <div class="h-full rounded-sm transition-all duration-500 ease-out w-full opacity-90"
-                                 :style="`width: ${(bossHpCurrent/bossHpMax)*100}%`"
-                                 :class="hpBarColor()"></div>
+                            <div class="h-full rounded-sm transition-all duration-500 ease-out"
+                                 :style="`width: ${(bossHpCurrent/bossHpMax)*100}%; background-color: #FF5252;`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Player HP Bar -->
+                    <div class="w-64 lg:w-72 mx-auto">
+                        <div class="flex justify-between text-xs font-bold text-vscode-muted mb-1 uppercase tracking-wider font-mono">
+                            <span class="flex items-center gap-1">
+                                <i class="fa-solid fa-heart text-xs" :style="playerHpColor()"></i>
+                                Player HP
+                            </span>
+                            <span x-text="`${playerHpCurrent}/${playerHpMax}`"></span>
+                        </div>
+                        <div class="w-full bg-[#333333] h-4 rounded-sm border border-[#444] p-[1px] relative overflow-hidden">
+                            <div class="h-full rounded-sm transition-all duration-500 ease-out"
+                                 :style="`width: ${(playerHpCurrent/playerHpMax)*100}%; ${playerHpColor(true)}`"
+                                 :class="playerHpCurrent <= (playerHpMax * 0.25) ? 'animate-pulse' : ''"></div>
                         </div>
                     </div>
                 </div>
@@ -186,8 +225,8 @@
             <!-- Progress Bar -->
             <div class="px-8 pt-6 pb-2">
                 <div class="flex items-center justify-between mb-2 font-mono text-xs">
-                    <span class="text-vscode-muted">PROGRESS</span>
-                    <span class="text-vscode-primary" x-text="`${currentQuestionIndex + 1} / ${questions.length} Completed`"></span>
+                    <span class="text-vscode-muted">PROGRES</span>
+                    <span class="text-vscode-primary" x-text="`${currentQuestionIndex + 1} / ${questions.length} Selesai`"></span>
                 </div>
                 <div class="w-full bg-[#333] h-1 rounded-full overflow-hidden">
                     <div class="bg-vscode-primary h-full shadow-[0_0_10px_#007acc] transition-all duration-300"
@@ -244,7 +283,7 @@
                             <button @click="submitAnswer(shortAnswerInput)"
                                     :disabled="!shortAnswerInput || isSubmitting"
                                     class="bg-vscode-primary hover:bg-vscode-primary-dark text-white font-mono font-bold py-2 px-6 rounded-sm transition-colors flex items-center gap-2">
-                                <i class="fa-solid fa-play"></i> Submit
+                                <i class="fa-solid fa-play"></i> Kirim
                             </button>
                         </div>
                     </template>
@@ -281,10 +320,10 @@
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
                 <div class="flex-1">
-                    <h3 class="font-bold text-white text-base mb-1">Runtime Error</h3>
+                    <h3 class="font-bold text-white text-base mb-1">Kesalahan Runtime</h3>
                     <p class="text-sm text-vscode-muted mb-4" x-text="errorMessage"></p>
                     <button @click="showErrorModal = false" class="bg-[#3c3c3c] hover:bg-[#4c4c4c] text-white text-xs px-3 py-2 rounded-sm border border-vscode-border transition-colors">
-                        Dismiss
+                        Tutup
                     </button>
                 </div>
             </div>
@@ -301,7 +340,7 @@
                 <i x-show="!feedbackCorrect" class="fa-solid fa-circle-xmark text-boss-red"></i>
             </div>
             <div class="flex-1">
-                <h3 class="font-bold text-base mb-1" x-text="feedbackCorrect ? 'Compilation Success!' : 'Syntax Error!'"></h3>
+                <h3 class="font-bold text-base mb-1" x-text="feedbackCorrect ? 'Kompilasi Berhasil!' : 'Kesalahan Sintaks!'"></h3>
                 <p class="text-sm text-vscode-muted mb-1" x-text="feedbackMessage"></p>
             </div>
         </div>
@@ -315,6 +354,8 @@
                 raidId: {{ $soloRaid->id }},
                 bossHpMax: {{ $session->boss_hp_awal }},
                 bossHpCurrent: {{ $session->boss_hp_akhir }},
+                playerHpMax: {{ $session->player_hp_awal ?? 5 }},
+                playerHpCurrent: {{ $session->player_hp_akhir ?? 5 }},
                 deadline: new Date('{{ $deadline->toIso8601String() }}').getTime(),
                 timeRemaining: 0,
                 
@@ -329,6 +370,7 @@
                 feedbackMessage: '',
                 showFeedback: false, // Used for shake effect trigger
                 isHit: false,
+                isPlayerHit: false,
                 showDamage: false,
                 showErrorModal: false,
                 errorMessage: '',
@@ -377,10 +419,14 @@
                     return `${mins}:${secs.toString().padStart(2, '0')}`;
                 },
 
-                hpBarColor() {
-                    const percentage = (this.bossHpCurrent / this.bossHpMax) * 100;
-                    if (percentage > 50) return 'bg-boss-red'; // Keep red as per design, or change to green if desired
-                    return 'bg-boss-red'; // Design uses red for boss HP always
+                // Returns inline color string for Player HP
+                playerHpColor(asBgStyle = false) {
+                    const percentage = (this.playerHpCurrent / this.playerHpMax) * 100;
+                    let color;
+                    if (percentage > 60) color = '#4EC9B0';      // Green
+                    else if (percentage > 30) color = '#f59e0b'; // Yellow/Orange
+                    else color = '#FF5252';                       // Red
+                    return asBgStyle ? `background-color: ${color};` : `color: ${color};`;
                 },
 
                 shakeBoss() {
@@ -437,6 +483,13 @@
                                 this.isHit = false;
                                 this.showDamage = false;
                             }, 800);
+                        } else {
+                            // Player takes damage
+                            this.playerHpCurrent = data.player_hp_current;
+                            this.isPlayerHit = true;
+                            setTimeout(() => {
+                                this.isPlayerHit = false;
+                            }, 500);
                         }
 
                         // Show Modal & Auto Advance
@@ -467,8 +520,8 @@
                     this.selectedAnswer = '';
                     this.shortAnswerInput = '';
                     
-                    if (this.bossHpCurrent <= 0) {
-                        // Boss Defeated
+                    if (this.bossHpCurrent <= 0 || this.playerHpCurrent <= 0) {
+                        // Battle Ends (Boss Defeated or Player Dead)
                         this.finishQuiz();
                     } else {
                         this.nextQuestion();

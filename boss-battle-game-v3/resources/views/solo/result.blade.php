@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result - {{ $session->soloRaid->type === 'learning' ? 'Latihan Soal' : $bossName }}</title>
+    <title>Hasil - {{ $session->soloRaid->type === 'learning' ? 'Latihan Soal' : $bossName }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -104,7 +104,7 @@
                     @endif
                 @else
                     <div class="mb-2">
-                        <span class="text-vscode-muted">[INFO]</span> Analyzing battle data...
+                        <span class="text-vscode-muted">[INFO]</span> Menganalisis data pertarungan...
                     </div>
                     <div class="mb-2">
                         <span class="text-vscode-muted">[INFO]</span> Target: <span class="text-vscode-string">'{{ $bossName }}'</span>
@@ -112,13 +112,17 @@
                     
                     @if($session->boss_kalah)
                         <div class="mt-6 mb-6 p-4 border-l-4 border-success-green bg-vscode-bg/50">
-                            <h1 class="text-2xl md:text-3xl font-bold text-success-green mb-2">BUILD SUCCESSFUL</h1>
-                            <p class="text-vscode-text">Target eliminated. Mission accomplished.</p>
+                            <h1 class="text-2xl md:text-3xl font-bold text-success-green mb-2">MISI BERHASIL</h1>
+                            <p class="text-vscode-text">Target berhasil dikalahkan. Misi selesai.</p>
                         </div>
                     @else
                         <div class="mt-6 mb-6 p-4 border-l-4 border-boss-red bg-vscode-bg/50">
-                            <h1 class="text-2xl md:text-3xl font-bold text-boss-red mb-2">BUILD FAILED</h1>
-                            <p class="text-vscode-text">Target remains active. Mission failed.</p>
+                            <h1 class="text-2xl md:text-3xl font-bold text-boss-red mb-2">MISI GAGAL</h1>
+                            @if(($session->player_hp_akhir ?? 1) <= 0)
+                                <p class="text-vscode-text">HP Player habis. Misi gagal.</p>
+                            @else
+                                <p class="text-vscode-text">Target masih aktif. Misi gagal.</p>
+                            @endif
                         </div>
                     @endif
                 @endif
@@ -127,27 +131,45 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 mb-8 text-vscode-text">
                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
-                    <span class="text-vscode-muted">Attempt ID</span>
+                    <span class="text-vscode-muted">Percobaan</span>
                     <span>#{{ $session->attempt_number }}</span>
                 </div>
                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
-                    <span class="text-vscode-muted">Duration</span>
+                    <span class="text-vscode-muted">Durasi</span>
                     <span>{{ gmdate("i:s", $session->durasi_detik) }}s</span>
                 </div>
                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
-                    <span class="text-vscode-muted">Accuracy</span>
+                    <span class="text-vscode-muted">Akurasi</span>
                     <span class="{{ $session->skor_akhir >= 60 ? 'text-success-green' : 'text-boss-red' }}">
                         {{ number_format($session->skor_akhir, 1) }}%
                     </span>
                 </div>
                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
-                    <span class="text-vscode-muted">XP Gained</span>
+                    <span class="text-vscode-muted">XP Diperoleh</span>
                     <span class="text-vscode-primary">+{{ $session->xp_diperoleh }} XP</span>
                 </div>
-                 <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
-                    <span class="text-vscode-muted">Correct/Total</span>
+                <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
+                    <span class="text-vscode-muted">Benar/Total</span>
                     <span>{{ $session->jumlah_benar }} / {{ $session->jumlah_soal }}</span>
                 </div>
+                @if($session->soloRaid->type !== 'learning' && $session->player_hp_awal)
+                <div class="flex justify-between border-b border-vscode-border pb-1 border-dashed">
+                    <span class="text-vscode-muted flex items-center gap-2">
+                        <i class="fa-solid fa-heart"></i> Sisa HP Player
+                    </span>
+                    <span>
+                        @php
+                            $hpPercent = ($session->player_hp_awal > 0) ? ($session->player_hp_akhir / $session->player_hp_awal) * 100 : 0;
+                        @endphp
+                        <span class="{{ $hpPercent > 60 ? 'text-success-green' : ($hpPercent > 30 ? 'text-yellow-400' : 'text-boss-red') }}">
+                            {{ $session->player_hp_akhir }} / {{ $session->player_hp_awal }}
+                        </span>
+                        @if(($session->player_hp_akhir ?? 1) <= 0)
+                            <span class="text-boss-red ml-2 text-xs">(DIKALAHKAN)</span>
+                        @endif
+                    </span>
+                </div>
+                @endif
             </div>
 
             <!-- Inline Notifications Removed (Moved to Modal) -->
@@ -286,7 +308,7 @@
             <div class="bg-vscode-bg px-6 py-4 border-b border-vscode-border flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg flex items-center gap-3 tracking-wide">
                     <span class="text-yellow-500"><i class="fa-solid fa-star"></i></span>
-                    MISSION REWARDS
+                    HADIAH MISI
                 </h3>
                 <button @click="showRewardModal = false" class="text-vscode-muted hover:text-white transition-colors">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -299,11 +321,11 @@
                 <div class="text-center relative">
                     <div class="absolute inset-0 bg-yellow-500/5 blur-xl rounded-full"></div>
                     <div class="relative">
-                        <div class="text-vscode-muted text-xs font-bold uppercase tracking-[0.3em] mb-2">Field Promotion</div>
+                        <div class="text-vscode-muted text-xs font-bold uppercase tracking-[0.3em] mb-2">Promosi Lapangan</div>
                         <div class="text-5xl font-black text-white mb-3 drop-shadow-md font-mono">
                             LEVEL <span class="text-yellow-500">{{ $battleResult['level_up']['new_level'] }}</span>
                         </div>
-                        <p class="text-vscode-text text-sm font-mono">Clearance level upgraded.</p>
+                        <p class="text-vscode-text text-sm font-mono">Level otorisasi ditingkatkan.</p>
                     </div>
                 </div>
                 @endif
@@ -312,7 +334,7 @@
                 @if(!empty($battleResult['new_badges']))
                 <div class="{{ ($battleResult['level_up']['leveled_up'] ?? false) ? 'border-t border-dashed border-vscode-border pt-8' : '' }}">
                     <div class="text-center mb-6">
-                        <span class="text-vscode-muted text-xs uppercase tracking-widest bg-vscode-bg border border-vscode-border inline-block px-3 py-1 rounded-sm">New Achievements</span>
+                        <span class="text-vscode-muted text-xs uppercase tracking-widest bg-vscode-bg border border-vscode-border inline-block px-3 py-1 rounded-sm">Pencapaian Baru</span>
                     </div>
                     
                     <div class="grid gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
@@ -332,7 +354,7 @@
                 @endif
 
                 <button @click="showRewardModal = false" class="w-full py-3 bg-vscode-primary hover:bg-vscode-primary/90 text-white font-bold text-base rounded-sm shadow-lg transition-all focus:ring-2 focus:ring-offset-2 focus:ring-vscode-primary focus:ring-offset-vscode-bg">
-                    CLAIM REWARDS
+                    AMBIL HADIAH
                 </button>
             </div>
         </div>

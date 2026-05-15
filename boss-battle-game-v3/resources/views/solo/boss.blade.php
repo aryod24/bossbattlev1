@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: { colors: {
@@ -28,10 +29,10 @@
         .animate-pulse-red { animation: pulse-red 2s ease-in-out infinite; }
     </style>
 </head>
-<body class="min-h-screen bg-background flex flex-col md:flex-row">
+<body class="min-h-screen bg-background flex flex-col md:flex-row" x-data="{ showConfirmModal: false }">
 
     {{-- Left: Info Panel --}}
-    <div class="w-full md:w-1/2 bg-card p-8 md:p-12 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border">
+    <div class="w-full md:w-1/2 bg-card p-8 md:p-12 flex flex-col justify-start border-b md:border-b-0 md:border-r border-border">
 
         {{-- Back + Logo --}}
         <div class="flex justify-between items-center mb-10 bg-surface rounded-xl p-4 border border-border">
@@ -84,10 +85,14 @@
                 @foreach($sessionHistory->take(5) as $sess)
                 <div class="bg-surface-light rounded-lg p-3 border border-border flex justify-between items-center text-xs">
                     <span class="text-text-muted">{{ \Carbon\Carbon::parse($sess->waktu_mulai)->format('d M, H:i') }}</span>
-                    <span class="font-bold {{ $sess->boss_kalah ? 'text-success' : 'text-error' }}">
-                        {{ $sess->boss_kalah ? '✓ Menang' : '✗ Kalah' }}
-                        — {{ number_format($sess->skor_akhir, 0) }}%
-                    </span>
+                    @if(!$sess->waktu_selesai)
+                        <span class="font-bold text-yellow-500 animate-pulse">● Berjalan</span>
+                    @else
+                        <span class="font-bold {{ $sess->boss_kalah ? 'text-success' : 'text-error' }}">
+                            {{ $sess->boss_kalah ? '✓ Menang' : '✗ Kalah' }}
+                            — {{ number_format($sess->skor_akhir, 0) }}%
+                        </span>
+                    @endif
                 </div>
                 @endforeach
             </div>
@@ -124,14 +129,66 @@
             </div>
             @endif
 
-            <a href="{{ route('solo.battle.init', ['soloRaid' => $soloRaid->id, 'level' => $section]) }}"
+            <button @click="showConfirmModal = true"
                class="w-full flex items-center justify-center gap-3 rounded-xl py-4 bg-error text-white text-base font-black shadow-lg hover:bg-red-600 transition-all hover:scale-105 active:scale-95">
                 <span class="material-symbols-outlined">swords</span>
                 Mulai Boss Battle!
-            </a>
+            </button>
 
-            <p class="text-xs text-text-muted">Timer mulai begitu kamu klik. Siap?</p>
+            <p class="text-xs text-text-muted">Timer mulai begitu kamu konfirmasi. Siap?</p>
         </div>
     </div>
+
+    <!-- Modal Konfirmasi Boss Battle -->
+    <div x-show="showConfirmModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div x-show="showConfirmModal" @click="showConfirmModal = false" class="fixed inset-0 bg-black opacity-75"></div>
+
+            <div x-show="showConfirmModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-error/50 max-w-md w-full">
+                <div class="px-6 pt-6 pb-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-error">swords</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-primary">Mulai Boss Battle?</h3>
+                    </div>
+                    <div class="bg-surface-light rounded-lg p-4 border border-border mb-4">
+                        <p class="text-sm text-text-muted mb-1">Boss</p>
+                        <p class="font-bold text-text-primary mb-3">{{ $bossName }}</p>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <p class="text-text-muted mb-1">HP Boss</p>
+                                <p class="font-bold text-error">{{ $levelConfig['boss_hp'] }} HP</p>
+                            </div>
+                            <div>
+                                <p class="text-text-muted mb-1">Percobaan ke-</p>
+                                <p class="font-bold text-text-primary">#{{ $sessionHistory->count() + 1 }}</p>
+                            </div>
+                            <div>
+                                <p class="text-text-muted mb-1">Durasi</p>
+                                <p class="font-bold text-text-primary">{{ $levelConfig['timer_minutes'] }} menit</p>
+                            </div>
+                            <div>
+                                <p class="text-text-muted mb-1">Min. Benar</p>
+                                <p class="font-bold text-text-primary">{{ $levelConfig['min_correct'] }} soal</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-muted">⚔️ Timer akan langsung mulai setelah konfirmasi.</p>
+                </div>
+                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
+                    <a href="{{ route('solo.battle.init', ['soloRaid' => $soloRaid->id, 'level' => $section]) }}"
+                       class="inline-flex justify-center rounded-lg px-5 py-2 bg-error text-white text-sm font-bold hover:bg-red-600">
+                        Mulai Sekarang!
+                    </a>
+                    <button type="button" @click="showConfirmModal = false"
+                            class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

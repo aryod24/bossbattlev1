@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\DB;
 class SoloBattleService
 {
     public const LEVEL_CONFIG = [
-        'Easy' => ['questions' => 10, 'boss_hp' => 10, 'min_correct' => 6, 'timer_minutes' => 2],
-        'Medium' => ['questions' => 15, 'boss_hp' => 15, 'min_correct' => 9, 'timer_minutes' => 3],
-        'Hard' => ['questions' => 17, 'boss_hp' => 17, 'min_correct' => 11, 'timer_minutes' => 4],
+        'Easy' => ['questions' => 10, 'boss_hp' => 10, 'min_correct' => 6, 'timer_minutes' => 2, 'player_hp' => 8],
+        'Medium' => ['questions' => 15, 'boss_hp' => 15, 'min_correct' => 9, 'timer_minutes' => 3, 'player_hp' => 10],
+        'Hard' => ['questions' => 17, 'boss_hp' => 17, 'min_correct' => 11, 'timer_minutes' => 4, 'player_hp' => 12],
     ];
 
     protected $xpService;
@@ -82,6 +82,8 @@ class SoloBattleService
                 'jumlah_soal' => $config['questions'],
                 'boss_hp_awal' => $config['boss_hp'],
                 'boss_hp_akhir' => $config['boss_hp'],
+                'player_hp_awal' => $config['player_hp'] ?? 5,
+                'player_hp_akhir' => $config['player_hp'] ?? 5,
                 'attempt_number' => $attemptNumber,
                 'is_counted_research' => ($attemptNumber === 1),
                 'is_first_attempt' => ($attemptNumber === 1),
@@ -135,7 +137,7 @@ class SoloBattleService
             // 1. Validate session exists & not finished (with row lock)
             $session = SessionSolo::lockForUpdate()->findOrFail($sessionId);
             if ($session->waktu_selesai) {
-                return ['error' => 'Session already finished'];
+                return ['error' => 'Sesi sudah berakhir'];
             }
             
             // 2. Security: Check Deadline (Prevent Infinite Time Exploit)
@@ -151,7 +153,7 @@ class SoloBattleService
 
             // Add small buffer (e.g. 5 seconds) for network latency
             if (now()->greaterThan($deadline->addSeconds(5))) {
-                return ['error' => 'Time expired'];
+                return ['error' => 'Waktu habis'];
             }
 
             // 3. Idempotency: Check if already answered with row lock (Prevent Double Scoring)
@@ -200,6 +202,10 @@ class SoloBattleService
                 }
             } else {
                 $session->increment('jumlah_salah');
+                // Decrement player HP on wrong answer (if not pretest/learning)
+                if (!$isPretest && !$isLearning && $session->player_hp_akhir !== null) {
+                    $session->decrement('player_hp_akhir', 1);
+                }
             }
             
             // Refresh to get updated values
@@ -208,8 +214,11 @@ class SoloBattleService
             // Ensure boss HP doesn't go below 0 (only for boss battles)
             if (!$isPretest && $session->boss_hp_akhir !== null && $session->boss_hp_akhir < 0) {
                 $session->boss_hp_akhir = 0;
-                $session->save();
             }
+            if (!$isPretest && $session->player_hp_akhir !== null && $session->player_hp_akhir < 0) {
+                $session->player_hp_akhir = 0;
+            }
+            $session->save();
 
             // 7. Save answer to session_answer
             if ($existingAnswer) {
@@ -243,7 +252,7 @@ class SoloBattleService
             } else {
                 $msg = $isCorrect
                     ? "Benar! Damage {$damage} ke Boss. Boss HP: {$session->boss_hp_akhir}/{$session->boss_hp_awal}"
-                    : "Salah! Boss HP tetap: {$session->boss_hp_akhir}/{$session->boss_hp_awal}";
+                    : "Salah! Player HP berkurang! Player HP: {$session->player_hp_akhir}/{$session->player_hp_awal}";
             }
 
             // 9. Return response
@@ -252,6 +261,8 @@ class SoloBattleService
                 'damage' => $damage,
                 'boss_hp_current' => $session->boss_hp_akhir,
                 'boss_hp_max' => $session->boss_hp_awal,
+                'player_hp_current' => $session->player_hp_akhir,
+                'player_hp_max' => $session->player_hp_awal,
                 'feedback_message' => $msg
             ];
         });
@@ -292,7 +303,10 @@ class SoloBattleService
         // 3. Determine if boss defeated / quiz passed
         $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
         $minDamage = $config['min_correct'];
-        $session->boss_kalah = ($session->jumlah_benar >= $minDamage) || ($session->skor_akhir >= 100);
+        
+        // WIN condition: Correct >= threshold AND Player still alive
+        $isPlayerAlive = $session->player_hp_akhir > 0;
+        $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100) && $isPlayerAlive;
 
         // 4. Calculate XP using XpService
         $finalXP = $this->xpService->calculateSessionXP($session);

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $soloRaid->nama }} - Dungeon Map</title>
+    <title>{{ $soloRaid->nama }}</title>
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -218,100 +218,101 @@
     <!-- Materi Modal Component -->
     <x-solo.materi-modal />
 
-    <!-- Start Battle Confirmation Modal -->
-    <div x-show="showStartModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showStartModal" @click="showStartModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-black opacity-75"></div>
-            </div>
+    <!-- Modal Konfirmasi Mulai Latihan -->
+    <div x-show="showConfirmModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div x-show="showConfirmModal" @click="showConfirmModal = false" class="fixed inset-0 bg-black opacity-75"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div x-show="showStartModal" class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
-                <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-500/20 sm:mx-0 sm:h-10 sm:w-10">
-                            <span class="material-symbols-outlined text-yellow-500">swords</span>
+            <div x-show="showConfirmModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-border max-w-md w-full">
+                <div class="px-6 pt-6 pb-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary">quiz</span>
                         </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-bold text-text-primary">Start Battle?</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-text-muted">
-                                    Are you sure you want to start the <span class="font-bold text-primary" x-text="selectedLevel.toUpperCase()"></span> level?
-                                </p>
-                                
-                                <!-- Battle Stats -->
-                                <div class="mt-4 p-3 bg-surface-light rounded-lg border border-border">
-                                    <div class="grid grid-cols-2 gap-3 text-xs">
-                                        <div>
-                                            <p class="text-text-muted mb-1">This will be</p>
-                                            <p class="font-bold text-text-primary" x-text="`Attempt #${(levelStats[selectedLevel]?.attempts || 0) + 1}`"></p>
-                                        </div>
-                                        <div>
-                                            <p class="text-text-muted mb-1">Max XP Possible</p>
-                                            <p class="font-bold text-primary" x-text="(() => {
-                                                const attempt = (levelStats[selectedLevel]?.attempts || 0) + 1;
-                                                const maxXP = selectedLevel === 'easy' ? 150 : selectedLevel === 'medium' ? 200 : 220;
-                                                const penalty = attempt === 1 ? 1.0 : attempt === 2 ? 0.5 : 0.0;
-                                                return Math.floor(maxXP * penalty) + ' XP';
-                                            })()"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <p class="text-xs text-text-muted mt-3">
-                                    ⏱️ Timer starts immediately after confirmation
-                                </p>
-                            </div>
+                        <h3 class="text-lg font-bold text-text-primary">Mulai Latihan Soal?</h3>
+                    </div>
+                    <div class="bg-surface-light rounded-lg p-4 border border-border mb-4">
+                        <p class="text-sm text-text-muted mb-1">Event</p>
+                        <p class="font-bold text-text-primary mb-3">{{ $soloRaid->nama }}</p>
+                        <div class="text-xs">
+                            <p class="text-text-muted mb-1">Percobaan ke-</p>
+                            <p class="font-bold text-text-primary">#{{ $userStats['attempts'] + 1 }}</p>
                         </div>
                     </div>
+                    <p class="text-xs text-text-muted">⏱️ Timer akan langsung mulai setelah konfirmasi.</p>
                 </div>
-                <div class="bg-background-dark px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
-                    <button type="button" @click="startBattle()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:w-auto sm:text-sm">
-                        Start Battle
+                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
+                    <button type="button" @click="doStartLatihan()" class="inline-flex justify-center rounded-lg px-5 py-2 bg-primary text-white text-sm font-bold hover:bg-primary/80">
+                        Mulai Sekarang
                     </button>
-                    <button type="button" @click="showStartModal = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-border shadow-sm px-4 py-2 bg-card text-base font-medium text-text-primary hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm">
-                        Cancel
+                    <button type="button" @click="showConfirmModal = false" class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                        Batal
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Active Session Warning Modal -->
+    <!-- Modal Sesi Aktif -->
     <div x-show="showActiveSessionModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showActiveSessionModal" @click="showActiveSessionModal = false" class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-black opacity-75"></div>
-            </div>
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div x-show="showActiveSessionModal" @click="showActiveSessionModal = false" class="fixed inset-0 bg-black opacity-75"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div x-show="showActiveSessionModal" class="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-border">
-                <div class="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-500/20 sm:mx-0 sm:h-10 sm:w-10">
+            <div x-show="showActiveSessionModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-yellow-500/50 max-w-md w-full">
+                <div class="px-6 pt-6 pb-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
                             <span class="material-symbols-outlined text-yellow-500">warning</span>
                         </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-bold text-text-primary">Active Session Detected</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-text-muted">
-                                    You have an active session on <span class="font-bold text-primary" x-text="activeSession?.level"></span> level.
-                                </p>
-                                <p class="text-sm text-text-muted mt-2">
-                                    Please complete your current session before starting a new level.
-                                </p>
-                            </div>
+                        <h3 class="text-lg font-bold text-text-primary">Sesi Aktif Terdeteksi</h3>
+                    </div>
+                    <div class="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/30 mb-4">
+                        <p class="text-sm text-text-muted mb-1">Kamu masih punya sesi yang sedang berjalan di:</p>
+                        <p class="font-bold text-yellow-400" x-text="activeSession ? activeSession.solo_raid_id + ' — Level ' + (activeSession.level || '-') : ''"></p>
+                    </div>
+                    <p class="text-xs text-text-muted">Selesaikan sesi tersebut terlebih dahulu, atau lanjutkan dari sini.</p>
+                </div>
+                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
+                    <button type="button" @click="continueActiveSession()" class="inline-flex justify-center rounded-lg px-5 py-2 bg-yellow-500 text-black text-sm font-bold hover:bg-yellow-400">
+                        Lanjutkan Sesi
+                    </button>
+                    <button type="button" @click="showActiveSessionModal = false" class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Boss Battle -->
+    <div x-show="showBossConfirmModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div x-show="showBossConfirmModal" @click="showBossConfirmModal = false" class="fixed inset-0 bg-black opacity-75"></div>
+
+            <div x-show="showBossConfirmModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-error/50 max-w-md w-full">
+                <div class="px-6 pt-6 pb-4">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-error">swords</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-primary">Mulai Boss Battle?</h3>
+                    </div>
+                    <div class="bg-surface-light rounded-lg p-4 border border-border mb-4">
+                        <p class="text-sm text-text-muted mb-1">Event</p>
+                        <p class="font-bold text-text-primary mb-3">{{ $soloRaid->nama }}</p>
+                        <div class="text-xs">
+                            <p class="text-text-muted mb-1">Percobaan ke-</p>
+                            <p class="font-bold text-text-primary">#{{ $userStats['attempts'] + 1 }}</p>
                         </div>
                     </div>
+                    <p class="text-xs text-text-muted">⚔️ Timer akan langsung mulai setelah konfirmasi. Siap?</p>
                 </div>
-                <div class="bg-background-dark px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
-                    <button type="button" @click="continueActiveSession()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:w-auto sm:text-sm">
-                        Continue Session
+                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
+                    <button type="button" @click="doStartBoss()" class="inline-flex justify-center rounded-lg px-5 py-2 bg-error text-white text-sm font-bold hover:bg-red-600">
+                        Mulai Sekarang!
                     </button>
-                    <button type="button" @click="showActiveSessionModal = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-border shadow-sm px-4 py-2 bg-card text-base font-medium text-text-primary hover:bg-background-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:w-auto sm:text-sm">
-                        Cancel
+                    <button type="button" @click="showBossConfirmModal = false" class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                        Batal
                     </button>
                 </div>
             </div>
@@ -346,10 +347,10 @@
                 infoTitle: '',
                 infoContent: '',
                 renderedContent: '',
-                // Battle/session state
-                showStartModal: false,
+                // Modal & battle state
+                showConfirmModal: false,
+                showBossConfirmModal: false,
                 showActiveSessionModal: false,
-                selectedLevel: '',
                 activeSession: @json($activeSession),
                 currentRaidId: {{ $soloRaid->id }},
                 // Quiz auto-level from user section
@@ -412,7 +413,36 @@
                 },
 
                 startLatihan() {
-                    // Latihan soal uses user's section as level (Easy/Medium/Hard)
+                    if (this.activeSession && this.activeSession.solo_raid_id != this.currentRaidId) {
+                        this.showActiveSessionModal = true;
+                        return;
+                    }
+                    if (this.activeSession && this.activeSession.solo_raid_id == this.currentRaidId) {
+                        this.continueActiveSession();
+                        return;
+                    }
+                    this.showConfirmModal = true;
+                },
+
+                doStartLatihan() {
+                    this.showConfirmModal = false;
+                    window.location.href = `/solo/${this.raidId}/battle/init/${this.userSection}`;
+                },
+
+                startBoss() {
+                    if (this.activeSession && this.activeSession.solo_raid_id != this.currentRaidId) {
+                        this.showActiveSessionModal = true;
+                        return;
+                    }
+                    if (this.activeSession && this.activeSession.solo_raid_id == this.currentRaidId) {
+                        this.continueActiveSession();
+                        return;
+                    }
+                    this.showBossConfirmModal = true;
+                },
+
+                doStartBoss() {
+                    this.showBossConfirmModal = false;
                     window.location.href = `/solo/${this.raidId}/battle/init/${this.userSection}`;
                 },
 

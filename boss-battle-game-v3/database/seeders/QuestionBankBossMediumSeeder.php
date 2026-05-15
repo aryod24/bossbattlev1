@@ -1,0 +1,191 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\QuestionBank;
+
+class QuestionBankBossMediumSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $commonAttributes = [
+            'bank_group'       => 4,
+            'bank_name'        => 'Functions & Arrays - Boss',
+            'bank_icon'        => '⚔️',
+            'bank_description' => 'Bank soal PHP menengah (Boss Level): string manipulation, multidimensional associative arrays, dan loop control.',
+        ];
+
+        $questions = [
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Variabel yang dideklarasikan di dalam fungsi bersifat...',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'Global — bisa diakses dari mana saja',
+                'pilihan_b'     => 'Lokal — hanya bisa diakses di dalam fungsi tersebut',
+                'pilihan_c'     => 'Static — nilainya tidak berubah',
+                'pilihan_d'     => 'Protected — hanya bisa diakses class turunan',
+                'jawaban_benar' => 'Lokal — hanya bisa diakses di dalam fungsi tersebut',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Jika kita menggunakan array_push() untuk menambahkan satu elemen baru ke array yang awalnya berisi 3 elemen, berapa hasil count() dari array tersebut sekarang?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => '3',
+                'pilihan_b'     => '4',
+                'pilihan_c'     => '5',
+                'pilihan_d'     => 'Error',
+                'jawaban_benar' => '4',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Apa string hasil dari fungsi str_replace("World", "PHP", "Hello World")?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'Hello World',
+                'pilihan_b'     => 'Hello PHP',
+                'pilihan_c'     => 'PHP World',
+                'pilihan_d'     => 'PHP PHP',
+                'jawaban_benar' => 'Hello PHP',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Pada perulangan do-while yang dimulai dari $i = 0, dicetak lalu ditambah ( $i++ ) dengan batas kondisi while ($i < 3), angka berapa saja yang dicetak?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => '0 1 2',
+                'pilihan_b'     => '1 2 3',
+                'pilihan_c'     => '0 1 2 3',
+                'pilihan_d'     => '1 2',
+                'jawaban_benar' => '0 1 2',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Fungsi yang digunakan untuk menggabungkan elemen array menjadi sebuah string adalah...',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'explode()',
+                'pilihan_b'     => 'concat()',
+                'pilihan_c'     => 'implode()',
+                'pilihan_d'     => 'join_array()',
+                'jawaban_benar' => 'implode()',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Pada array multidimensi $kelas = ["TI-3A" => ["ketua" => "Budi"]], nilai apa yang dihasilkan oleh pemanggilan $kelas["TI-3A"]["ketua"]?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'TI-3A',
+                'pilihan_b'     => 'Budi',
+                'pilihan_c'     => 'ketua',
+                'pilihan_d'     => 'Error',
+                'jawaban_benar' => 'Budi',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Apa string hasil dari fungsi substr("Hello World", 6, 5)?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'Hello',
+                'pilihan_b'     => 'World',
+                'pilihan_c'     => 'ello ',
+                'pilihan_d'     => 'lo Wo',
+                'jawaban_benar' => 'World',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Fungsi yang mengembalikan POSISI (indeks angka) pertama kemunculan substring di dalam string adalah...',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'str_contains()',
+                'pilihan_b'     => 'substr()',
+                'pilihan_c'     => 'strpos()',
+                'pilihan_d'     => 'str_search()',
+                'jawaban_benar' => 'strpos()',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Jika kita melakukan perulangan foreach pada array [5, 3, 8, 1] as $i => $val, lalu mencetak indeks ($i) saat $val == 8 dan menggunakan break, angka berapa yang tercetak?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => '8',
+                'pilihan_b'     => '2',
+                'pilihan_c'     => '3',
+                'pilihan_d'     => '1',
+                'jawaban_benar' => '2',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Apa nilai kembalian default dari fungsi PHP jika tidak memiliki statement return secara eksplisit?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => '0',
+                'pilihan_b'     => 'false',
+                'pilihan_c'     => 'null',
+                'pilihan_d'     => 'undefined',
+                'jawaban_benar' => 'null',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Apa string hasil dari fungsi strtoupper("php adalah bahasa")?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'php adalah bahasa',
+                'pilihan_b'     => 'Php Adalah Bahasa',
+                'pilihan_c'     => 'PHP ADALAH BAHASA',
+                'pilihan_d'     => 'PHP adalah bahasa',
+                'jawaban_benar' => 'PHP ADALAH BAHASA',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Fungsi array_shift() digunakan untuk...',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'Menambahkan elemen di awal array',
+                'pilihan_b'     => 'Menghapus dan mengembalikan elemen pertama array',
+                'pilihan_c'     => 'Menghapus dan mengembalikan elemen terakhir array',
+                'pilihan_d'     => 'Mengurutkan elemen array',
+                'jawaban_benar' => 'Menghapus dan mengembalikan elemen pertama array',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Fungsi kali($n, $kali = 2) mengembalikan nilai $n * $kali. Berapa hasil dari pemanggilan kali(5) dan kali(5, 3) secara berurutan?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => '10 15',
+                'pilihan_b'     => '5 15',
+                'pilihan_c'     => '10 10',
+                'pilihan_d'     => 'Error',
+                'jawaban_benar' => '10 15',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Apa string yang dihasilkan dari penggabungan array ["PHP", "Laravel", "MySQL"] menggunakan fungsi implode("-", ...)?',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'PHP Laravel MySQL',
+                'pilihan_b'     => 'PHP-Laravel-MySQL',
+                'pilihan_c'     => 'PHP,Laravel,MySQL',
+                'pilihan_d'     => 'PHPLaravelMySQL',
+                'jawaban_benar' => 'PHP-Laravel-MySQL',
+                'bobot_xp'      => 20,
+            ],
+            [
+                'level'         => 'Medium',
+                'soal_text'     => 'Keyword yang digunakan untuk menghentikan eksekusi loop sepenuhnya secara paksa di PHP adalah...',
+                'tipe'          => 'multiple_choice',
+                'pilihan_a'     => 'stop',
+                'pilihan_b'     => 'exit',
+                'pilihan_c'     => 'continue',
+                'pilihan_d'     => 'break',
+                'jawaban_benar' => 'break',
+                'bobot_xp'      => 20,
+            ],
+        ];
+
+        foreach ($questions as $question) {
+            QuestionBank::create(array_merge($commonAttributes, $question));
+        }
+    }
+}

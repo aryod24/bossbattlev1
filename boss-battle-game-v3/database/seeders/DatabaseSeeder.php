@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,8 +17,22 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             SoloRaidSeeder::class,
-            QuestionBankSeeder::class,   // Bank 1: PHP Basics (74 questions)
-            QuestionBankSeeder2::class,  // Bank 2: PHP Advanced (75 questions)
+            
+            // Pre-Test Questions (Bank Group 0)
+            QuestionBankPreTestSeeder::class,
+            
+            // Bank Group 1: PHP Basics Week 1
+            QuestionBankEasySeeder::class,
+            QuestionBankBossSeeder::class,
+            
+            // Bank Group 2: Functions & Arrays
+            QuestionBankMediumSeeder::class,
+            QuestionBankBossMediumSeeder::class,
+            
+            // Bank Group 3: OOP & Database
+            QuestionBankHardSeeder::class,
+            QuestionBankBossHardSeeder::class,
+            
             BadgeSeeder::class,
         ]);
     }

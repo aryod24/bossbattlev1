@@ -13,8 +13,15 @@ class PreTestConfigController extends Controller
 
     public function edit()
     {
-        // Get all unique bank_groups
-        $bankGroups = QuestionBank::select('bank_group')->whereNotNull('bank_group')->where('bank_group', '!=', '')->distinct()->pluck('bank_group');
+        // Get all unique bank_groups with their names
+        $bankGroups = QuestionBank::select('bank_group', 'bank_name')
+            ->whereNotNull('bank_group')
+            ->distinct()
+            ->orderBy('bank_group')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->bank_group => "Bank Group {$item->bank_group}: {$item->bank_name}"];
+            });
 
         // Load current config
         $config = self::getConfig();

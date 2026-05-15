@@ -86,8 +86,36 @@ class PreTestService
             if ($count <= 0) continue;
 
             $query = QuestionBank::where('level', $level);
+            
+            // If bank_group is specified, use it
+            // If bank_group is null or empty, prioritize bank_group 0 (Pre-Test bank)
+            // If bank_group 0 doesn't have enough questions, get from all banks
             if (!empty($bankGroup)) {
                 $query->where('bank_group', $bankGroup);
+            } else {
+                // Try to get from bank_group 0 first (Pre-Test specific bank)
+                $pretestQuestions = QuestionBank::where('level', $level)
+                    ->where('bank_group', 0)
+                    ->inRandomOrder()
+                    ->limit($count)
+                    ->get();
+                
+                // If not enough questions in bank_group 0, get from all banks
+                if ($pretestQuestions->count() < $count) {
+                    $remaining = $count - $pretestQuestions->count();
+                    $additionalQuestions = QuestionBank::where('level', $level)
+                        ->where('bank_group', '!=', 0)
+                        ->inRandomOrder()
+                        ->limit($remaining)
+                        ->get();
+                    
+                    $questions = $pretestQuestions->merge($additionalQuestions);
+                } else {
+                    $questions = $pretestQuestions;
+                }
+                
+                $allQuestions = $allQuestions->merge($questions);
+                continue;
             }
 
             $questions = $query->inRandomOrder()

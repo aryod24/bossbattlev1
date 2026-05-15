@@ -15,13 +15,13 @@
                     <label for="bank_group" class="block text-sm font-bold text-text-light-secondary mb-2">Paket Soal (Opsional)</label>
                     <select name="bank_group" id="bank_group" class="w-full rounded-xl border-border bg-surface-dark text-text-primary p-4 focus:ring-primary focus:border-primary">
                         <option value="">-- Semua Paket Soal (Campur) --</option>
-                        @foreach($bankGroups as $group)
-                            <option value="{{ $group }}" {{ $config['bank_group'] === $group ? 'selected' : '' }}>
-                                {{ $group }}
+                        @foreach($bankGroups as $groupId => $groupName)
+                            <option value="{{ $groupId }}" {{ $config['bank_group'] == $groupId ? 'selected' : '' }}>
+                                {{ $groupName }}
                             </option>
                         @endforeach
                     </select>
-                    <p class="text-sm text-text-muted mt-2">Pilih spesifik bank_group jika ingin Pre-Test hanya mengambil soal dari paket tertentu.</p>
+                    <p class="text-sm text-text-muted mt-2">Kosongkan untuk mengambil soal dari Bank Group 0 (Pre-Test) atau semua bank jika tidak cukup. Pilih spesifik bank_group untuk mengambil soal dari paket tertentu saja.</p>
                 </div>
 
                 <div class="bg-surface-light dark:bg-black/20 p-6 rounded-xl border border-border">

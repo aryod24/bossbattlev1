@@ -76,7 +76,7 @@ class SoloRaidController extends Controller
 
     // ─── MAP ──────────────────────────────────────────────────────────────────
 
-    public function map(SoloRaid $soloRaid, SoloBattleService $battleService)
+    public function map(SoloRaid $soloRaid, SoloBattleService $battleService, \App\Services\BadgeService $badgeService)
     {
         // Boss-type raids don't need the dungeon map — go straight to boss intro
         if ($soloRaid->type === 'boss') {
@@ -89,6 +89,9 @@ class SoloRaidController extends Controller
         }
 
         $user = auth()->user();
+
+        // Check for badges (sync completion status)
+        $badgeService->checkAll($user);
 
         // Check for active session (handle expired)
         $activeSession = \App\Models\SessionSolo::where('user_id', $user->id)
@@ -134,7 +137,7 @@ class SoloRaidController extends Controller
 
     // ─── COMPLETE NODE ────────────────────────────────────────────────────────
 
-    public function completeNode(RaidNode $node)
+    public function completeNode(RaidNode $node, \App\Services\BadgeService $badgeService)
     {
         $user = auth()->user();
 
@@ -143,6 +146,9 @@ class SoloRaidController extends Controller
             'user_id'      => $user->id,
             'raid_node_id' => $node->id,
         ]);
+
+        // Check for badges (e.g. content completion count)
+        $badgeService->checkAll($user);
 
         // Check if ALL content nodes for this event are now done
         $soloRaid    = $node->soloRaid;

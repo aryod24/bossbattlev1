@@ -52,7 +52,7 @@ class QuestionBankBossMediumSeeder extends Seeder
             ],
             [
                 'level'         => 'Medium',
-                'soal_text'     => 'Pada perulangan do-while yang dimulai dari $i = 0, dicetak lalu ditambah ( $i++ ) dengan batas kondisi while ($i < 3), angka berapa saja yang dicetak?',
+                'soal_text'     => 'Pada perulangan do-while dengan $i = 0, setiap iterasi mencetak $i lalu menjalankan $i++, dan kondisi berhenti while ($i < 3). Angka apa saja yang dicetak?',
                 'tipe'          => 'multiple_choice',
                 'pilihan_a'     => '0 1 2',
                 'pilihan_b'     => '1 2 3',
@@ -107,7 +107,7 @@ class QuestionBankBossMediumSeeder extends Seeder
             ],
             [
                 'level'         => 'Medium',
-                'soal_text'     => 'Jika kita melakukan perulangan foreach pada array [5, 3, 8, 1] as $i => $val, lalu mencetak indeks ($i) saat $val == 8 dan menggunakan break, angka berapa yang tercetak?',
+                'soal_text'     => 'Pada foreach array [5, 3, 8, 1] as $i => $val, berapa nilai INDEKS $i yang tercetak saat $val == 8, kemudian loop dihentikan dengan break?',
                 'tipe'          => 'multiple_choice',
                 'pilihan_a'     => '8',
                 'pilihan_b'     => '2',

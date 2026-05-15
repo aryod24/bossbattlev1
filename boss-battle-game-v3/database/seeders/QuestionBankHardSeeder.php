@@ -26,16 +26,16 @@ class QuestionBankHardSeeder extends Seeder
             ],
             [
                 'level'         => 'Hard',
-                'soal_text'     => 'Fungsi __construct() dijalankan otomatis saat object dibuat dengan keyword...',
+                'soal_text'     => 'Nama method konstruktor bawaan PHP yang otomatis dipanggil saat object dibuat adalah...',
                 'tipe'          => 'short_answer',
-                'jawaban_benar' => 'new',
+                'jawaban_benar' => '__construct',
                 'bobot_xp'      => 30,
             ],
             [
                 'level'         => 'Hard',
-                'soal_text'     => 'Jika class Hewan memiliki konstruktor yang mengeset property $nama, apa string yang direturn oleh method suara() yang berisi "$this->nama bersuara" jika diinstansiasi dengan new Hewan("Kucing")?',
+                'soal_text'     => 'Pseudo-variable yang digunakan di dalam method class untuk mengakses property object itu sendiri adalah...',
                 'tipe'          => 'short_answer',
-                'jawaban_benar' => 'Kucing bersuara',
+                'jawaban_benar' => '$this',
                 'bobot_xp'      => 30,
             ],
             [
@@ -136,7 +136,7 @@ class QuestionBankHardSeeder extends Seeder
                 'pilihan_a'     => 'String hasil pencarian',
                 'pilihan_b'     => '1 jika cocok, 0 jika tidak cocok',
                 'pilihan_c'     => 'Array semua kecocokan',
-                'pilihan_d'     => 'true atau false',
+                'pilihan_d'     => 'false jika terjadi error kompilasi regex',
                 'jawaban_benar' => '1 jika cocok, 0 jika tidak cocok',
                 'bobot_xp'      => 30,
             ],
@@ -171,9 +171,9 @@ class QuestionBankHardSeeder extends Seeder
             ],
             [
                 'level'         => 'Hard',
-                'soal_text'     => 'Di dalam method sebuah class PHP, pseudo-variable apa yang digunakan untuk merujuk dan mengakses property dari object itu sendiri?',
+                'soal_text'     => 'Keyword yang digunakan untuk mencegah sebuah class di PHP agar tidak bisa diwariskan adalah...',
                 'tipe'          => 'short_answer',
-                'jawaban_benar' => '$this',
+                'jawaban_benar' => 'final',
                 'bobot_xp'      => 30,
             ],
         ];

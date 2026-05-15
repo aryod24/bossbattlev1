@@ -10,7 +10,7 @@ class QuestionBankPreTestSeeder extends Seeder
     public function run(): void
     {
         $commonAttributes = [
-            'bank_group'       => 0, // Group 0 khusus untuk Pre-Test
+            'bank_group'       => 0,
             'bank_name'        => 'Initial Assessment: Pre-Test',
             'bank_icon'        => '📋',
             'bank_description' => 'Uji kemampuan awal PHP Anda dengan 30 soal acak dari tingkat Easy hingga Hard.',
@@ -98,9 +98,9 @@ class QuestionBankPreTestSeeder extends Seeder
             // ==================== 10 SOAL DARI MEDIUM (Arrays & Functions) ====================
             [
                 'level'         => 'Medium',
-                'soal_text'     => 'Fungsi yang digunakan untuk menghitung jumlah elemen dalam sebuah array adalah...',
+                'soal_text'     => 'Fungsi yang digunakan untuk menghitung jumlah elemen dalam sebuah array adalah (tulis tanpa tanda kurung)',
                 'tipe'          => 'short_answer',
-                'jawaban_benar' => 'count()',
+                'jawaban_benar' => 'count',
                 'bobot_xp'      => 20,
             ],
             [
@@ -139,7 +139,7 @@ class QuestionBankPreTestSeeder extends Seeder
                 'soal_text'     => 'Variabel yang dideklarasikan di dalam fungsi bersifat...',
                 'tipe'          => 'multiple_choice',
                 'pilihan_a'     => 'Global', 'pilihan_b' => 'Lokal', 'pilihan_c' => 'Static', 'pilihan_d' => 'Protected',
-                'jawaban_benar' => 'Lokal — hanya bisa diakses di dalam fungsi tersebut',
+                'jawaban_benar' => 'Lokal',
                 'bobot_xp'      => 20,
             ],
             [

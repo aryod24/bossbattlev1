@@ -77,7 +77,13 @@
             </div>
             <div>
                 <div class="text-sm text-text-muted mb-1">XP Gained</div>
-                <div class="font-bold text-primary text-lg">+{{ $session->xp_diperoleh }} XP</div>
+                <div class="font-bold text-primary text-lg">
+                    @if($session->soloRaid && $session->soloRaid->type === 'learning')
+                        0 XP <span class="text-xs font-normal text-text-muted">(Learning)</span>
+                    @else
+                        +{{ $session->xp_diperoleh }} XP
+                    @endif
+                </div>
             </div>
         </div>
     </div>

@@ -92,26 +92,37 @@
                 <span class="material-symbols-outlined text-warning text-sm">stars</span>
                 Potensi Hadiah Misi
             </h3>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
                         <span class="text-xs font-black text-primary">XP</span>
                     </div>
                     <div>
                         @php
                             $maxXP = ($levelConfig['questions'] * ($section === 'Easy' ? 10 : ($section === 'Medium' ? 15 : 20))) + ($section === 'Easy' ? 50 : ($section === 'Medium' ? 75 : 100));
                         @endphp
-                        <p class="text-xs font-black text-text-primary uppercase tracking-tight">Hingga +{{ $maxXP }} XP</p>
-                        <p class="text-[9px] text-text-muted font-bold uppercase">Poin Pengalaman</p>
+                        <p class="text-xs font-black text-text-primary uppercase tracking-tight">+{{ $maxXP }} XP</p>
+                        <p class="text-[9px] text-text-muted font-bold uppercase">Potensi Maks.</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-warning/10 flex items-center justify-center border border-warning/20">
+
+                <div class="flex items-center gap-3 border-l border-border pl-4">
+                    <div class="w-8 h-8 rounded bg-error/10 flex items-center justify-center border border-error/20 shrink-0">
+                        <span class="material-symbols-outlined text-error text-sm">info</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black text-error uppercase tracking-tight">XP 50%</p>
+                        <p class="text-[9px] text-text-muted font-bold uppercase leading-tight">Percobaan ≥ 2</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 border-l border-border pl-4">
+                    <div class="w-8 h-8 rounded bg-warning/10 flex items-center justify-center border border-warning/20 shrink-0">
                         <span class="material-symbols-outlined text-warning text-lg">workspace_premium</span>
                     </div>
                     <div>
                         <p class="text-xs font-black text-text-primary uppercase tracking-tight">Badge Khusus</p>
-                        <p class="text-[9px] text-text-muted font-bold uppercase">Reward Pencapaian</p>
+                        <p class="text-[9px] text-text-muted font-bold uppercase">Reward Misi</p>
                     </div>
                 </div>
             </div>
@@ -133,7 +144,7 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-[10px] font-black text-text-primary uppercase tracking-widest">Percobaan #{{ $sess->attempt_number }}</span>
                                     <span class="w-1 h-1 rounded-full bg-border"></span>
-                                    <span class="text-[10px] font-bold text-error uppercase">{{ $section }}</span>
+                                <span class="text-[10px] font-black text-error uppercase">{{ $section }}</span>
                                 </div>
                             </div>
                             
@@ -147,7 +158,7 @@
                                     <div class="text-xs font-black {{ $sess->boss_kalah ? 'text-success' : 'text-error' }} uppercase">
                                         {{ $sess->boss_kalah ? 'Berhasil' : 'Gagal' }}
                                     </div>
-                                    <div class="text-[10px] font-bold text-text-muted">Akurasi {{ number_format($sess->skor_akhir, 0) }}%</div>
+                                    <div class="text-[10px] font-black text-text-primary">Akurasi {{ number_format($sess->skor_akhir, 0) }}%</div>
                                 @endif
                             </div>
                         </div>

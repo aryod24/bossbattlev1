@@ -79,7 +79,7 @@
                 <div class="w-2 h-2 rounded-full bg-primary animate-ping"></div>
                 <span class="text-xs font-black text-white uppercase tracking-widest">Progress Materi</span>
             </div>
-            <span class="text-[10px] font-bold text-text-muted px-2 py-0.5 bg-background rounded-full border border-border">
+            <span class="text-[10px] font-black text-text-primary px-2 py-0.5 bg-background rounded-full border border-border">
                 {{ $stats['completed_nodes'] }}/{{ $stats['total_nodes'] }} Materi Selesai
             </span>
         </div>
@@ -107,7 +107,7 @@
                             <span class="text-[8px] font-black text-text-muted">{{ $loop->iteration }}</span>
                         @endif
                     </div>
-                    <span class="text-xs font-bold {{ $isDone ? 'text-text-primary' : 'text-text-muted' }} truncate flex-1">
+                    <span class="text-xs font-black {{ $isDone ? 'text-text-primary' : 'text-text-muted' }} truncate flex-1">
                         {{ $node->title }}
                     </span>
                     <span class="text-[9px] font-black uppercase tracking-tighter {{ $isDone ? 'text-success' : 'text-text-muted' }}">
@@ -134,7 +134,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-black text-text-primary uppercase tracking-widest">Percobaan #{{ $session->attempt_number }}</span>
                                 <span class="w-1 h-1 rounded-full bg-border"></span>
-                                <span class="text-[10px] font-bold text-info uppercase">{{ $session->level }}</span>
+                                <span class="text-[10px] font-black text-info uppercase">{{ $session->level }}</span>
                             </div>
                         </div>
                         
@@ -148,7 +148,7 @@
                                 <div class="text-xs font-black {{ ($session->boss_kalah || $session->skor_akhir >= 100) ? 'text-success' : 'text-error' }} uppercase">
                                     {{ ($session->boss_kalah || $session->skor_akhir >= 100) ? 'Lulus' : 'Gagal' }}
                                 </div>
-                                <div class="text-[10px] font-bold text-text-muted">Akurasi {{ number_format($session->skor_akhir, 0) }}%</div>
+                                <div class="text-[10px] font-black text-text-primary">Akurasi {{ number_format($session->skor_akhir, 0) }}%</div>
                             @endif
                         </div>
                     </div>

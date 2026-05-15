@@ -87,8 +87,8 @@ export default {
                 'ui': '#6366F1',
             },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-                "display": ["Spline Sans", "sans-serif"],
+                sans: ['Outfit', ...defaultTheme.fontFamily.sans],
+                "display": ["Outfit", "sans-serif"],
                 'game': ['"Press Start 2P"', 'cursive'],
             },
             borderRadius: {

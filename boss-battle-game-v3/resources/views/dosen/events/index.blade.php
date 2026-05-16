@@ -30,7 +30,7 @@
             <thead class="border-b border-border">
                 <tr>
                     <th class="px-4 py-3 text-sm font-medium">Nama Event</th>
-                    <th class="px-4 py-3 text-sm font-medium">Level</th>
+                    <th class="px-4 py-3 text-sm font-medium">Tipe</th>
                     <th class="px-4 py-3 text-sm font-medium">Tanggal & Waktu</th>
                     <th class="px-4 py-3 text-sm font-medium">Status</th>
                     <th class="px-4 py-3 text-sm font-medium text-right">Aksi</th>
@@ -39,25 +39,20 @@
             <tbody>
                 @foreach($raids as $raid)
                     <tr class="border-b border-border hover:bg-primary/10">
-                        <td class="px-4 py-3 text-sm font-medium">{{ $raid->nama }}</td>
+                        <td class="px-4 py-3 text-sm font-medium">
+                            {{ $raid->nama }}
+                            <p class="text-xs text-text-muted font-normal mt-0.5">Section: {{ $raid->section }} · Order #{{ $raid->section_order }}</p>
+                        </td>
                         <td class="px-4 py-3 text-sm">
-                            <div class="flex gap-1">
-                                <form action="{{ route('dosen.events.toggle-level', $raid) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="level" value="easy">
-                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->easy_enabled ? 'bg-success/20 text-success' : 'bg-border text-text-muted' }}" title="Toggle Easy">E</button>
-                                </form>
-                                <form action="{{ route('dosen.events.toggle-level', $raid) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="level" value="medium">
-                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->medium_enabled ? 'bg-warning/20 text-warning' : 'bg-border text-text-muted' }}" title="Toggle Medium">M</button>
-                                </form>
-                                <form action="{{ route('dosen.events.toggle-level', $raid) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="level" value="hard">
-                                    <button type="submit" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold {{ $raid->hard_enabled ? 'bg-error/20 text-error' : 'bg-border text-text-muted' }}" title="Toggle Hard">H</button>
-                                </form>
-                            </div>
+                            @if($raid->type === 'boss')
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                                    <span class="material-symbols-outlined" style="font-size:13px">skull</span> Boss
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                    <span class="material-symbols-outlined" style="font-size:13px">menu_book</span> Materi
+                                </span>
+                            @endif
                         </td>
                         <td class="px-4 py-3 text-sm text-text-muted">
                             {{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y, H:i') }}
@@ -82,8 +77,12 @@
                                 <a href="{{ route('dosen.events.monitoring', $raid) }}" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20 text-primary" title="Monitoring">
                                     <span class="material-symbols-outlined text-base">monitoring</span>
                                 </a>
-                                <a href="{{ route('dosen.events.edit', $raid) }}" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20" title="Edit">
-                                    <span class="material-symbols-outlined text-base">edit</span>
+                                <a href="{{ route('dosen.events.edit', $raid) }}"
+                                   class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md hover:bg-primary/20 text-xs font-semibold
+                                          {{ $raid->type === 'boss' ? 'text-red-400 hover:text-red-300' : 'text-primary hover:text-primary' }}"
+                                   title="{{ $raid->type === 'boss' ? 'Edit Boss Battle' : 'Edit Materi' }}">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                    {{ $raid->type === 'boss' ? 'Edit Boss' : 'Edit Materi' }}
                                 </a>
                                 <form action="{{ route('dosen.events.duplicate', $raid) }}" method="POST" class="inline">
                                     @csrf

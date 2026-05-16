@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\DB;
 class EventController extends Controller
 {
     /**
-     * Display a listing of events created by this dosen.
+     * Display a listing of all events (for monitoring).
      */
     public function index()
     {
-        $raids = SoloRaid::where('created_by', auth()->id())
-            ->latest()
+        // Show all events for monitoring, not just created by this dosen
+        $raids = SoloRaid::latest()
+            ->with('creator:id,nama')
             ->get();
 
         return view('dosen.events.index', compact('raids'));
@@ -218,34 +219,49 @@ class EventController extends Controller
 
     public function monitoring(SoloRaid $soloRaid)
     {
-        if ($soloRaid->created_by !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Allow all dosen to view monitoring (not just creator)
+        // if ($soloRaid->created_by !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $soloRaid->load('nodes');
+        $nodeIds = $soloRaid->nodes->pluck('id');
         
-        $students = \App\Models\User::where('role', 'student')->get();
+        // Load semua data sekaligus dengan eager loading
+        $students = \App\Models\User::where('role', 'student')
+            ->with([
+                'eventProgress' => function($q) use ($soloRaid) {
+                    $q->where('solo_raid_id', $soloRaid->id);
+                },
+                'sessionSolos' => function($q) use ($soloRaid) {
+                    $q->where('solo_raid_id', $soloRaid->id)
+                      ->latest('waktu_mulai');
+                }
+            ])
+            ->paginate(50);
+        
+        // Load completed nodes untuk semua students sekaligus
+        $completedNodesByUser = \App\Models\UserNodeCompletion::whereIn('raid_node_id', $nodeIds)
+            ->whereIn('user_id', $students->pluck('id'))
+            ->select('user_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('user_id')
+            ->pluck('count', 'user_id');
+        
+        // Load attempts count untuk semua students sekaligus
+        $attemptsByUser = \App\Models\SessionSolo::where('solo_raid_id', $soloRaid->id)
+            ->whereIn('user_id', $students->pluck('id'))
+            ->select('user_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('user_id')
+            ->pluck('count', 'user_id');
         
         $monitoringData = [];
         
         foreach ($students as $student) {
-            $progress = \App\Models\UserEventProgress::where('user_id', $student->id)
-                ->where('solo_raid_id', $soloRaid->id)
-                ->first();
-                
-            $completedNodesCount = \App\Models\UserNodeCompletion::where('user_id', $student->id)
-                ->whereIn('raid_node_id', $soloRaid->nodes->pluck('id'))
-                ->count();
+            $progress = $student->eventProgress->first();
+            $lastSession = $student->sessionSolos->first();
+            $completedNodesCount = $completedNodesByUser[$student->id] ?? 0;
+            $attempts = $attemptsByUser[$student->id] ?? 0;
             
-            $lastSession = \App\Models\SessionSolo::where('user_id', $student->id)
-                ->where('solo_raid_id', $soloRaid->id)
-                ->latest('waktu_mulai')
-                ->first();
-
-            $attempts = \App\Models\SessionSolo::where('user_id', $student->id)
-                ->where('solo_raid_id', $soloRaid->id)
-                ->count();
-                
             $monitoringData[] = [
                 'user' => $student,
                 'progress' => $progress ? $progress->status : 'belum mulai',
@@ -262,14 +278,15 @@ class EventController extends Controller
             return $item['last_active'] ?? '0000-00-00 00:00:00';
         })->values();
 
-        return view('dosen.events.monitoring.index', compact('soloRaid', 'monitoringData'));
+        return view('dosen.events.monitoring.index', compact('soloRaid', 'monitoringData', 'students'));
     }
 
     public function monitoringDetail(SoloRaid $soloRaid, \App\Models\User $user)
     {
-        if ($soloRaid->created_by !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Allow all dosen to view monitoring detail (not just creator)
+        // if ($soloRaid->created_by !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $soloRaid->load('nodes');
         

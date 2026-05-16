@@ -37,8 +37,10 @@ class ProfileController extends Controller
         // Load user's unlocked badges
         $unlockedBadges = $user->userBadges->keyBy('badge_id');
         
-        // Get all badge definitions from DB
-        $allBadges = \App\Models\Badge::all();
+        // Get all badge definitions from DB (cached)
+        $allBadges = \Illuminate\Support\Facades\Cache::remember('badges_all', 3600, function () {
+            return \App\Models\Badge::all();
+        });
 
         return view('profile.mhs', [
             'user' => $user,

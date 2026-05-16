@@ -45,6 +45,10 @@ class BadgeController extends Controller
         }
 
         Badge::create($validated);
+        
+        // Clear badge cache
+        \Illuminate\Support\Facades\Cache::forget('badges_all');
+        \Illuminate\Support\Facades\Cache::forget('badges_all_keyed');
 
         return redirect()->route('admin.badges.index')->with('success', 'Badge created successfully.');
     }
@@ -87,6 +91,10 @@ class BadgeController extends Controller
         }
 
         $badge->update($validated);
+        
+        // Clear badge cache
+        \Illuminate\Support\Facades\Cache::forget('badges_all');
+        \Illuminate\Support\Facades\Cache::forget('badges_all_keyed');
 
         return redirect()->route('admin.badges.index')->with('success', 'Badge updated successfully.');
     }
@@ -101,6 +109,10 @@ class BadgeController extends Controller
         }
 
         $badge->delete();
+        
+        // Clear badge cache
+        \Illuminate\Support\Facades\Cache::forget('badges_all');
+        \Illuminate\Support\Facades\Cache::forget('badges_all_keyed');
 
         return redirect()->route('admin.badges.index')->with('success', 'Badge deleted successfully.');
     }

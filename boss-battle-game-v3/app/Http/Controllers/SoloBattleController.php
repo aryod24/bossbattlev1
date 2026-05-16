@@ -129,7 +129,11 @@ class SoloBattleController extends Controller
         
         $session->load('soloRaid');
         $bossName = $session->soloRaid->{'boss_'.strtolower($session->level).'_name'};
-        $allBadges = \App\Models\Badge::all()->keyBy('id'); // Use ID as key for JS mapping
+        
+        // Cache badges untuk 1 jam
+        $allBadges = \Illuminate\Support\Facades\Cache::remember('badges_all_keyed', 3600, function () {
+            return \App\Models\Badge::all()->keyBy('id');
+        });
         
         return view('solo.result', compact('session', 'bossName', 'allBadges', 'battleResult'));
     }

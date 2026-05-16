@@ -305,6 +305,16 @@ class SoloBattleService
         $session->waktu_selesai = $endTime;
         $session->durasi_detik = $session->waktu_mulai->diffInSeconds($session->waktu_selesai);
 
+        // Recalculate jumlah_benar from answers (in case it wasn't incremented properly)
+        $correctCount = SessionAnswer::where('session_id', $session->id)
+            ->where('session_type', 'solo')
+            ->where('is_correct', true)
+            ->count();
+        
+        if ($correctCount > 0 && $session->jumlah_benar === 0) {
+            $session->jumlah_benar = $correctCount;
+        }
+
         // 2. Calculate final score (percentage)
         $session->skor_akhir = $session->jumlah_soal > 0 
             ? ($session->jumlah_benar / $session->jumlah_soal) * 100 

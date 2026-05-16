@@ -36,6 +36,7 @@ class SoloRaidController extends Controller
         foreach ($sections as $sectionName) {
             $events = SoloRaid::where('status', 'active')
                 ->where('section', $sectionName)
+                ->with(['creator:id,nama', 'questionBank:id,bank_name'])
                 ->ordered()
                 ->get();
 

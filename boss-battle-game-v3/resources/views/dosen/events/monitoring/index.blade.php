@@ -85,4 +85,11 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    @if($students->hasPages())
+        <div class="mt-6">
+            {{ $students->links() }}
+        </div>
+    @endif
 </x-dosen-layout>

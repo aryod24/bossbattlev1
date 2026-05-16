@@ -171,14 +171,4 @@
         @endforeach
 
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('{{ route("solo.check-expired") }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            }).then(r => r.json()).then(d => { if (d.processed > 0) window.location.reload(); })
-              .catch(() => {});
-        });
-    </script>
 </x-app-layout>

@@ -20,7 +20,7 @@ class SoloRaidSeeder extends Seeder
         // ================================================================
 
         $raid1 = SoloRaid::create([
-            'nama'            => 'PHP Basics Week 1',
+            'nama'            => 'PHP Basics',
             'deskripsi'       => 'Pelajari dasar-dasar PHP: sintaks, variabel, tipe data, operator, echo/print, dan percabangan kondisi.',
             'tanggal_mulai'   => Carbon::now()->subDays(2),
             'tanggal_selesai' => Carbon::now()->addDays(30),
@@ -235,7 +235,7 @@ EOT
         foreach ($raid1Nodes as $i => $node) {
             RaidNode::create(['solo_raid_id' => $raid1->id, 'type' => 'content', 'title' => $node['title'], 'content' => $node['content'], 'order' => $i + 1]);
         }
-        RaidNode::create(['solo_raid_id' => $raid1->id, 'type' => 'quiz', 'title' => 'Latihan Soal: PHP Basics Week 1', 'content' => null, 'order' => 6]);
+        RaidNode::create(['solo_raid_id' => $raid1->id, 'type' => 'quiz', 'title' => 'Latihan Soal: PHP Basics', 'content' => null, 'order' => 6]);
 
         // Easy Boss Battle
         SoloRaid::create([

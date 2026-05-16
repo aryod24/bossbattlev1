@@ -11,7 +11,7 @@ class QuestionBankBossSeeder extends Seeder
     {
         $commonAttributes = [
             'bank_group'       => 2,
-            'bank_name'        => 'PHP Basics Week 1 - Boss',
+            'bank_name'        => 'PHP Basics - Boss',
             'bank_icon'        => '👑',
             'bank_description' => 'Bank soal PHP (Boss Level): operator lanjutan, case-sensitivity, dan match expression.',
         ];

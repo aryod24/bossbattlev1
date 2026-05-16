@@ -11,7 +11,7 @@ class QuestionBankEasySeeder extends Seeder
     {
         $commonAttributes = [
             'bank_group'       => 1,
-            'bank_name'        => 'PHP Basics Week 1 - Easy',
+            'bank_name'        => 'PHP Basics - Easy',
             'bank_icon'        => '💻',
             'bank_description' => 'Bank soal PHP dasar (Easy Level): sintaks, variabel, dan tipe data.',
         ];

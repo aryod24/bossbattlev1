@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             // Pre-Test Questions (Bank Group 0)
             QuestionBankPreTestSeeder::class,
             
-            // Bank Group 1: PHP Basics Week 1
+            // Bank Group 1: PHP Basics
             QuestionBankEasySeeder::class,
             QuestionBankBossSeeder::class,
             

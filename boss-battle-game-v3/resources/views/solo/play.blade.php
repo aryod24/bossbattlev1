@@ -89,10 +89,20 @@
             background-color: #1e1e1e !important;
             border: 1px solid #333;
             border-radius: 0.125rem;
+            padding: 0.75rem;
+            overflow-x: auto;
         }
         .prose code {
             color: #ce9178;
-            font-family: 'Fira Code', monospace;
+            background-color: #2d2d2d;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.125rem;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
         }
     </style>
 </head>
@@ -379,7 +389,45 @@
                 startTime: null,
 
                 get currentQuestion() {
-                    return this.questions[this.currentQuestionIndex];
+                    const question = this.questions[this.currentQuestionIndex];
+                    // Process question text to wrap code snippets
+                    if (question && question.soal_text) {
+                        question.soal_text = this.formatCodeInText(question.soal_text);
+                    }
+                    return question;
+                },
+
+                formatCodeInText(text) {
+                    // Skip if already has HTML tags
+                    if (/<[^>]+>/.test(text)) {
+                        return text;
+                    }
+                    
+                    // Wrap code-like patterns in <code> tags
+                    // Pattern 1: PHP variables ($variable)
+                    text = text.replace(/(\$[a-zA-Z_][a-zA-Z0-9_]*(?:\[[^\]]+\])*)/g, '<code>$1</code>');
+                    
+                    // Pattern 2: Function calls (function_name())
+                    text = text.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*\(\))/g, '<code>$1</code>');
+                    
+                    // Pattern 3: Operators and symbols (==, ===, !=, &&, ||, etc.)
+                    text = text.replace(/\b(===|!==|==|!=|&&|\|\||<=|>=|<>|\+=|-=|\*=|\/=|%=|\+\+|--|\*\*)\b/g, '<code>$1</code>');
+                    
+                    // Pattern 4: Numbers in quotes or standalone
+                    text = text.replace(/"([^"]+)"/g, '<code>"$1"</code>');
+                    text = text.replace(/'([^']+)'/g, "<code>'$1'</code>");
+                    
+                    // Pattern 5: PHP tags
+                    text = text.replace(/(&lt;\?php|<\?php|\?&gt;|\?>)/g, '<code>$1</code>');
+                    
+                    // Pattern 6: Common keywords
+                    const keywords = ['true', 'false', 'null', 'return', 'if', 'else', 'elseif', 'switch', 'case', 'break', 'continue', 'for', 'while', 'foreach', 'do', 'function', 'class', 'new', 'extends', 'public', 'private', 'protected', 'static', 'const'];
+                    keywords.forEach(keyword => {
+                        const regex = new RegExp(`\\b(${keyword})\\b(?![^<]*>)`, 'gi');
+                        text = text.replace(regex, '<code>$1</code>');
+                    });
+                    
+                    return text;
                 },
 
                 init() {

@@ -108,11 +108,7 @@
                         
                         <p class="mt-8 text-center text-sm text-text-muted">
                             Belum punya akun?
-                            @if (Route::has('register'))
-                                <a class="font-medium text-primary hover:text-accent-hover hover:underline" href="{{ route('register') }}">Daftar di sini</a>
-                            @else
-                                <span class="font-medium text-text-muted">Registrasi ditutup</span>
-                            @endif
+                            <span class="font-medium text-text-muted">Hubungi Admin</span>
                         </p>
                     </div>
                 </div>

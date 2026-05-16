@@ -9,57 +9,63 @@
     <a href="https://alpinejs.dev"><img src="https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=for-the-badge&logo=alpine.js" alt="Alpine.js"></a>
 </p>
 
-# 🎮 CodeBossArena (Gamified Quiz Platform)
+# 🎮 CodeBossArena — Adaptive Learning Platform
 
-**CodeBossArena** is an innovative educational platform that transforms traditional quizzes into exciting RPG-style battles. Instead of simply answering questions, players deal damage to bosses with every correct answer, turning learning into a heroic quest.
+**CodeBossArena** adalah platform pembelajaran berbasis gamifikasi yang mengubah kuis menjadi pertarungan RPG. Mahasiswa belajar PHP melalui sistem **Pre-Test Adaptive Learning** yang menempatkan mereka di level yang sesuai kemampuan.
 
-## ⚔️ Core Mechanics
+## ✨ Fitur Utama
 
-The core philosophy is simple: **Knowledge is Power.**
-
-- **Quiz = Combat**: Answering a question correctly strikes the boss.
-- **Health Bars**: Both the boss and the player (in some modes) have HP. Deplete the boss's HP to win!
-- **Timer**: Speed matters. Answer quickly to maximize your score and survive the encounter.
-- **Progression**: Earn XP, level up, and unlock unique badges as you master different subjects.
-
-## 🚀 Key Features
-
-### 🏰 Solo Raid (Dungeon Map)
-Explore a dungeon map filled with challenges.
-- **Info Nodes**: Learn the material before the battle.
-- **Difficulty Levels**: Test your skills in Easy, Medium, and Hard modes.
-- **Visual Progression**: Watch nodes unlock as you conquer them 🔓.
-
-### 🏆 RPG Elements
-- **XP System**: accumulate experience points from every battle.
-- **Leveling**: Climb from Level 1 to Level 5 and beyond.
-- **Badges**: Unlock achievements like "Boss Novice", "Perfect Strike", and "Veteran" for bragging rights.
-
-### 📚 Adaptive Question Bank
-powered by a robust question bank covering various topics (currently focused on PHP Programming).
-- **Multiple Choice**: Quick strategic decisions.
-- **Short Answer**: Test your deep understanding.
+- 🎯 **Pre-Test Placement** — 30 soal campuran menentukan section awal (Easy / Medium / Hard)
+- 🏰 **Solo Raid** — Jelajahi map berisi materi dan kuis interaktif
+- ⚔️ **Boss Battle** — Jawaban benar = damage ke boss; kalahkan boss untuk menang
+- 🏆 **RPG Progression** — Kumpulkan XP, naik level, dan unlock 5+ badge unik
+- 📊 **Dosen Dashboard** — Monitor progress mahasiswa di tiap event
 
 ## 🛠️ Tech Stack
 
-This project is built with a modern, performance-focused stack:
+| Layer | Teknologi |
+|-------|-----------|
+| Backend | Laravel 11, PHP 8.3 |
+| Database | MySQL 8.0 |
+| Frontend | Tailwind CSS 3.4, Alpine.js 3.x |
+| Editor | EasyMDE, Material Symbols |
 
-- **Backend framework**: Laravel 11
-- **Language**: PHP 8.3
-- **Database**: MySQL 8.0
-- **Frontend Styling**: Tailwind CSS
-- **Interactivity**: Alpine.js (Lightweight reactive framework)
+## 🚀 Instalasi
 
-## 🔜 Upcoming Features
+```bash
+git clone <repository-url>
+cd codebossarena
 
-### ⚔️ Multiplayer Events (In Development)
-Get ready for real-time competitive quiz battles!
-- **Live Leaderboards**: Compete against classmates in real-time.
-- **Raid Logic**: Join forces or compete to take down massive World Bosses.
-- **Event Lobby**: Join events via unique codes and wait in the lobby with your friends.
+composer install && npm install
+
+cp .env.example .env
+php artisan key:generate
+
+php artisan migrate && php artisan db:seed
+
+npm run build
+php artisan serve
+```
+
+## 🎭 Role Pengguna
+
+| Role | Akses |
+|------|-------|
+| **Student** | Pre-test, Solo Raid, Boss Battle, Leaderboard |
+| **Dosen** | Kelola events, monitor progress, question bank |
+| **Admin** | Full system access, manajemen user & badge |
+
+## ⚙️ Requirements
+
+- PHP 8.3+
+- MySQL 8.0+
+- Composer
+- Node.js & NPM
 
 ---
 
 <p align="center">
-  Built with ❤️ for Gamified Education.
+  Built with ❤️ for Gamified Education<br>
+  <strong>CodeBossArena</strong> — Adaptive Learning Platform<br>
+  © 2026
 </p>

@@ -56,11 +56,12 @@ class EventController extends Controller
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
-            'nodes' => 'nullable|array',
-            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
-            'nodes.*.title' => 'required_with:nodes|string|max:150',
-            'nodes.*.content' => 'nullable|string',
-            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
+            // Dynamic nodes
+            'nodes' => 'nullable|array|exclude_if:type,boss',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz|exclude_if:type,boss',
+            'nodes.*.title' => 'required_with:nodes|string|max:150|exclude_if:type,boss',
+            'nodes.*.content' => 'nullable|string|exclude_if:type,boss',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
         $validated['created_by'] = auth()->id();
@@ -74,6 +75,7 @@ class EventController extends Controller
 
             $raid = SoloRaid::create($validated);
 
+            // Create associated nodes
             foreach ($nodes as $nodeData) {
                 RaidNode::create([
                     'solo_raid_id' => $raid->id,
@@ -93,9 +95,10 @@ class EventController extends Controller
      */
     public function edit(SoloRaid $soloRaid)
     {
-        if ($soloRaid->created_by !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Allow all dosen to edit (not just creator)
+        // if ($soloRaid->created_by !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $banks = \App\Models\QuestionBank::select('bank_group', 'bank_name')
             ->distinct()
@@ -110,9 +113,10 @@ class EventController extends Controller
      */
     public function update(Request $request, SoloRaid $soloRaid)
     {
-        if ($soloRaid->created_by !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Allow all dosen to edit (not just creator)
+        // if ($soloRaid->created_by !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
@@ -130,12 +134,13 @@ class EventController extends Controller
             'medium_enabled' => 'boolean',
             'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
-            'nodes' => 'nullable|array',
-            'nodes.*.id' => 'nullable|integer',
-            'nodes.*.type' => 'required_with:nodes|in:content,quiz',
-            'nodes.*.title' => 'required_with:nodes|string|max:150',
-            'nodes.*.content' => 'nullable|string',
-            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6',
+            // Dynamic nodes
+            'nodes' => 'nullable|array|exclude_if:type,boss',
+            'nodes.*.id' => 'nullable|integer|exclude_if:type,boss',
+            'nodes.*.type' => 'required_with:nodes|in:content,quiz|exclude_if:type,boss',
+            'nodes.*.title' => 'required_with:nodes|string|max:150|exclude_if:type,boss',
+            'nodes.*.content' => 'nullable|string|exclude_if:type,boss',
+            'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
         $validated['easy_enabled'] = $request->has('easy_enabled');
@@ -148,16 +153,38 @@ class EventController extends Controller
 
             $soloRaid->update($validated);
 
-            $soloRaid->nodes()->delete();
+            // Upsert nodes: update existing, create new, delete removed
+            $incomingIds = [];
             foreach ($nodes as $nodeData) {
-                RaidNode::create([
+                if (!empty($nodeData['id'])) {
+                    // Update existing node (preserves ID → keeps user_node_completions)
+                    $existingNode = RaidNode::where('id', $nodeData['id'])
+                        ->where('solo_raid_id', $soloRaid->id)
+                        ->first();
+                    if ($existingNode) {
+                        $existingNode->update([
+                            'type' => $nodeData['type'],
+                            'title' => $nodeData['title'],
+                            'content' => $nodeData['content'] ?? null,
+                            'order' => $nodeData['order'],
+                        ]);
+                        $incomingIds[] = $existingNode->id;
+                        continue;
+                    }
+                }
+                // Create new node
+                $newNode = RaidNode::create([
                     'solo_raid_id' => $soloRaid->id,
                     'type' => $nodeData['type'],
                     'title' => $nodeData['title'],
                     'content' => $nodeData['content'] ?? null,
                     'order' => $nodeData['order'],
                 ]);
+                $incomingIds[] = $newNode->id;
             }
+
+            // Delete nodes that were removed
+            $soloRaid->nodes()->whereNotIn('id', $incomingIds)->delete();
         });
 
         return redirect()->route('dosen.events.index')->with('success', 'Solo Raid updated successfully.');
@@ -168,9 +195,10 @@ class EventController extends Controller
      */
     public function destroy(SoloRaid $soloRaid)
     {
-        if ($soloRaid->created_by !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Allow all dosen to delete (not just creator)
+        // if ($soloRaid->created_by !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $soloRaid->delete();
 
@@ -202,9 +230,10 @@ class EventController extends Controller
      */
     public function toggleLevel(Request $request, SoloRaid $soloRaid)
     {
-        if ($soloRaid->created_by !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Allow all dosen to toggle (not just creator)
+        // if ($soloRaid->created_by !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // }
 
         $level = $request->level;
         $field = $level . '_enabled';

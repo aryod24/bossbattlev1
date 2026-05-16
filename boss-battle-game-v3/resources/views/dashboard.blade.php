@@ -32,23 +32,23 @@
         <!-- Welcome Card -->
         <div class="lg:col-span-2 bg-card p-6 rounded-lg shadow-sm border border-border flex flex-col justify-center h-full">
             <div>
-                <h1 class="text-2xl font-bold text-text-primary mb-2">Welcome back, {{ auth()->user()->nama }}!</h1>
-                <p class="text-text-muted">Ready to conquer the code? Check out the latest events and boost your rank.</p>
+                <h1 class="text-2xl font-bold text-text-primary mb-2">Selamat datang kembali, {{ auth()->user()->nama }}!</h1>
+                <p class="text-text-muted">Siap menaklukkan kode? Lihat event terbaru dan tingkatkan peringkatmu.</p>
             </div>
             
             <div class="mt-6 flex gap-4">
                 <a href="{{ route('solo.index') }}" class="flex items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-bold px-5 shadow-sm hover:bg-accent-hover transition-transform duration-200 hover:-translate-y-0.5">
-                    Browse Events
+                    Jelajahi Event
                 </a>
                 <a href="{{ route('leaderboard.index') }}" class="flex items-center justify-center rounded-lg h-10 bg-surface-light text-text-primary gap-2 text-sm font-bold px-5 border border-border shadow-sm hover:bg-border transition-transform duration-200 hover:-translate-y-0.5">
-                    View Leaderboard
+                    Lihat Leaderboard
                 </a>
             </div>
         </div>
 
         <!-- Stats Card -->
         <div class="bg-card p-6 rounded-lg shadow-sm border border-border">
-            <h2 class="text-lg font-bold text-text-primary mb-4">Your Stats</h2>
+            <h2 class="text-lg font-bold text-text-primary mb-4">Statistik Kamu</h2>
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <span class="text-text-muted">Level</span>
@@ -57,7 +57,7 @@
                 
                 <div>
                      <div class="flex justify-between text-xs mb-1">
-                        <span class="text-text-muted">Progress to Lvl {{ $level < 5 ? $level + 1 : 'Max' }}</span>
+                        <span class="text-text-muted">Progress ke Lvl {{ $level < 5 ? $level + 1 : 'Maks' }}</span>
                         <span class="text-text-primary font-bold">{{ $nextThresholdText }}</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
@@ -66,7 +66,7 @@
                 </div>
 
                 <div class="flex justify-between items-center pt-2 border-t border-border">
-                    <span class="text-text-muted text-sm">Rank</span>
+                    <span class="text-text-muted text-sm">Peringkat</span>
                     <span class="
                         px-3 py-1 rounded-full text-xs font-bold
                         {{ auth()->user()->rank_label == 'Master' ? 'bg-red-900 text-red-300' : '' }}
@@ -102,12 +102,12 @@
                         <span class="material-symbols-outlined text-5xl bg-black/10 p-3 rounded-lg backdrop-blur-sm">emoji_events</span>
                         <div class="flex flex-col">
                             <p class="text-2xl font-bold">Event Aktif</p>
-                            <span class="text-xs font-bold uppercase tracking-wider bg-black/20 text-black px-2 py-0.5 rounded w-fit">Live Now</span>
+                            <span class="text-xs font-bold uppercase tracking-wider bg-black/20 text-black px-2 py-0.5 rounded w-fit">Sedang Berlangsung</span>
                         </div>
                     </div>
                     <p class="text-base font-medium text-yellow-900 relative z-10">{{ $activeEvent->nama_event }}</p>
                     <p class="text-sm text-yellow-900/80 relative z-10 line-clamp-2">Bergabunglah dalam event kompetitif ini dan buktikan kemampuanmu!</p>
-                    <button disabled class="mt-4 self-start rounded-lg bg-white/90 px-6 py-2.5 text-base font-bold text-yellow-800 shadow-lg cursor-not-allowed opacity-80" title="Coming Soon">
+                    <button disabled class="mt-4 self-start rounded-lg bg-white/90 px-6 py-2.5 text-base font-bold text-yellow-800 shadow-lg cursor-not-allowed opacity-80" title="Segera Hadir">
                         Gabung Event (Segera)
                     </button>
                 </div>

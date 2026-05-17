@@ -230,14 +230,6 @@
                         </div>
                     </div>
                 @endforeach
-
-                @if($sessions->count() > 3)
-                    <div class="text-center pt-1">
-                        <span class="font-mono-label text-[10px] uppercase tracking-wider text-faint">
-                            ... {{ $sessions->count() - 3 }} entri lainnya disembunyikan
-                        </span>
-                    </div>
-                @endif
             </div>
         @else
             <div class="flex flex-col items-center justify-center w-full py-8 text-center rounded-lg"

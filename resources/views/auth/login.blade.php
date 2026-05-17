@@ -164,7 +164,6 @@
                     <div class="w-full max-w-sm">
                         <div class="flex flex-col items-center justify-center mb-8 gap-3">
                             <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain drop-shadow-[0_0_18px_rgba(0,242,255,0.4)]">
-                            <h2 class="font-headline text-2xl font-bold tracking-wide text-cyan-glow">CodeBossArena</h2>
                         </div>
                         <h3 class="font-headline text-3xl font-extrabold text-center mb-2" style="color: #e5e2e3;">Masuk</h3>
                         <p class="font-body text-center text-sm text-soft mb-8">Akses arena dan lanjutkan progres kamu.</p>
@@ -192,7 +191,7 @@
                                 <div class="flex items-center justify-between">
                                     <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="password">Password</label>
                                     @if (Route::has('password.request'))
-                                        <a class="font-headline text-xs text-cyan-glow hover:underline" href="{{ route('password.request') }}">Lupa Password?</a>
+                                        <a class="font-headline text-xs text-cyan-glow hover:underline opacity-50 cursor-not-allowed pointer-events-none" href="javascript:void(0)">Lupa Password?</a>
                                     @endif
                                 </div>
                                 <div class="mt-2">

@@ -7,7 +7,9 @@
     <title>{{ $soloRaid->nama }}</title>
     
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -75,16 +77,57 @@
     
     <style>
         body { 
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Hanken Grotesk', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #0A0A0B;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            color: #e5e2e3;
         }
-        
+
+        /* === Cyber-noir typography & shared components (matches dashboard/profile) === */
+        .font-headline { font-family: 'Sora', sans-serif; }
+        .font-body { font-family: 'Hanken Grotesk', sans-serif; }
+        .font-mono-label { font-family: 'JetBrains Mono', monospace; }
+
+        .text-cyan-glow { color: #00f2ff; }
+        .text-magenta-glow { color: #ce5dff; }
+        .text-soft { color: #b9cacb; }
+        .text-faint { color: #849495; }
+        .border-cyan-soft { border-color: rgba(0, 242, 255, 0.3); }
+        .bg-cyan-soft { background-color: rgba(0, 242, 255, 0.15); }
+
+        .glass-card {
+            background: rgba(25, 25, 28, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover { border-color: rgba(0, 242, 255, 0.4); }
+
+        .btn-cyber-primary {
+            background: linear-gradient(135deg, #00f2ff, #ce5dff);
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        .btn-cyber-primary:hover { box-shadow: 0 0 20px rgba(0, 242, 255, 0.6); }
+
+        .progress-bar-fill { background: linear-gradient(90deg, #00f2ff, #ce5dff); }
+        .progress-glow-tip { box-shadow: 0 0 10px #ffffff; }
+        .divider-soft { border-top: 1px solid rgba(58, 73, 75, 0.5); }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(25,25,28,0.4); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,242,255,0.2); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0,242,255,0.4); }
+
         .glass-panel {
-            background: rgba(30, 41, 59, 0.9);
+            background: rgba(25, 25, 28, 0.7);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.2);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
 
@@ -207,10 +250,10 @@
         }
     </style>
 </head>
-<body x-data="dungeonMap({{ $soloRaid->id }})">
-    <div class="flex flex-col md:flex-row min-h-screen">
+<body x-data="dungeonMap({{ $soloRaid->id }})" class="md:h-screen md:overflow-hidden">
+    <div class="flex flex-col md:flex-row md:h-screen">
         
-        <!-- Left Section: Info Panel (Light Theme) -->
+        <!-- Left Section: Info Panel (cyber-noir, scrolls internally on desktop) -->
         <x-solo.map-info-panel :solo-raid="$soloRaid" :stats="$userStats" :sessions="$sessionHistory" :active-session="$activeSession" :nodes="$nodes" :completed-node-ids="$completedNodeIds" />
         <x-solo.map-visual :solo-raid="$soloRaid" :nodes="$nodes" :completed-node-ids="$completedNodeIds" />
     </div>
@@ -223,29 +266,47 @@
         <div class="flex items-center justify-center min-h-screen px-4">
             <div x-show="showConfirmModal" @click="showConfirmModal = false" class="fixed inset-0 bg-black opacity-75"></div>
 
-            <div x-show="showConfirmModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-border max-w-md w-full">
+            <div x-show="showConfirmModal"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 class="relative inline-block rounded-xl text-left overflow-hidden shadow-2xl max-w-md w-full"
+                 style="background: rgba(25, 25, 28, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(0, 242, 255, 0.4); box-shadow: 0 0 40px rgba(0, 242, 255, 0.18);">
                 <div class="px-6 pt-6 pb-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">quiz</span>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                             style="background: linear-gradient(135deg, rgba(0,242,255,0.2), rgba(206,93,255,0.15)); border: 1px solid rgba(0, 242, 255, 0.4);">
+                            <span class="material-symbols-outlined text-cyan-glow">quiz</span>
                         </div>
-                        <h3 class="text-lg font-bold text-text-primary">Mulai Latihan Soal?</h3>
+                        <h3 class="font-headline text-lg font-bold" style="color: #e5e2e3;">Mulai Latihan Soal?</h3>
                     </div>
-                    <div class="bg-surface-light rounded-lg p-4 border border-border mb-4">
-                        <p class="text-sm text-text-muted mb-1">Event</p>
-                        <p class="font-bold text-text-primary mb-3">{{ $soloRaid->nama }}</p>
-                        <div class="text-xs">
-                            <p class="text-text-muted mb-1">Percobaan ke-</p>
-                            <p class="font-bold text-text-primary">#{{ $userStats['attempts'] + 1 }}</p>
+
+                    <div class="rounded-lg p-4 mb-4"
+                         style="background-color: rgba(32, 31, 32, 0.6); border: 1px solid rgba(58, 73, 75, 0.5);">
+                        <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Event</p>
+                        <p class="font-headline text-base font-bold mb-3" style="color: #e5e2e3;">{{ $soloRaid->nama }}</p>
+                        <div class="pt-3" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                            <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Percobaan ke-</p>
+                            <p class="font-headline text-sm font-bold text-cyan-glow">#{{ $userStats['attempts'] + 1 }}</p>
                         </div>
                     </div>
-                    <p class="text-xs text-text-muted">⏱️ Timer akan langsung mulai setelah konfirmasi.</p>
+
+                    <p class="font-body text-xs text-soft">
+                        ⏱️ Timer akan langsung mulai setelah konfirmasi.
+                    </p>
                 </div>
-                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
-                    <button type="button" @click="doStartLatihan()" class="inline-flex justify-center rounded-lg px-5 py-2 bg-primary text-white text-sm font-bold hover:bg-primary/80">
+
+                <div class="px-6 py-4 flex flex-row-reverse gap-2"
+                     style="background-color: rgba(14, 14, 15, 0.8); border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                    <button type="button" @click="doStartLatihan()"
+                            class="btn-cyber-primary font-headline inline-flex justify-center rounded-lg px-5 py-2 text-sm font-bold">
                         Mulai Sekarang
                     </button>
-                    <button type="button" @click="showConfirmModal = false" class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                    <button type="button" @click="showConfirmModal = false"
+                            class="font-headline inline-flex justify-center rounded-lg px-5 py-2 text-sm font-medium transition-colors"
+                            style="background-color: transparent; color: #b9cacb; border: 1px solid rgba(58, 73, 75, 0.5);"
+                            onmouseover="this.style.backgroundColor='rgba(0,242,255,0.05)'; this.style.borderColor='rgba(0,242,255,0.3)';"
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='rgba(58, 73, 75, 0.5)';">
                         Batal
                     </button>
                 </div>
@@ -258,25 +319,47 @@
         <div class="flex items-center justify-center min-h-screen px-4">
             <div x-show="showActiveSessionModal" @click="showActiveSessionModal = false" class="fixed inset-0 bg-black opacity-75"></div>
 
-            <div x-show="showActiveSessionModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-yellow-500/50 max-w-md w-full">
+            <div x-show="showActiveSessionModal"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 class="relative inline-block rounded-xl text-left overflow-hidden shadow-2xl max-w-md w-full"
+                 style="background: rgba(25, 25, 28, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(250, 204, 21, 0.45); box-shadow: 0 0 40px rgba(250, 204, 21, 0.15);">
                 <div class="px-6 pt-6 pb-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-yellow-500">warning</span>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                             style="background-color: rgba(250, 204, 21, 0.15); border: 1px solid rgba(250, 204, 21, 0.4);">
+                            <span class="material-symbols-outlined" style="color: #fde68a;">warning</span>
                         </div>
-                        <h3 class="text-lg font-bold text-text-primary">Sesi Aktif Terdeteksi</h3>
+                        <h3 class="font-headline text-lg font-bold" style="color: #e5e2e3;">Sesi Aktif Terdeteksi</h3>
                     </div>
-                    <div class="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/30 mb-4">
-                        <p class="text-sm text-text-muted mb-1">Kamu masih punya sesi yang sedang berjalan di:</p>
-                        <p class="font-bold text-yellow-400" x-text="activeSession ? activeSession.solo_raid_id + ' — Level ' + (activeSession.level || '-') : ''"></p>
+
+                    <div class="rounded-lg p-4 mb-4"
+                         style="background-color: rgba(250, 204, 21, 0.08); border: 1px solid rgba(250, 204, 21, 0.3);">
+                        <p class="font-body text-sm text-soft mb-1">Kamu masih punya sesi yang sedang berjalan di:</p>
+                        <p class="font-headline text-sm font-bold" style="color: #fde68a;"
+                           x-text="activeSession ? activeSession.solo_raid_id + ' — Level ' + (activeSession.level || '-') : ''"></p>
                     </div>
-                    <p class="text-xs text-text-muted">Selesaikan sesi tersebut terlebih dahulu, atau lanjutkan dari sini.</p>
+
+                    <p class="font-body text-xs text-soft">
+                        Selesaikan sesi tersebut terlebih dahulu, atau lanjutkan dari sini.
+                    </p>
                 </div>
-                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
-                    <button type="button" @click="continueActiveSession()" class="inline-flex justify-center rounded-lg px-5 py-2 bg-yellow-500 text-black text-sm font-bold hover:bg-yellow-400">
+
+                <div class="px-6 py-4 flex flex-row-reverse gap-2"
+                     style="background-color: rgba(14, 14, 15, 0.8); border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                    <button type="button" @click="continueActiveSession()"
+                            class="font-headline inline-flex justify-center rounded-lg px-5 py-2 text-sm font-bold transition-all"
+                            style="background: linear-gradient(135deg, #fde68a, #fbbf24); color: #1a1a1a; text-shadow: 0 1px 1px rgba(255,255,255,0.2);"
+                            onmouseover="this.style.boxShadow='0 0 18px rgba(250,204,21,0.5)';"
+                            onmouseout="this.style.boxShadow='none';">
                         Lanjutkan Sesi
                     </button>
-                    <button type="button" @click="showActiveSessionModal = false" class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                    <button type="button" @click="showActiveSessionModal = false"
+                            class="font-headline inline-flex justify-center rounded-lg px-5 py-2 text-sm font-medium transition-colors"
+                            style="background-color: transparent; color: #b9cacb; border: 1px solid rgba(58, 73, 75, 0.5);"
+                            onmouseover="this.style.backgroundColor='rgba(0,242,255,0.05)'; this.style.borderColor='rgba(0,242,255,0.3)';"
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='rgba(58, 73, 75, 0.5)';">
                         Tutup
                     </button>
                 </div>
@@ -289,29 +372,50 @@
         <div class="flex items-center justify-center min-h-screen px-4">
             <div x-show="showBossConfirmModal" @click="showBossConfirmModal = false" class="fixed inset-0 bg-black opacity-75"></div>
 
-            <div x-show="showBossConfirmModal" class="relative inline-block bg-card rounded-xl text-left overflow-hidden shadow-2xl border border-error/50 max-w-md w-full">
+            <div x-show="showBossConfirmModal"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 class="relative inline-block rounded-xl text-left overflow-hidden shadow-2xl max-w-md w-full"
+                 style="background: rgba(25, 25, 28, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(206, 93, 255, 0.5); box-shadow: 0 0 40px rgba(206, 93, 255, 0.2);">
                 <div class="px-6 pt-6 pb-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-error">swords</span>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                             style="background: linear-gradient(135deg, rgba(206, 93, 255, 0.2), rgba(255, 99, 99, 0.15)); border: 1px solid rgba(206, 93, 255, 0.4);">
+                            <span class="material-symbols-outlined text-magenta-glow">swords</span>
                         </div>
-                        <h3 class="text-lg font-bold text-text-primary">Mulai Boss Battle?</h3>
+                        <h3 class="font-headline text-lg font-bold" style="color: #e5e2e3;">Mulai Boss Battle?</h3>
                     </div>
-                    <div class="bg-surface-light rounded-lg p-4 border border-border mb-4">
-                        <p class="text-sm text-text-muted mb-1">Event</p>
-                        <p class="font-bold text-text-primary mb-3">{{ $soloRaid->nama }}</p>
-                        <div class="text-xs">
-                            <p class="text-text-muted mb-1">Percobaan ke-</p>
-                            <p class="font-bold text-text-primary">#{{ $userStats['attempts'] + 1 }}</p>
+
+                    <div class="rounded-lg p-4 mb-4"
+                         style="background-color: rgba(32, 31, 32, 0.6); border: 1px solid rgba(58, 73, 75, 0.5);">
+                        <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Event</p>
+                        <p class="font-headline text-base font-bold mb-3" style="color: #e5e2e3;">{{ $soloRaid->nama }}</p>
+                        <div class="pt-3" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                            <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Percobaan ke-</p>
+                            <p class="font-headline text-sm font-bold text-magenta-glow">#{{ $userStats['attempts'] + 1 }}</p>
                         </div>
                     </div>
-                    <p class="text-xs text-text-muted">⚔️ Timer akan langsung mulai setelah konfirmasi. Siap?</p>
+
+                    <p class="font-body text-xs text-soft">
+                        ⚔️ Timer akan langsung mulai setelah konfirmasi. Siap?
+                    </p>
                 </div>
-                <div class="px-6 py-4 bg-background flex flex-row-reverse gap-2">
-                    <button type="button" @click="doStartBoss()" class="inline-flex justify-center rounded-lg px-5 py-2 bg-error text-white text-sm font-bold hover:bg-red-600">
+
+                <div class="px-6 py-4 flex flex-row-reverse gap-2"
+                     style="background-color: rgba(14, 14, 15, 0.8); border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                    <button type="button" @click="doStartBoss()"
+                            class="font-headline inline-flex justify-center rounded-lg px-5 py-2 text-sm font-bold transition-all"
+                            style="background: linear-gradient(135deg, #ce5dff, #ff6b6b); color: #ffffff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);"
+                            onmouseover="this.style.boxShadow='0 0 24px rgba(206, 93, 255, 0.55)';"
+                            onmouseout="this.style.boxShadow='none';">
                         Mulai Sekarang!
                     </button>
-                    <button type="button" @click="showBossConfirmModal = false" class="inline-flex justify-center rounded-lg px-5 py-2 border border-border text-text-primary text-sm font-medium hover:bg-surface-light">
+                    <button type="button" @click="showBossConfirmModal = false"
+                            class="font-headline inline-flex justify-center rounded-lg px-5 py-2 text-sm font-medium transition-colors"
+                            style="background-color: transparent; color: #b9cacb; border: 1px solid rgba(58, 73, 75, 0.5);"
+                            onmouseover="this.style.backgroundColor='rgba(0,242,255,0.05)'; this.style.borderColor='rgba(0,242,255,0.3)';"
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='rgba(58, 73, 75, 0.5)';">
                         Batal
                     </button>
                 </div>

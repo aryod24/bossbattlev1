@@ -31,7 +31,7 @@
             {{-- Welcome Card --}}
             <div class="glass-card rounded-xl p-8 lg:col-span-2 flex flex-col justify-center">
                 <h1 class="font-headline text-3xl md:text-[32px] font-bold text-cyan-glow mb-2 leading-tight">
-                    Selamat datang kembali, {{ auth()->user()->nama }}!
+                    Selamat datang kembali, {{ explode(' ', trim(auth()->user()->nama))[0] }}!
                 </h1>
                 <p class="font-body text-base md:text-lg text-soft mb-8">
                     Siap menaklukkan kode? Lihat event terbaru dan tingkatkan peringkatmu.
@@ -88,9 +88,9 @@
             </div>
         </div>
 
-        {{-- Middle Section: Main Activities --}}
+        {{-- Middle Section: Main Activities (Split Left/Right) --}}
         <div class="grid grid-cols-2 gap-6">
-            {{-- Solo Boss Battle --}}
+            {{-- Left: Solo Boss Battle --}}
             <div class="boss-card rounded-xl p-8 relative overflow-hidden group">
                 <div class="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
                     <span class="material-symbols-outlined" style="font-size: 128px;">swords</span>
@@ -112,7 +112,7 @@
                 </div>
             </div>
 
-            {{-- Active / Empty Event --}}
+            {{-- Right: Active / Empty Event --}}
             @if($activeEvent)
                 <div class="rounded-xl p-8 relative overflow-hidden group"
                      style="background: linear-gradient(135deg, rgba(250, 204, 21, 0.6), rgba(250, 204, 21, 0.1));
@@ -166,9 +166,9 @@
             @endif
         </div>
 
-        {{-- Bottom Section: Badges & Activity --}}
+        {{-- Bottom Section: Badges & Activity (Split Left/Right) --}}
         <div class="grid grid-cols-2 gap-6">
-            {{-- Recent Badges --}}
+            {{-- Left: Recent Badges --}}
             <div class="glass-card rounded-xl p-8 flex flex-col">
                 <div class="flex justify-between items-center mb-8 pb-2" style="border-bottom: 1px solid rgba(58, 73, 75, 0.5);">
                     <div class="flex items-center gap-2">
@@ -203,7 +203,7 @@
                 @endif
             </div>
 
-            {{-- Recent Activity --}}
+            {{-- Right: Recent Activity --}}
             <div class="glass-card rounded-xl p-8 flex flex-col">
                 <div class="flex justify-between items-center mb-8 pb-2" style="border-bottom: 1px solid rgba(58, 73, 75, 0.5);">
                     <div class="flex items-center gap-2">
@@ -225,7 +225,7 @@
                         };
 
                         if ($lastRaidSession->soloRaid) {
-                            $activityTitle = 'Boss Battle: ' . $lastRaidSession->soloRaid->nama;
+                            $activityTitle = '' . $lastRaidSession->soloRaid->nama;
                         } elseif ($lastRaidSession->is_pretest) {
                             $activityTitle = 'Pre-test';
                         } else {

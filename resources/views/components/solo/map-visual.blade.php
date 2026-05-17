@@ -6,8 +6,9 @@
     Positions: odd = left, even = right, quiz = final bottom-right (large)
 --}}
 
-<div class="w-full md:w-1/2 bg-background text-text-primary p-6 md:p-12 flex items-center justify-center relative overflow-hidden min-h-screen">
-    <div class="w-full max-w-md relative z-10 flex flex-col items-center">
+<div class="w-full md:w-1/2 md:h-screen text-text-primary p-6 md:p-12 flex items-center justify-center relative overflow-y-auto custom-scrollbar"
+     style="background: radial-gradient(ellipse at center, rgba(0, 242, 255, 0.05) 0%, rgba(10, 10, 11, 0) 60%);">
+    <div class="w-full max-w-md relative z-10 flex flex-col items-center my-auto">
 
         {{-- Header --}}
         <div class="text-center mb-6 w-full">
@@ -20,10 +21,10 @@
         </div>
 
         {{-- Map Container --}}
-        <div class="relative w-[360px] h-[580px]">
+        <div class="relative w-[360px] h-[680px]">
 
-            {{-- Background Path (SVG) — same as original --}}
-            <svg class="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" viewBox="0 0 360 580" xmlns="http://www.w3.org/2000/svg">
+            {{-- Background Path (SVG) — extends down to reach quiz node --}}
+            <svg class="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" viewBox="0 0 360 680" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="gradientPath" x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%"   stop-color="#9cdcfe" />
@@ -38,8 +39,8 @@
                     </filter>
                 </defs>
                 <path d="
-                    M 45,40 
-                    C 150,40 180,85 240,120 
+                    M 45,40
+                    C 150,40 180,85 240,120
                     C 315,165 315,115 315,155
                     C 315,200 240,225 180,250
                     C 45,295 45,245 45,270
@@ -47,8 +48,8 @@
                     C 315,410 315,360 315,390
                     C 315,430 240,455 180,480
                     C 45,525 45,475 45,500
-                    C 45,540 120,560 180,580
-                    C 315,625 315,575 315,600
+                    C 45,560 120,580 180,610
+                    C 250,630 290,635 305,640
                 "
                 stroke="url(#gradientPath)"
                 stroke-width="4"
@@ -119,7 +120,7 @@
                 $quizColor  = $allContentDone ? '#f44747' : '#555';
                 $quizShadow = $allContentDone ? 'rgba(244,71,71,0.6)' : 'rgba(0,0,0,0)';
             @endphp
-            <div class="absolute w-full flex justify-end" style="top: 510px; right: 13px;">
+            <div class="absolute w-full flex justify-end" style="top: 600px; right: 13px;">
                 <div class="flex flex-row-reverse items-center gap-4 node {{ $allContentDone ? 'cursor-pointer' : 'cursor-not-allowed opacity-60' }}"
                      @if($allContentDone) @click="startLatihan()" @endif>
 

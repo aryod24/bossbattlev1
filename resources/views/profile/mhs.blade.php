@@ -35,7 +35,7 @@
                             <span class="material-symbols-outlined text-magenta-glow" style="font-size: 44px;">military_tech</span>
                             Koleksi Badge
                         </h1>
-                        <p class="font-body text-soft mt-1">Pencapaian {{ $user->nama }} di arena Boss Battle.</p>
+                        <p class="font-body text-soft mt-1">Pencapaian {{ explode(' ', trim($user->nama))[0] }} di arena Boss Battle.</p>
                     </div>
                 </div>
                 <div class="text-center px-6 py-3 rounded-xl"

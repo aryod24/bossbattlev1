@@ -40,9 +40,9 @@ class QuestionBankMediumSeeder extends Seeder
             ],
             [
                 'level'         => 'Medium',
-                'soal_text'     => 'Manakah cara yang benar untuk mengakses nilai "Budi" pada array associative: $mhs = ["nama" => "Budi", "umur" => 20]?',
+                'soal_text'     => 'Array associative $mhs memiliki key "nama" dengan nilai "Budi" dan key "umur" dengan nilai 20. Apa key yang digunakan untuk mengakses nilai "Budi"?',
                 'tipe'          => 'short_answer',
-                'jawaban_benar' => '$mhs["nama"]',
+                'jawaban_benar' => 'nama',
                 'bobot_xp'      => 20,
             ],
             [
@@ -54,7 +54,7 @@ class QuestionBankMediumSeeder extends Seeder
             ],
             [
                 'level'         => 'Medium',
-                'soal_text'     => 'Pada array multidimensi $siswa = [["Budi", 85], ["Ani", 92]], apa hasil dari pemanggilan $siswa[1][0]?',
+                'soal_text'     => 'Array $siswa terdiri dari dua baris: baris 0 berisi ["Budi", 85] dan baris 1 berisi ["Ani", 92]. Apa nilai dari elemen indeks 0 pada baris indeks 1?',
                 'tipe'          => 'multiple_choice',
                 'pilihan_a'     => 'Budi',
                 'pilihan_b'     => '85',
@@ -111,7 +111,7 @@ class QuestionBankMediumSeeder extends Seeder
                 'level'         => 'Medium',
                 'soal_text'     => 'Apa string yang dihasilkan dari fungsi trim("  PHP Laravel  ")?',
                 'tipe'          => 'multiple_choice',
-                'pilihan_a'     => '  PHP Laravel  ',
+                'pilihan_a'     => 'Php Laravel',
                 'pilihan_b'     => 'PHPLaravel',
                 'pilihan_c'     => 'PHP Laravel',
                 'pilihan_d'     => 'php laravel',

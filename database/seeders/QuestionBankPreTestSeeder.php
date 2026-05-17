@@ -185,7 +185,7 @@ class QuestionBankPreTestSeeder extends Seeder
             ],
             [
                 'level'         => 'Hard',
-                'soal_text'     => 'Access modifier mana yang membuat property hanya bisa diakses dari dalam class itu sendiri DAN class turunannya?',
+                'soal_text'     => 'Access modifier mana yang membuat property hanya bisa diakses dari dalam class itu sendiri dan class turunannya?',
                 'tipe'          => 'short_answer',
                 'jawaban_benar' => 'protected',
                 'bobot_xp'      => 30,

@@ -21,6 +21,14 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     /** @var \App\Models\User $user */
     $user = Auth::user();
+
+    // Redirect admin/dosen to their own dashboard
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    if ($user->role === 'dosen') {
+        return redirect()->route('dosen.dashboard');
+    }
     
     // Redirect students to pre-test if not completed
     if ($user->needsPretest()) {
@@ -80,7 +88,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin Routes
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', \App\Http\Controllers\Admin\DashboardController::class)->name('dashboard');
 
     Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'edit'])->name('profile.edit');
@@ -121,7 +129,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 });
 
 // Dosen Routes
-Route::middleware(['auth', 'verified'])->prefix('dosen')->name('dosen.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:dosen'])->prefix('dosen')->name('dosen.')->group(function () {
     Route::get('/dashboard', \App\Http\Controllers\Dosen\DashboardController::class)->name('dashboard');
 
     Route::get('/profile', [\App\Http\Controllers\Dosen\DosenProfileController::class, 'edit'])->name('profile.edit');

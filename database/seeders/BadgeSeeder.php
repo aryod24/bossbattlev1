@@ -88,6 +88,32 @@ class BadgeSeeder extends Seeder
                     'count' => 10,
                 ],
             ],
+            // ID 7: Centurion - Jawab 100 benar dalam 5 sesi game (perfect_score_count = 5)
+            [
+                'id' => 7,
+                'slug' => 'Flawless Streak',
+                'name' => 'Flawless Streak',
+                'emoji' => '🏆',
+                'description' => 'Jawab 100% benar dalam 5 sesi game',
+                'is_system' => true,
+                'requirements' => [
+                    'type' => 'perfect_score_count',
+                    'count' => 5,
+                ],
+            ],
+            // ID 8: Lore Keeper - Selesaikan 15 materi (content node)
+            [
+                'id' => 8,
+                'slug' => 'Scholar',
+                'name' => 'Scholar',
+                'emoji' => '🧠',
+                'description' => 'Selesaikan 15 materi (content node)',
+                'is_system' => true,
+                'requirements' => [
+                    'type' => 'node_completion_count',
+                    'count' => 15,
+                ],
+            ],
         ];
 
         foreach ($badges as $badge) {

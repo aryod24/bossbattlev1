@@ -25,26 +25,27 @@
 
     <div class="flex flex-col gap-6">
         {{-- Hero Header: User identity + collection summary --}}
-        <div class="glass-card rounded-xl p-8 relative overflow-hidden">
-            <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div class="glass-card rounded-xl p-6 relative overflow-hidden">
+            <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="size-16 rounded-full bg-cover bg-center ring-2 ring-cyan-soft"
-                         style='background-image: url("https://ui-avatars.com/api/?name={{ urlencode($user->nama) }}&background=random&size=128");'></div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                         style="background: linear-gradient(135deg, rgba(0,242,255,0.15), rgba(206,93,255,0.15)); border: 1px solid rgba(0,242,255,0.3);">
+                        <span class="material-symbols-outlined text-magenta-glow" style="font-size: 24px;">military_tech</span>
+                    </div>
                     <div>
-                        <h1 class="font-headline text-3xl md:text-[32px] font-extrabold text-cyan-glow leading-tight flex items-center gap-3">
-                            <span class="material-symbols-outlined text-magenta-glow" style="font-size: 44px;">military_tech</span>
+                        <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-cyan-glow leading-tight">
                             Koleksi Badge
                         </h1>
-                        <p class="font-body text-soft mt-1">Pencapaian {{ explode(' ', trim($user->nama))[0] }} di arena Boss Battle.</p>
+                        <p class="font-body text-sm text-soft mt-1">Pencapaian {{ explode(' ', trim($user->nama))[0] }} di arena Boss Battle.</p>
                     </div>
                 </div>
-                <div class="text-center px-6 py-3 rounded-xl"
+                <div class="text-center px-4 py-2 rounded-lg"
                      style="background-color: rgba(0, 242, 255, 0.08); border: 1px solid rgba(0, 242, 255, 0.3);">
                     <div class="flex items-baseline gap-1 justify-center">
-                        <span class="font-headline text-4xl font-extrabold text-cyan-glow">{{ count($unlockedBadges) }}</span>
-                        <span class="font-headline text-xl text-soft">/ {{ count($allBadges) }}</span>
+                        <span class="font-headline text-xl font-extrabold text-cyan-glow">{{ count($unlockedBadges) }}</span>
+                        <span class="font-headline text-sm text-soft">/ {{ count($allBadges) }}</span>
                     </div>
-                    <div class="font-mono-label text-xs font-medium uppercase tracking-wider text-soft mt-1">Terbuka</div>
+                    <div class="font-mono-label text-[10px] font-medium uppercase tracking-wider text-soft mt-0.5">Terbuka</div>
                 </div>
             </div>
         </div>

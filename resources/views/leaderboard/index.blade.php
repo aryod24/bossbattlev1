@@ -1,15 +1,21 @@
 <x-app-layout>
     <div class="flex flex-col gap-6">
         {{-- Header --}}
-        <div class="glass-card rounded-xl p-8">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-                <div class="flex flex-col gap-2">
-                    <h1 class="font-headline text-3xl md:text-[40px] font-extrabold leading-tight tracking-tight text-cyan-glow">
-                        Leaderboard Global
-                    </h1>
-                    <p class="font-body text-base md:text-lg text-soft">
-                        Lihat posisi Anda di antara semua mahasiswa.
-                    </p>
+        <div class="glass-card rounded-xl p-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                         style="background: linear-gradient(135deg, rgba(0,242,255,0.15), rgba(206,93,255,0.15)); border: 1px solid rgba(0,242,255,0.3);">
+                        <span class="material-symbols-outlined text-cyan-glow" style="font-size: 24px;">leaderboard</span>
+                    </div>
+                    <div>
+                        <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-cyan-glow leading-tight">
+                            Leaderboard Global
+                        </h1>
+                        <p class="font-body text-sm text-soft mt-1">
+                            Lihat posisi Anda di antara semua mahasiswa.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

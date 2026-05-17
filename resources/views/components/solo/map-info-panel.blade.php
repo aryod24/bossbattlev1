@@ -102,7 +102,7 @@
 
     {{-- Tactical Progress + Modul List --}}
     <div class="glass-card rounded-xl p-8">
-        <div class="flex justify-between items-center mb-4 pb-4 divider-soft" style="border-bottom: 1px solid rgba(58, 73, 75, 0.5);">
+        <div class="flex justify-between items-center mb-4">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-cyan-glow">route</span>
                 <h3 class="font-headline text-xl font-semibold" style="color: #e5e2e3;">Progres Materi</h3>

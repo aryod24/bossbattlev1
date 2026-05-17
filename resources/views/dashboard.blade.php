@@ -90,80 +90,55 @@
 
         {{-- Middle Section: Main Activities (Split Left/Right) --}}
         <div class="grid grid-cols-2 gap-6">
-            {{-- Left: Solo Boss Battle --}}
-            <div class="boss-card rounded-xl p-8 relative overflow-hidden group">
+            {{-- Left: Learning Mode --}}
+            <div class="rounded-xl p-8 relative overflow-hidden group"
+                 style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(79, 70, 229, 0.5), rgba(67, 56, 202, 0.4));
+                        border: 1px solid rgba(99, 102, 241, 0.4);
+                        box-shadow: 0 0 25px rgba(99, 102, 241, 0.2);">
+                <div class="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                    <span class="material-symbols-outlined" style="font-size: 128px;">school</span>
+                </div>
+                <div class="relative z-10">
+                    <div class="w-16 h-16 rounded-xl flex items-center justify-center backdrop-blur-md mb-4 border"
+                         style="background-color: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3);">
+                        <span class="material-symbols-outlined text-white" style="font-size: 36px;">school</span>
+                    </div>
+                    <h2 class="font-headline text-3xl md:text-[40px] font-extrabold text-white mb-2 leading-tight drop-shadow-md">
+                        Learning Mode
+                    </h2>
+                    <p class="font-body text-base md:text-lg mb-8 max-w-md" style="color: rgba(255,255,255,0.95);">
+                        Pelajari materi programming dan asah kemampuan dengan latihan soal terstruktur.
+                    </p>
+                    <a href="#" class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:bg-gray-100 hover:scale-105" style="color: #4f46e5;">
+                        Mulai Belajar
+                    </a>
+                </div>
+            </div>
+
+            {{-- Right: Solo Boss Battle --}}
+            <div class="rounded-xl p-8 relative overflow-hidden group"
+                 style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.7), rgba(6, 182, 212, 0.6));
+                        border: 1px solid rgba(59, 130, 246, 0.5);
+                        box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);">
                 <div class="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
                     <span class="material-symbols-outlined" style="font-size: 128px;">swords</span>
                 </div>
                 <div class="relative z-10">
                     <div class="w-16 h-16 rounded-xl flex items-center justify-center backdrop-blur-md mb-4 border"
-                         style="background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
+                         style="background-color: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3);">
                         <span class="material-symbols-outlined text-white" style="font-size: 36px;">swords</span>
                     </div>
                     <h2 class="font-headline text-3xl md:text-[40px] font-extrabold text-white mb-2 leading-tight drop-shadow-md">
-                        Solo Boss Battle
+                        Boss Battle
                     </h2>
-                    <p class="font-body text-base md:text-lg mb-8 max-w-md" style="color: rgba(255,255,255,0.9);">
+                    <p class="font-body text-base md:text-lg mb-8 max-w-md" style="color: rgba(255,255,255,0.95);">
                         Tantang Boss & Kuasai Materi. Pilih Level Kesulitan dan raih XP maksimal!
                     </p>
-                    <a href="{{ route('solo.index') }}" class="font-headline inline-flex items-center bg-white text-magenta-glow px-8 py-3 rounded-lg font-bold transition-colors duration-300 hover:bg-gray-200">
+                    <a href="{{ route('solo.index') }}" class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:bg-gray-100 hover:scale-105" style="color: #1d4ed8;">
                         Mulai Battle
                     </a>
                 </div>
             </div>
-
-            {{-- Right: Active / Empty Event --}}
-            @if($activeEvent)
-                <div class="rounded-xl p-8 relative overflow-hidden group"
-                     style="background: linear-gradient(135deg, rgba(250, 204, 21, 0.6), rgba(250, 204, 21, 0.1));
-                            border: 1px solid rgba(250, 204, 21, 0.4);
-                            box-shadow: 0 0 30px rgba(250, 204, 21, 0.15);">
-                    <div class="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-                        <span class="material-symbols-outlined" style="font-size: 128px;">emoji_events</span>
-                    </div>
-                    <div class="relative z-10">
-                        <div class="w-16 h-16 rounded-xl flex items-center justify-center backdrop-blur-md mb-4 border"
-                             style="background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);">
-                            <span class="material-symbols-outlined text-white" style="font-size: 36px;">emoji_events</span>
-                        </div>
-                        <span class="font-mono-label text-[10px] uppercase tracking-wider font-medium px-2 py-0.5 rounded mb-2 inline-block"
-                              style="background-color: rgba(255,255,255,0.15); color: #fde68a;">
-                            Sedang Berlangsung
-                        </span>
-                        <h2 class="font-headline text-3xl md:text-[40px] font-extrabold text-white mb-2 leading-tight drop-shadow-md">
-                            {{ $activeEvent->nama_event }}
-                        </h2>
-                        <p class="font-body text-base md:text-lg mb-8 max-w-md" style="color: rgba(255,255,255,0.9);">
-                            Bergabunglah dalam event kompetitif ini dan buktikan kemampuanmu!
-                        </p>
-                        <button disabled class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold cursor-not-allowed opacity-80" style="color: #b45309;">
-                            Gabung Event (Segera)
-                        </button>
-                    </div>
-                </div>
-            @else
-                <div class="neutral-card rounded-xl p-8 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-                        <span class="material-symbols-outlined" style="font-size: 128px;">event_busy</span>
-                    </div>
-                    <div class="relative z-10">
-                        <div class="w-16 h-16 rounded-xl flex items-center justify-center backdrop-blur-md mb-4 border"
-                             style="background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
-                            <span class="material-symbols-outlined text-soft" style="font-size: 36px;">event_busy</span>
-                        </div>
-                        <h2 class="font-headline text-3xl md:text-[40px] font-extrabold mb-2 leading-tight drop-shadow-md" style="color: #e5e2e3;">
-                            Tidak Ada Event
-                        </h2>
-                        <p class="font-body text-base md:text-lg mb-8 max-w-md text-soft">
-                            Saat ini belum ada event yang aktif. Fokus pada Solo Battle untuk meningkatkan levelmu!
-                        </p>
-                        <button class="font-headline inline-flex items-center px-8 py-3 rounded-lg font-bold cursor-not-allowed border text-soft"
-                                style="background-color: rgba(53, 52, 54, 0.8); border-color: rgba(132, 148, 149, 0.3);">
-                            Menunggu Event...
-                        </button>
-                    </div>
-                </div>
-            @endif
         </div>
 
         {{-- Bottom Section: Badges & Activity (Split Left/Right) --}}

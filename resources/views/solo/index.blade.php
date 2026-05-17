@@ -2,18 +2,18 @@
     <div class="flex flex-col gap-6">
 
         {{-- Page Heading --}}
-        <div class="glass-card rounded-xl p-8">
-            <div class="flex flex-wrap justify-between items-start gap-4">
+        <div class="glass-card rounded-xl p-6">
+            <div class="flex flex-wrap justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-xl flex items-center justify-center"
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center"
                          style="background: linear-gradient(135deg, rgba(0,242,255,0.15), rgba(206,93,255,0.15)); border: 1px solid rgba(0,242,255,0.3);">
-                        <span class="material-symbols-outlined text-cyan-glow" style="font-size: 32px;">swords</span>
+                        <span class="material-symbols-outlined text-cyan-glow" style="font-size: 24px;">swords</span>
                     </div>
                     <div>
-                        <h1 class="font-headline text-3xl md:text-[32px] font-extrabold text-cyan-glow leading-tight">
-                            Solo Raid
+                        <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-cyan-glow leading-tight">
+                            Event
                         </h1>
-                        <p class="font-body text-soft text-sm mt-1">
+                        <p class="font-body text-sm text-soft mt-1">
                             Selesaikan event secara bertahap untuk unlock Boss Battle.
                         </p>
                     </div>
@@ -55,18 +55,14 @@
                 $events = $sectionData['events'];
                 $isSectionUnlocked = $sectionData['is_unlocked'];
 
-                $sectionMeta = match($sectionName) {
-                    'Easy'   => ['color' => '#86efac', 'bg' => 'rgba(34,197,94,0.15)',  'border' => 'rgba(34,197,94,0.3)'],
-                    'Medium' => ['color' => '#fde68a', 'bg' => 'rgba(250,204,21,0.15)', 'border' => 'rgba(250,204,21,0.3)'],
-                    'Hard'   => ['color' => '#ffb4ab', 'bg' => 'rgba(255,99,99,0.15)',  'border' => 'rgba(255,99,99,0.3)'],
-                    default  => ['color' => '#00f2ff', 'bg' => 'rgba(0,242,255,0.15)',  'border' => 'rgba(0,242,255,0.3)'],
-                };
+                // All sections use cyan color
+                $sectionMeta = ['color' => '#00f2ff', 'bg' => 'rgba(0,242,255,0.15)', 'border' => 'rgba(0,242,255,0.3)'];
             @endphp
 
             <div class="flex flex-col gap-4">
                 <div class="flex items-center gap-3">
                     <h2 class="font-headline text-2xl font-extrabold" style="color: {{ $sectionMeta['color'] }};">{{ $sectionName }}</h2>
-                    <div class="h-px flex-1" style="background-color: rgba(58, 73, 75, 0.5);"></div>
+                    <div class="h-px flex-1" style="background-color: {{ $sectionMeta['border'] }};"></div>
                     @if(!$isSectionUnlocked)
                         <span class="font-mono-label text-xs font-medium px-2 py-1 rounded-md uppercase tracking-wider flex items-center gap-1"
                               style="background-color: rgba(132,148,149,0.15); color: #849495; border: 1px solid rgba(132,148,149,0.3);">
@@ -83,7 +79,7 @@
                     </div>
                 @else
                     {{-- Event Cards Grid --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @foreach($events as $index => $event)
                             @php
                                 $isExpired    = now()->greaterThan($event->tanggal_selesai);
@@ -93,118 +89,140 @@
                                 $isUnlocked   = $isSectionUnlocked && $event->is_unlocked && !$isExpired;
                                 $isBoss       = $event->type === 'boss';
 
-                                $cardBorder = $isCompleted
-                                    ? 'rgba(34, 197, 94, 0.4)'
-                                    : ($isBoss ? 'rgba(206, 93, 255, 0.5)' : 'rgba(0, 242, 255, 0.2)');
+                                // Card styling with dark background
+                                if ($isBoss) {
+                                    // Boss Battle: Blue-Cyan border
+                                    $cardBorder     = 'rgba(59, 130, 246, 0.5)';
+                                    $cardShadow     = '0 0 30px rgba(6, 182, 212, 0.2)';
+                                    $iconBgColor    = 'rgba(59, 130, 246, 0.3)';
+                                    $iconBorder     = 'rgba(59, 130, 246, 0.6)';
+                                    $iconColor      = '#00d4ff';
+                                    $iconSymbol     = 'skull';
+                                    $bgIconColor    = 'rgba(0, 212, 255, 0.6)';
+                                    $bgIconSymbol   = 'swords';
+                                    $titleColor     = '#ffffff';
+                                    $descColor      = 'rgba(255, 255, 255, 0.9)';
+                                    $dateColor      = 'rgba(255, 255, 255, 0.75)';
+                                    $btnTextColor   = '#1d4ed8';
+                                } else {
+                                    // Materi: Indigo-Purple border
+                                    $cardBorder     = 'rgba(99, 102, 241, 0.4)';
+                                    $cardShadow     = '0 0 25px rgba(99, 102, 241, 0.15)';
+                                    $iconBgColor    = 'rgba(99, 102, 241, 0.3)';
+                                    $iconBorder     = 'rgba(99, 102, 241, 0.6)';
+                                    $iconColor      = '#a78bfa';
+                                    $iconSymbol     = 'menu_book';
+                                    $bgIconColor    = 'rgba(167, 139, 250, 0.6)';
+                                    $bgIconSymbol   = 'school';
+                                    $titleColor     = '#ffffff';
+                                    $descColor      = 'rgba(255, 255, 255, 0.9)';
+                                    $dateColor      = 'rgba(255, 255, 255, 0.75)';
+                                    $btnTextColor   = '#4f46e5';
+                                }
 
-                                $cardShadow = $isBoss
-                                    ? '0 0 30px rgba(206, 93, 255, 0.15)'
-                                    : ($isCompleted ? '0 0 20px rgba(34, 197, 94, 0.1)' : 'none');
+                                // Badge styling
+                                $badgeBg        = 'rgba(255,255,255,0.1)';
+                                $badgeBorder    = 'rgba(255,255,255,0.2)';
+                                $badgeColor     = 'rgba(255,255,255,0.85)';
+
+                                // Completed status — keep cyan, just add extra glow
+                                if ($isCompleted) {
+                                    $cardShadow = $isBoss
+                                        ? '0 0 30px rgba(0, 212, 255, 0.3), 0 0 15px rgba(0, 212, 255, 0.2)'
+                                        : '0 0 25px rgba(0, 212, 255, 0.25), 0 0 15px rgba(0, 212, 255, 0.15)';
+                                }
                             @endphp
 
-                            <div class="flex flex-col rounded-xl overflow-hidden glow-card transition-all duration-300 {{ !$isUnlocked ? 'opacity-50' : 'hover:-translate-y-0.5' }}"
-                                 style="background: rgba(25, 25, 28, 0.6);
-                                        backdrop-filter: blur(20px);
-                                        -webkit-backdrop-filter: blur(20px);
+                            <div class="rounded-xl p-8 relative overflow-hidden group transition-all duration-300 {{ !$isUnlocked ? 'opacity-50' : 'hover:-translate-y-1' }}"
+                                 style="background: rgba(19, 19, 20, 0.8);
                                         border: 1px solid {{ $cardBorder }};
                                         box-shadow: {{ $cardShadow }};">
 
-                                {{-- Coloured top stripe --}}
-                                @if($isBoss)
-                                    <div class="h-1.5" style="background: linear-gradient(90deg, #ce5dff, #ff6b6b);"></div>
-                                @elseif($isCompleted)
-                                    <div class="h-1.5" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
-                                @else
-                                    <div class="h-1.5 progress-bar-fill"></div>
-                                @endif
+                                {{-- Decorative background icon --}}
+                                <div class="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                                    <span class="material-symbols-outlined" style="font-size: 128px; color: {{ $bgIconColor }};">{{ $bgIconSymbol }}</span>
+                                </div>
 
-                                <div class="p-5 flex-1 flex flex-col gap-3">
-                                    {{-- Top row: badges + icon --}}
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="flex flex-col gap-2 flex-1 min-w-0">
-                                            <div class="flex flex-wrap gap-2 items-center">
-                                                @if($isBoss)
-                                                    <span class="font-mono-label inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded uppercase tracking-wider"
-                                                          style="background-color: rgba(206,93,255,0.15); color: #ebb2ff; border: 1px solid rgba(206,93,255,0.3);">
-                                                        <span class="material-symbols-outlined" style="font-size:11px">skull</span> Boss Battle
-                                                    </span>
-                                                @else
-                                                    <span class="font-mono-label inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded uppercase tracking-wider"
-                                                          style="background-color: rgba(0,242,255,0.12); color: #00f2ff; border: 1px solid rgba(0,242,255,0.3);">
-                                                        <span class="material-symbols-outlined" style="font-size:11px">menu_book</span> Materi #{{ $index + 1 }}
-                                                    </span>
-                                                @endif
-
-                                                @if($isCompleted)
-                                                    <span class="font-mono-label text-[10px] font-medium px-2 py-0.5 rounded uppercase tracking-wider"
-                                                          style="background-color: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3);">
-                                                        ✓ Selesai
-                                                    </span>
-                                                @elseif($isInProgress)
-                                                    <span class="font-mono-label text-[10px] font-medium px-2 py-0.5 rounded uppercase tracking-wider"
-                                                          style="background-color: rgba(250,204,21,0.15); color: #fde68a; border: 1px solid rgba(250,204,21,0.3);">
-                                                        Sedang
-                                                    </span>
-                                                @elseif(!$isUnlocked)
-                                                    <span class="font-mono-label text-[10px] font-medium px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-0.5"
-                                                          style="background-color: rgba(132,148,149,0.15); color: #849495; border: 1px solid rgba(132,148,149,0.3);">
-                                                        <span class="material-symbols-outlined" style="font-size:10px">lock</span> Terkunci
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <h3 class="font-headline text-base font-semibold leading-snug" style="color: #e5e2e3;">
-                                                {{ $event->nama }}
-                                            </h3>
+                                <div class="relative z-10 flex flex-col h-full gap-4">
+                                    {{-- Icon Box (top-left) --}}
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-14 h-14 rounded-xl flex items-center justify-center backdrop-blur-md border"
+                                             style="background-color: {{ $iconBgColor }}; border-color: {{ $iconBorder }};">
+                                            <span class="material-symbols-outlined" style="color: {{ $iconColor }}; font-size: 30px;">{{ $iconSymbol }}</span>
                                         </div>
-                                        {{-- Icon --}}
-                                        @if($isBoss)
-                                            <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                                                 style="background-color: rgba(206,93,255,0.15); border: 1px solid rgba(206,93,255,0.3);">
-                                                <span class="material-symbols-outlined text-magenta-glow">skull</span>
-                                            </div>
-                                        @else
-                                            <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                                                 style="background-color: rgba(0,242,255,0.12); border: 1px solid rgba(0,242,255,0.3);">
-                                                <span class="font-headline text-sm font-extrabold text-cyan-glow">{{ $index + 1 }}</span>
-                                            </div>
-                                        @endif
+
+                                        {{-- Status badges --}}
+                                        <div class="flex flex-wrap gap-2 justify-end">
+                                            @if($isBoss)
+                                                <span class="font-mono-label inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded uppercase tracking-wider"
+                                                      style="background-color: {{ $badgeBg }}; color: {{ $badgeColor }}; border: 1px solid {{ $badgeBorder }};">
+                                                    <span class="material-symbols-outlined" style="font-size:11px">skull</span> Boss Battle
+                                                </span>
+                                            @else
+                                                <span class="font-mono-label inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded uppercase tracking-wider"
+                                                      style="background-color: {{ $badgeBg }}; color: {{ $badgeColor }}; border: 1px solid {{ $badgeBorder }};">
+                                                    <span class="material-symbols-outlined" style="font-size:11px">menu_book</span> Materi
+                                                </span>
+                                            @endif
+
+                                            @if($isCompleted)
+                                                <span class="font-mono-label text-[10px] font-medium px-2 py-1 rounded uppercase tracking-wider inline-flex items-center gap-1"
+                                                      style="background-color: rgba(34,197,94,0.2); color: #bbf7d0; border: 1px solid rgba(34,197,94,0.4);">
+                                                    <span class="material-symbols-outlined" style="font-size:11px">check_circle</span> Selesai
+                                                </span>
+                                            @elseif($isInProgress)
+                                                <span class="font-mono-label text-[10px] font-medium px-2 py-1 rounded uppercase tracking-wider"
+                                                      style="background-color: rgba(250,204,21,0.2); color: #fef3c7; border: 1px solid rgba(250,204,21,0.4);">
+                                                    Sedang
+                                                </span>
+                                            @elseif(!$isUnlocked)
+                                                <span class="font-mono-label text-[10px] font-medium px-2 py-1 rounded uppercase tracking-wider inline-flex items-center gap-1"
+                                                      style="background-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.2);">
+                                                    <span class="material-symbols-outlined" style="font-size:11px">lock</span> Terkunci
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
 
-                                    <p class="font-body text-xs text-soft line-clamp-2 mt-auto">{{ $event->deskripsi }}</p>
+                                    {{-- Title --}}
+                                    <h3 class="font-headline text-xl md:text-2xl font-extrabold leading-tight" style="color: {{ $titleColor }};">
+                                        {{ $event->nama }}
+                                    </h3>
+
+                                    {{-- Description --}}
+                                    <p class="font-body text-sm md:text-base line-clamp-3" style="color: {{ $descColor }};">{{ $event->deskripsi }}</p>
 
                                     {{-- Date + CTA --}}
-                                    <div class="mt-4 flex items-center justify-between pt-3" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
-                                        <div class="font-mono-label flex items-center gap-1 text-xs uppercase tracking-wider text-soft">
+                                    <div class="mt-auto flex items-center justify-between pt-4" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                                        <div class="font-mono-label flex items-center gap-1 text-xs uppercase tracking-wider" style="color: {{ $dateColor }};">
                                             <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
                                             <span>{{ \Carbon\Carbon::parse($event->tanggal_selesai)->format('d M Y') }}</span>
                                         </div>
 
                                         @if(!$isUnlocked || $isExpired)
-                                            <div class="font-mono-label flex items-center gap-1 text-xs uppercase tracking-wider text-faint">
+                                            <div class="font-mono-label flex items-center gap-1 text-xs uppercase tracking-wider" style="color: rgba(255,255,255,0.5);">
                                                 <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
                                                 <span>Terkunci</span>
                                             </div>
                                         @elseif($isBoss)
                                             <a href="{{ route('solo.boss', $event) }}"
-                                               class="font-headline flex items-center justify-center rounded-lg h-8 text-xs font-bold px-4 transition-all"
-                                               style="background: linear-gradient(135deg, #ce5dff, #ff6b6b); color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.4);"
-                                               onmouseover="this.style.boxShadow='0 0 18px rgba(206,93,255,0.5)';"
-                                               onmouseout="this.style.boxShadow='none';">
+                                               class="font-headline inline-flex items-center bg-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-gray-100 hover:scale-105"
+                                               style="color: {{ $btnTextColor }};">
                                                 <span class="material-symbols-outlined text-sm mr-1">swords</span>
                                                 {{ $isCompleted ? 'Ulangi' : 'Mulai Battle' }}
                                             </a>
                                         @elseif($isCompleted)
                                             <a href="{{ route('solo.map', $event) }}"
-                                               class="font-headline flex items-center justify-center rounded-lg h-8 text-xs font-bold px-3 transition-colors"
-                                               style="background-color: rgba(34,197,94,0.12); color: #86efac; border: 1px solid rgba(34,197,94,0.3);"
-                                               onmouseover="this.style.backgroundColor='rgba(34,197,94,0.2)';"
-                                               onmouseout="this.style.backgroundColor='rgba(34,197,94,0.12)';">
+                                               class="font-headline inline-flex items-center bg-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-gray-100 hover:scale-105"
+                                               style="color: {{ $btnTextColor }};">
                                                 <span class="material-symbols-outlined text-sm mr-1">replay</span>Ulangi
                                             </a>
                                         @else
                                             <a href="{{ route('solo.map', $event) }}"
-                                               class="btn-cyber-primary font-headline flex items-center justify-center rounded-lg h-8 text-xs font-bold px-4">
+                                               class="font-headline inline-flex items-center bg-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-gray-100 hover:scale-105"
+                                               style="color: {{ $btnTextColor }};">
                                                 {{ $isInProgress ? 'Lanjutkan' : 'Mulai' }}
+                                                <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span>
                                             </a>
                                         @endif
                                     </div>

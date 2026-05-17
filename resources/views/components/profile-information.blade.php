@@ -5,7 +5,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="space-y-3">
         @csrf
         @method('patch')
 
@@ -25,7 +25,7 @@
                 id="nama"
                 name="nama"
                 type="text"
-                class="mt-1 block w-full"
+                class="block w-full"
                 x-ref="namaInput"
                 x-model="nama"
                 x-bind:readonly="!editing"
@@ -52,7 +52,7 @@
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
-                    <p class="text-sm mt-2 text-text-primary">
+                    <p class="text-sm text-text-primary">
                         {{ __('Your email address is unverified.') }}
 
                         <button form="send-verification" class="underline text-sm text-text-muted hover:text-text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">

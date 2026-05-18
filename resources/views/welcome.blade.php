@@ -96,6 +96,46 @@
             font-weight: 700;
             user-select: none;
             pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        /* Six different float patterns for organic movement */
+        @keyframes ornament-float-a {
+            0%, 100% { transform: translate(0, 0) rotate(-15deg); opacity: 0.55; }
+            50%      { transform: translate(8px, -18px) rotate(-12deg); opacity: 1; }
+        }
+        @keyframes ornament-float-b {
+            0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+            50%      { transform: translate(-12px, 14px); opacity: 1; }
+        }
+        @keyframes ornament-float-c {
+            0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+            50%      { transform: translate(14px, -10px); opacity: 0.95; }
+        }
+        @keyframes ornament-float-d {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.55; }
+            50%      { transform: translate(-10px, -16px) scale(1.05); opacity: 1; }
+        }
+        @keyframes ornament-float-e {
+            0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+            50%      { transform: translate(18px, 12px); opacity: 0.9; }
+        }
+        @keyframes ornament-float-f {
+            0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+            50%      { transform: translate(-16px, -8px); opacity: 1; }
+        }
+
+        .ornament-anim-1 { animation: ornament-float-a 9s ease-in-out infinite; }
+        .ornament-anim-2 { animation: ornament-float-b 11s ease-in-out infinite 1.2s; }
+        .ornament-anim-3 { animation: ornament-float-c 8s ease-in-out infinite 0.4s; }
+        .ornament-anim-4 { animation: ornament-float-d 13s ease-in-out infinite 2s; }
+        .ornament-anim-5 { animation: ornament-float-e 10s ease-in-out infinite 0.8s; }
+        .ornament-anim-6 { animation: ornament-float-f 12s ease-in-out infinite 1.6s; }
+        .ornament-anim-7 { animation: ornament-float-b 14s ease-in-out infinite 2.4s; }
+        .ornament-anim-8 { animation: ornament-float-c 15s ease-in-out infinite 0.2s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .code-ornament { animation: none !important; }
         }
 
         /* Side panel cyber border accent */
@@ -127,14 +167,14 @@
     <div class="relative flex min-h-screen w-full flex-col overflow-hidden">
         {{-- Background Code Ornaments --}}
         <div class="absolute inset-0 pointer-events-none overflow-hidden select-none">
-            <span class="code-ornament top-[10%] left-[5%] text-7xl rotate-[-15deg]" style="color: rgba(0, 242, 255, 0.08);">&lt;div&gt;</span>
-            <span class="code-ornament top-[25%] right-[45%] text-5xl" style="color: rgba(206, 93, 255, 0.08);">;</span>
-            <span class="code-ornament bottom-[20%] left-[15%] text-4xl" style="color: rgba(134, 239, 172, 0.08);">const</span>
-            <span class="code-ornament bottom-[10%] left-[30%] text-6xl" style="color: rgba(0, 242, 255, 0.08);">{ }</span>
-            <span class="code-ornament top-[40%] left-[10%] text-4xl" style="color: rgba(253, 230, 138, 0.08);">function</span>
-            <span class="code-ornament bottom-[40%] right-[50%] text-5xl" style="color: rgba(255, 180, 171, 0.08);">=&gt;</span>
-            <span class="code-ornament top-[15%] left-[40%] text-3xl" style="color: rgba(206, 93, 255, 0.08);">return</span>
-            <span class="code-ornament bottom-[5%] left-[5%] text-4xl" style="color: rgba(132, 148, 149, 0.10);">// TODO</span>
+            <span class="code-ornament ornament-anim-1 top-[10%] left-[5%] text-7xl" style="color: rgba(0, 242, 255, 0.08);">&lt;div&gt;</span>
+            <span class="code-ornament ornament-anim-2 top-[25%] right-[45%] text-5xl" style="color: rgba(206, 93, 255, 0.08);">;</span>
+            <span class="code-ornament ornament-anim-3 bottom-[20%] left-[15%] text-4xl" style="color: rgba(134, 239, 172, 0.08);">const</span>
+            <span class="code-ornament ornament-anim-4 bottom-[10%] left-[30%] text-6xl" style="color: rgba(0, 242, 255, 0.08);">{ }</span>
+            <span class="code-ornament ornament-anim-5 top-[40%] left-[10%] text-4xl" style="color: rgba(253, 230, 138, 0.08);">function</span>
+            <span class="code-ornament ornament-anim-6 bottom-[40%] right-[50%] text-5xl" style="color: rgba(255, 180, 171, 0.08);">=&gt;</span>
+            <span class="code-ornament ornament-anim-7 top-[15%] left-[40%] text-3xl" style="color: rgba(206, 93, 255, 0.08);">return</span>
+            <span class="code-ornament ornament-anim-8 bottom-[5%] left-[5%] text-4xl" style="color: rgba(132, 148, 149, 0.10);">// TODO</span>
         </div>
 
         <div class="relative flex h-full min-h-screen grow flex-col z-10">
@@ -142,7 +182,7 @@
                 {{-- Left Section (Hero) --}}
                 <div class="hidden md:flex w-full md:w-3/5 flex-col justify-center items-start p-8 sm:p-12 md:p-12 lg:p-16 xl:p-20 relative min-h-[50vh] md:min-h-screen">
                     <main class="w-full max-w-3xl lg:max-w-4xl relative z-10">
-                        <span class="font-mono-label text-xs uppercase tracking-[0.3em] text-cyan-glow mb-4 inline-block">
+                        <span class="font-mono-label text-xl uppercase tracking-[0.3em] text-cyan-glow mb-4 inline-block">
                             // welcome to the arena
                         </span>
                         <h1 class="hero-title leading-[1.05] tracking-tight">

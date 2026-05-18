@@ -44,24 +44,45 @@ class UserSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        // 4 Students
+        // 25 Students
         $students = [
-            ['nim' => '2241760101', 'nama' => 'aryod1', 'kelas' => 'TI-3A'],
-            ['nim' => '2241760102', 'nama' => 'aryod2', 'kelas' => 'TI-3A'],
-            ['nim' => '2241760103', 'nama' => 'aryod3', 'kelas' => 'TI-3B'],
-            ['nim' => '2241760104', 'nama' => 'aryod4', 'kelas' => 'TI-3B'],
+            ['nim' => '244107020078', 'nama' => 'ABIM MUSTAWA'],
+            ['nim' => '244107020207', 'nama' => 'ADAM BAHY MAULANA'],
+            ['nim' => '244107020109', 'nama' => 'AISYA ASWY NUR AIDHA'],
+            ['nim' => '244107020079', 'nama' => 'AMIN AZIZ SUDJUD'],
+            ['nim' => '244107020060', 'nama' => 'ARYAN ZUDA FIRDAUS'],
+            ['nim' => '244107020216', 'nama' => 'BISMA ADHIAKSA'],
+            ['nim' => '244107020093', 'nama' => 'DAVI AULIA MAGHFIRAH'],
+            ['nim' => '244107020209', 'nama' => 'DIMAS HANDARHESKY IRIANTO'],
+            ['nim' => '244107020072', 'nama' => 'DINA KUMALA SARI'],
+            ['nim' => '244107020142', 'nama' => 'FAATIHURRIZKI PRASOJO'],
+            ['nim' => '244107020168', 'nama' => 'FARREL ANDIKA CHANDRA'],
+            ['nim' => '244107020150', 'nama' => 'GADUH PRAKOSO'],
+            ['nim' => '244107020176', 'nama' => 'HAFIF NURRAHMAD'],
+            ['nim' => '244107020220', 'nama' => 'ILHAM DHARMA ATMAJA'],
+            ['nim' => '244107020139', 'nama' => 'MOKHAMMAD ILHAM PUTRA WIJAYA'],
+            ['nim' => '244107020169', 'nama' => 'MUHAMMAD CHRISTIANO OLYVIAN BARINI'],
+            ['nim' => '244107020025', 'nama' => 'MUHAMMAD FAIQ NABIL SAPUTRA'],
+            ['nim' => '244107020148', 'nama' => 'RACHMAD APRISANDHY'],
+            ['nim' => '244107020026', 'nama' => 'RAFI ADRIAN PRASETYA'],
+            ['nim' => '244107020113', 'nama' => 'RAIHAN DAFFA IZZUDDIN'],
+            ['nim' => '244107020102', 'nama' => 'SINGGIH WAHYU PERMANA'],
+            ['nim' => '244107020143', 'nama' => 'SITI MUTMAINAH'],
+            ['nim' => '244107020014', 'nama' => 'SITI NIKMATUS SHOLIHAH'],
+            ['nim' => '244107020172', 'nama' => 'YANUAR RAMADHANI KUSWOKO'],
+            ['nim' => '244107020086', 'nama' => 'ZACKY RIO ORLANDO'],
         ];
 
         foreach ($students as $student) {
             User::create([
                 'nim'      => $student['nim'],
                 'nama'     => $student['nama'],
-                'email'    => $student['nama'] . '@gmail.com',
-                'kelas'    => $student['kelas'],
+                'email'    => $student['nim'] . '@gmail.com',
+                'kelas'    => 'TI-2D',
                 'role'     => 'student',
                 'total_xp' => 0,
                 'level'    => 1,
-                'password' => bcrypt('password'),
+                'password' => bcrypt($student['nim']),
             ]);
         }
     }

@@ -41,9 +41,9 @@
 
         .hero-title {
             font-family: 'Sora', sans-serif;
-            font-weight: 800;
-            /* Fixed size for large screens to prevent shifting */
-            font-size: clamp(2.5rem, 4vw, 4rem);
+            font-weight: 500;
+            /* Larger size for better visibility on 1920x1080 */
+            font-size: clamp(3rem, 5vw, 6rem);
             line-height: 1.05;
             letter-spacing: -0.02em;
             background: linear-gradient(135deg, #00f2ff 0%, #ce5dff 100%);
@@ -141,14 +141,14 @@
             <div class="flex min-h-screen flex-col md:flex-row">
                 {{-- Left Section (Hero) --}}
                 <div class="hidden md:flex w-full md:w-3/5 flex-col justify-center items-start p-8 sm:p-12 md:p-12 lg:p-16 xl:p-20 relative min-h-[50vh] md:min-h-screen">
-                    <main class="w-full max-w-2xl lg:max-w-3xl relative z-10">
+                    <main class="w-full max-w-3xl lg:max-w-4xl relative z-10">
                         <span class="font-mono-label text-xs uppercase tracking-[0.3em] text-cyan-glow mb-4 inline-block">
                             // welcome to the arena
                         </span>
                         <h1 class="hero-title leading-[1.05] tracking-tight">
                             CodeBossArena
                         </h1>
-                        <h2 class="font-body mt-5 lg:mt-6 text-sm md:text-base lg:text-lg text-soft leading-relaxed max-w-xl">
+                        <h2 class="font-body mt-5 lg:mt-6 text-base md:text-lg lg:text-xl text-soft leading-relaxed max-w-2xl">
                             Platform pembelajaran pemrograman berbasis gamifikasi. Tantang boss, kuasai materi, dan naikkan level kamu.
                         </h2>
 

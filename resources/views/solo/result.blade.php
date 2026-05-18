@@ -4,38 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasil - {{ $session->soloRaid->type === 'learning' ? 'Latihan Soal' : $bossName }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Tailwind & Alpine via Vite (production build, no JIT in browser) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Nunito', 'sans-serif'],
-                        mono: ['"Fira Code"', 'monospace'],
-                    },
-                    colors: {
-                        'vscode-bg': '#1e1e1e',
-                        'vscode-card': '#252526',
-                        'vscode-primary': '#007acc',
-                        'vscode-text': '#d4d4d4',
-                        'vscode-muted': '#858585',
-                        'vscode-border': '#333333',
-                        'vscode-string': '#ce9178',
-                        'vscode-button': '#3c3c3c',
-                        'vscode-button-hover': '#4c4c4c',
-                        'boss-red': '#FF5252',
-                        'success-green': '#4EC9B0',
-                        'terminal-bg': '#1e1e1e',
-                    }
-                }
-            }
-        }
-    </script>
+
+    <style>
+        /* Page-scoped: use Nunito as default body font and Fira Code for .font-mono */
+        body { font-family: 'Nunito', 'Outfit', sans-serif; }
+        .font-mono, body.font-mono { font-family: 'Fira Code', ui-monospace, monospace !important; }
+    </style>
     <style>
         body {
             background-color: #1e1e1e;

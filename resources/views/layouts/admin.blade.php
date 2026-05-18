@@ -5,69 +5,20 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }} - Admin</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <style type="text/tailwindcss">
+    <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        
+
         *:not(.material-symbols-outlined) {
             font-family: 'Outfit', sans-serif !important;
         }
     </style>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#007acc",
-                        "background": "#1e1e1e",
-                        "background-light": "#252526",
-                        "background-dark": "#1e1e1e",
-                        "card": "#252526",
-                        "surface": "#252526",
-                        "surface-light": "#2d2d2d",
-                        "surface-dark": "#252526",
-                        "text-primary": "#d4d4d4",
-                        "text-light-primary": "#d4d4d4",
-                        "text-dark-primary": "#d4d4d4",
-                        "text-muted": "#858585",
-                        "text-light-secondary": "#858585",
-                        "text-dark-secondary": "#9d9d9d",
-                        "border": "#333333",
-                        "border-light": "#404040",
-                        "border-dark": "#333333",
-                        "status-green-bg": "rgb(56 161 105 / 0.1)",
-                        "status-green-text": "#38a169",
-                        "status-red-bg": "rgb(229 62 62 / 0.1)",
-                        "status-red-text": "#e53e3e",
-                        "status-gray-bg": "rgb(128 128 128 / 0.1)",
-                        "status-gray-text": "#808080",
-                        "accent": "#007acc",
-                        "accent-hover": "#1a8ad4",
-                        "success": "#4ec9b0",
-                        "warning": "#dcdcaa",
-                        "error": "#f44747",
-                        "info": "#9cdcfe"
-                    },
-                    fontFamily: {
-                        "display": ["Outfit", "sans-serif"],
-                        "sans": ["Outfit", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Tailwind & Alpine via Vite (production build, no JIT in browser) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-background-dark font-display font-medium text-text-primary">
     <div class="flex min-h-screen w-full">

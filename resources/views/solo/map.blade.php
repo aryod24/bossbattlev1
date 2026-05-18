@@ -21,59 +21,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        // Primary Colors (VS Code Dark Theme)
-                        "primary": "#007acc",
-                        
-                        // Background Colors
-                        "background": "#1e1e1e",
-                        "background-light": "#252526",
-                        "background-dark": "#1e1e1e",
-                        
-                        // Card/Surface Colors
-                        "card": "#252526",
-                        "surface": "#252526",
-                        "surface-light": "#2d2d2d",
-                        "surface-dark": "#252526",
-                        
-                        // Text Colors
-                        "text-primary": "#d4d4d4",
-                        "text-muted": "#858585",
-                        
-                        // Border Colors
-                        "border": "#333333",
-                        "border-light": "#404040",
-                        
-                        // Status Colors
-                        "success": "#4ec9b0",
-                        "warning": "#dcdcaa",
-                        "error": "#f44747",
-                        "info": "#9cdcfe",
-                        
-                        // Accent Colors
-                        "accent": "#007acc",
-                        "accent-hover": "#1a8ad4",
-                        
-                        // Game/Legacy Colors (untuk map visual)
-                        "game": {
-                            "darker": "#0d1117",
-                            "panel": "#161b22",
-                            "gold": "#fbbf24",
-                            "green": "#22c55e",
-                            "red": "#ef4444",
-                            "teal": "#14b8a6",
-                        },
-                    },
-                },
-            },
-        }
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Tailwind & Alpine via Vite (production build, no JIT in browser) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <style>
         body { 

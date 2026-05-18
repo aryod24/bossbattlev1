@@ -48,6 +48,11 @@ export default {
                 'vscode-text': '#d4d4d4',
                 'vscode-muted': '#858585',
                 'vscode-border': '#333333',
+                // Used by solo/result.blade.php (was inline CDN config)
+                'vscode-string': '#ce9178',
+                'vscode-button': '#3c3c3c',
+                'vscode-button-hover': '#4c4c4c',
+                'terminal-bg': '#1e1e1e',
                 'boss-red': '#FF5252',
                 'success-green': '#4EC9B0',
 

@@ -6,12 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $soloRaid->type === 'learning' ? 'Latihan Soal - ' . $soloRaid->nama : 'Boss Battle - ' . $bossName }}</title>
     
-    <!-- Tailwind CSS -->
     <!-- Vite Assets (Optimized) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
         /* Custom Animations Config (Moved from inline JS) */

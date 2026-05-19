@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class LeaderboardController extends Controller
 {
+    // Emails to exclude from leaderboard (test accounts)
+    private array $excludedEmails = [
+        'usertest@gmail.com',
+    ];
+
     public function index()
     {
         $excludePretest = function ($query) {
@@ -21,19 +26,19 @@ class LeaderboardController extends Controller
             });
         };
 
-        // Fetch top students ordered by XP
+        // Fetch top students ordered by XP (excluding test accounts)
         $users = User::where('role', 'student')
+            ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
             ->withCount(['sessionSolos as total_games' => $excludePretest])
             ->withSum(['sessionSolos as total_wins' => function ($query) use ($excludePretest) {
                 $excludePretest($query);
                 $query->where('boss_kalah', true);
-            }], 'boss_kalah') // Assuming boss_kalah is boolean (1/0), sum works as count of true
+            }], 'boss_kalah')
             ->withAvg(['sessionSolos as avg_score' => $excludePretest], 'skor_akhir')
             ->paginate(10);
 
         // Process users to calculate rates and ranks
-        // Since pagination is used, rank needs to be calculated based on page
         $startRank = ($users->currentPage() - 1) * $users->perPage() + 1;
 
         $rankings = $users->getCollection()->map(function ($user, $index) use ($startRank) {
@@ -41,7 +46,7 @@ class LeaderboardController extends Controller
             
             // Calculate Win Rate
             $totalGames = $user->total_games ?? 0;
-            $totalWins = $user->total_wins ?? 0; // sum of booleans
+            $totalWins = $user->total_wins ?? 0;
             $user->win_rate = $totalGames > 0 ? round(($totalWins / $totalGames) * 100) : 0;
             
             // Format Avg Score
@@ -55,22 +60,26 @@ class LeaderboardController extends Controller
 
         // Current User for Sidebar
         $currentUser = Auth::user();
-        // Calculate current user's rank efficiently
+
+        // Calculate current user's rank (excluding test accounts)
         $currentUserRank = User::where('role', 'student')
+            ->whereNotIn('email', $this->excludedEmails)
             ->where('total_xp', '>', $currentUser->total_xp)
             ->count() + 1;
             
-        // Get user above (target) if not first
+        // Get user above (target) if not first (excluding test accounts)
         $targetUser = null;
         if ($currentUserRank > 1) {
             $targetUser = User::where('role', 'student')
+                ->whereNotIn('email', $this->excludedEmails)
                 ->where('total_xp', '>', $currentUser->total_xp)
-                ->orderBy('total_xp', 'asc') // Lowest XP higher than current user
+                ->orderBy('total_xp', 'asc')
                 ->first();
         }
 
-        // Get Top 3 explicitly for podium
+        // Get Top 3 explicitly for podium (excluding test accounts)
         $topUsers = User::where('role', 'student')
+            ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
             ->take(3)
             ->get();

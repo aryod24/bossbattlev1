@@ -247,10 +247,10 @@
                 <div class="mb-6">
                     <div class="flex justify-between items-center mb-2">
                         <div class="font-mono text-vscode-muted text-sm">// Pertanyaan:</div>
-                        <!-- KUNCI JAWABAN (UNTUK TESTING) -->
-                        <div class="font-mono text-yellow-500 font-bold border border-yellow-500/30 bg-[#1e1e1e] px-2 py-1 rounded text-xs uppercase shadow-sm">
+                        {{-- KUNCI JAWABAN DISABLED untuk testing/production --}}
+                        {{-- <div class="font-mono text-yellow-500 font-bold border border-yellow-500/30 bg-[#1e1e1e] px-2 py-1 rounded text-xs uppercase shadow-sm">
                             <i class="fa-solid fa-key mr-1"></i> Jawaban: <span x-text="currentQuestion.jawaban_benar"></span>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="font-medium text-lg lg:text-xl leading-relaxed text-[#d4d4d4] prose prose-invert max-w-none"
                          x-html="currentQuestion.soal_text">

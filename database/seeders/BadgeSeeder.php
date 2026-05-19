@@ -20,9 +20,12 @@ class BadgeSeeder extends Seeder
                 'slug' => 'boss-novice',
                 'name' => 'Boss Novice',
                 'emoji' => '🎮',
-                'description' => 'Kalahkan 1 boss level apapun (Solo/Event)',
+                'description' => 'Kalahkan 1 boss level apapun',
                 'is_system' => true,
-                'requirements' => null, // Legacy check via checkBossNovice()
+                'requirements' => [
+                    'type' => 'solo_victory_count',
+                    'count' => 1,
+                ],
             ],
             // ID 2: Boss Slayer - Sekarang = kalahkan 2 boss
             [
@@ -81,7 +84,7 @@ class BadgeSeeder extends Seeder
                 'slug' => 'knowledge-master',
                 'name' => 'Knowledge Master',
                 'emoji' => '📚',
-                'description' => 'Selesaikan 10 materi (content node)',
+                'description' => 'Selesaikan 10 materi',
                 'is_system' => true,
                 'requirements' => [
                     'type' => 'node_completion_count',
@@ -107,7 +110,7 @@ class BadgeSeeder extends Seeder
                 'slug' => 'Scholar',
                 'name' => 'Scholar',
                 'emoji' => '🧠',
-                'description' => 'Selesaikan 15 materi (content node)',
+                'description' => 'Selesaikan 15 materi',
                 'is_system' => true,
                 'requirements' => [
                     'type' => 'node_completion_count',

@@ -249,11 +249,15 @@
                                         <a class="font-headline text-xs text-cyan-glow hover:underline opacity-50 cursor-not-allowed pointer-events-none" href="javascript:void(0)">Lupa Password?</a>
                                     @endif
                                 </div>
-                                <div class="mt-2">
+                                <div class="mt-2" style="position: relative;">
                                     <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"
+                                           style="padding-right: 2.5rem;"
                                            id="password" name="password"
                                            required type="password"
                                            autocomplete="current-password"/>
+                                    <button type="button" onclick="togglePassword()" style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #849495; padding: 0; display: flex; align-items: center;" aria-label="Toggle password visibility">
+                                        <span id="eye-icon" class="material-symbols-outlined" style="font-size: 20px;">visibility_off</span>
+                                    </button>
                                     @error('password')
                                         <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
                                     @enderror
@@ -276,5 +280,18 @@
             </div>
         </div>
     </div>
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        }
+    </script>
 </body>
 </html>

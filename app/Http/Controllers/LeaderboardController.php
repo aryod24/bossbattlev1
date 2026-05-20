@@ -26,8 +26,9 @@ class LeaderboardController extends Controller
             });
         };
 
-        // Fetch top students ordered by XP (excluding test accounts)
+        // Fetch top students ordered by XP (excluding test accounts, only TI-2E)
         $users = User::where('role', 'student')
+            ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
             ->withCount(['sessionSolos as total_games' => $excludePretest])
@@ -61,24 +62,27 @@ class LeaderboardController extends Controller
         // Current User for Sidebar
         $currentUser = Auth::user();
 
-        // Calculate current user's rank (excluding test accounts)
+        // Calculate current user's rank (excluding test accounts, only TI-2E)
         $currentUserRank = User::where('role', 'student')
+            ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->where('total_xp', '>', $currentUser->total_xp)
             ->count() + 1;
             
-        // Get user above (target) if not first (excluding test accounts)
+        // Get user above (target) if not first (excluding test accounts, only TI-2E)
         $targetUser = null;
         if ($currentUserRank > 1) {
             $targetUser = User::where('role', 'student')
+                ->where('kelas', 'TI-2E')
                 ->whereNotIn('email', $this->excludedEmails)
                 ->where('total_xp', '>', $currentUser->total_xp)
                 ->orderBy('total_xp', 'asc')
                 ->first();
         }
 
-        // Get Top 3 explicitly for podium (excluding test accounts)
+        // Get Top 3 explicitly for podium (excluding test accounts, only TI-2E)
         $topUsers = User::where('role', 'student')
+            ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
             ->take(3)

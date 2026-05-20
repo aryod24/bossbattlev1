@@ -31,6 +31,7 @@ class LeaderboardController extends Controller
             ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
+            ->orderBy('nama', 'asc')
             ->withCount(['sessionSolos as total_games' => $excludePretest])
             ->withSum(['sessionSolos as total_wins' => function ($query) use ($excludePretest) {
                 $excludePretest($query);
@@ -85,6 +86,7 @@ class LeaderboardController extends Controller
             ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
+            ->orderBy('nama', 'asc')
             ->take(3)
             ->get();
 

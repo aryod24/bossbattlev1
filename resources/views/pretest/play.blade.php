@@ -321,10 +321,8 @@
                         this.feedbackMessage = data.is_correct ? 'Jawaban benar!' : 'Jawaban salah.';
                         this.answerResults[this.currentQuestionIndex] = data.is_correct ? 'correct' : 'incorrect';
 
-                        setTimeout(() => {
-                            this.showModal = true;
-                            setTimeout(() => this.closeModal(), 1200);
-                        }, 300);
+                        this.showModal = true;
+                        setTimeout(() => this.closeModal(), 600);
 
                         this.questions[this.currentQuestionIndex].is_answered = true;
                     })

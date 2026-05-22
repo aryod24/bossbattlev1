@@ -537,14 +537,10 @@
                         }
 
                         // Show Modal & Auto Advance
+                        this.showModal = true;
                         setTimeout(() => {
-                            this.showModal = true;
-                            
-                            // Auto close after 1.5 seconds
-                            setTimeout(() => {
-                                this.closeModal();
-                            }, 1500);
-                        }, 800);
+                            this.closeModal();
+                        }, 600);
 
                         // Mark answered
                         this.questions[this.currentQuestionIndex].is_answered = true;

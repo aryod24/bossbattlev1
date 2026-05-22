@@ -64,6 +64,12 @@
                                     ({{ $bossStats['Hard'] }} responden)
                                 @endif
                             </option>
+                            <option value="boss:NoPretest">
+                                Tanpa Pre-Test (belum mengerjakan pre-test)
+                                @if(($bossStats['NoPretest'] ?? 0) > 0)
+                                    ({{ $bossStats['NoPretest'] }} responden)
+                                @endif
+                            </option>
                         </optgroup>
 
                         @if($events->count())
@@ -111,15 +117,19 @@
                             tidak terikat raid). Diambil sesi finish pertama per responden.
                         </li>
                         <li>
-                            <strong>Boss Battle</strong> dikelompokkan murni dari <code>pretest_score</code>
-                            mahasiswa: 0–40 = Easy, 41–70 = Medium, 71–100 = Hard. Boss yang dimainkan
-                            (Easy/Medium/Hard) tidak menyaring data — tercatat di kolom <code>level_sesi</code>.
-                            Jadi mahasiswa pretest=Easy yang sudah progresi ke Boss Medium tetap masuk ke
-                            kelompok Easy.
+                            <strong>Boss Battle</strong> dikumpulkan dari semua sesi yang sudah selesai di raid
+                            ber-tipe <code>boss</code> (sumber data sama dengan halaman <em>monitoring</em>).
+                            Pengelompokan dilakukan berdasarkan <code>pretest_score</code>:
+                            0–40 = Easy, 41–70 = Medium, 71–100 = Hard. Responden yang belum sempat mengerjakan
+                            pre-test masuk ke kelompok <strong>Tanpa Pre-Test</strong>.
                         </li>
                         <li>
-                            Mahasiswa tanpa <code>pretest_score</code> tidak akan muncul. Akun uji
-                            (<code>usertest@gmail.com</code>) dan sesi yang belum selesai selalu dieksklusi.
+                            Boss yang dimainkan (Easy/Medium/Hard) tidak menyaring data — tercatat di kolom
+                            <code>level_sesi</code>. Mahasiswa pretest=Easy yang sudah progresi ke Boss Medium
+                            tetap masuk ke kelompok Easy.
+                        </li>
+                        <li>
+                            Akun uji (<code>usertest@gmail.com</code>) dan sesi yang belum selesai selalu dieksklusi.
                         </li>
                     </ul>
                 </div>

@@ -27,6 +27,28 @@ class ReportController extends Controller
         'Hard'   => [71, 100],
     ];
 
+    /** Label kelompok untuk responden yang belum sempat menyelesaikan Pre-Test. */
+    private const NO_PRETEST_KEY = 'NoPretest';
+
+    /**
+     * Tentukan level_adaptif dari pretest_score user. Mengikuti ambang yang
+     * sama dengan PreTestService::PLACEMENT_THRESHOLDS supaya konsisten.
+     */
+    private function classifyAdaptive(?int $pretestScore): string
+    {
+        if ($pretestScore === null) {
+            return self::NO_PRETEST_KEY;
+        }
+
+        foreach (self::ADAPTIVE_RANGES as $label => [$min, $max]) {
+            if ($pretestScore >= $min && $pretestScore <= $max) {
+                return $label;
+            }
+        }
+
+        return self::NO_PRETEST_KEY;
+    }
+
     public function index()
     {
         // Hitung responden Pre-Test per kelas (untuk label di dropdown).
@@ -40,10 +62,23 @@ class ReportController extends Controller
             ->pluck('total', 'kelas');
 
         // Hitung sesi Boss Battle per kelompok level_adaptif (pretest-derived).
-        // Sesi dihitung berdasarkan pretest mahasiswa, BUKAN section raid.
-        $bossStats = [];
-        foreach (array_keys(self::ADAPTIVE_RANGES) as $section) {
-            $bossStats[$section] = $this->bossSessionsQuery($section)->count();
+        // Klasifikasi dilakukan di PHP supaya responden tanpa pretest_score
+        // tetap masuk ke kelompok "NoPretest" — sama dengan halaman monitoring
+        // yang juga tidak menyaring berdasarkan pre-test.
+        $bossStats = ['Easy' => 0, 'Medium' => 0, 'Hard' => 0, self::NO_PRETEST_KEY => 0];
+        $finishedBossSessions = $this->bossSessionsBaseQuery()->get();
+        $countedUsersPerGroup = [
+            'Easy' => [], 'Medium' => [], 'Hard' => [], self::NO_PRETEST_KEY => [],
+        ];
+        foreach ($finishedBossSessions as $session) {
+            $group = $this->classifyAdaptive(
+                $session->user->pretest_score !== null ? (int) $session->user->pretest_score : null
+            );
+            // unique by user_id supaya stats menghitung responden, bukan attempt
+            if (!isset($countedUsersPerGroup[$group][$session->user_id])) {
+                $countedUsersPerGroup[$group][$session->user_id] = true;
+                $bossStats[$group] = ($bossStats[$group] ?? 0) + 1;
+            }
         }
 
         // Event multiplayer (opsional, tetap diekspos kalau ada datanya).
@@ -74,26 +109,13 @@ class ReportController extends Controller
     // ===================================================================
 
     /**
-     * Build base query for Boss Battle sessions where:
-     *   - solo_raid.type = 'boss'
-     *   - user's level_adaptif (derived from pretest_score) = $adaptiveLevel
-     *   - is_pretest != true
-     *   - session finished
-     *   - non-test user
-     *
-     * Catatan: filter HANYA dari pretest_score mahasiswa.
-     * Section raid yang dimainkan (Easy/Medium/Hard) tidak ikut menyaring,
-     * karena kelompok dianalisis berdasarkan level_adaptif — mahasiswa
-     * pre-test Easy yang sudah progresi & main Boss Medium tetap dihitung
-     * sebagai kelompok Easy. Boss yang dimainkan tercatat di kolom level_sesi.
+     * Base query untuk semua sesi Boss Battle yang sudah selesai.
+     * TIDAK menyaring berdasarkan pretest_score — kelompok level_adaptif
+     * dihitung di PHP supaya konsisten dengan halaman /monitoring yang juga
+     * menampilkan semua responden, termasuk yang belum sempat pre-test.
      */
-    private function bossSessionsQuery(string $adaptiveLevel)
+    private function bossSessionsBaseQuery()
     {
-        $adaptiveLevel = ucfirst(strtolower($adaptiveLevel));
-        abort_unless(isset(self::ADAPTIVE_RANGES[$adaptiveLevel]), 400, 'Invalid level');
-
-        [$min, $max] = self::ADAPTIVE_RANGES[$adaptiveLevel];
-
         return SessionSolo::query()
             ->with(['user', 'soloRaid'])
             ->whereNotNull('waktu_selesai')
@@ -103,31 +125,43 @@ class ReportController extends Controller
             ->whereHas('soloRaid', function ($q) {
                 $q->where('type', 'boss');
             })
-            ->whereHas('user', function ($q) use ($min, $max) {
-                $q->whereNotIn('email', $this->excludedEmails)
-                    ->whereNotNull('pretest_score')
-                    ->whereBetween('pretest_score', [$min, $max]);
+            ->whereHas('user', function ($q) {
+                $q->whereNotIn('email', $this->excludedEmails);
             });
     }
 
     private function exportBossBattleBySection(string $adaptiveLevel)
     {
-        $adaptiveLevel = ucfirst(strtolower($adaptiveLevel));
-        abort_unless(isset(self::ADAPTIVE_RANGES[$adaptiveLevel]), 400);
+        $adaptiveLevel = $adaptiveLevel === self::NO_PRETEST_KEY
+            ? self::NO_PRETEST_KEY
+            : ucfirst(strtolower($adaptiveLevel));
 
-        // Per responden ambil sesi Boss Battle PERTAMA yang selesai (urut waktu).
-        // Mahasiswa Easy yang langsung main Boss Easy → baris itu masuk.
-        // Mahasiswa Easy yang sudah lanjut ke Boss Medium juga masuk grup Easy
-        // (boss yang dimainkan terlihat di kolom level_sesi).
-        $items = $this->bossSessionsQuery($adaptiveLevel)
+        abort_unless(
+            isset(self::ADAPTIVE_RANGES[$adaptiveLevel]) || $adaptiveLevel === self::NO_PRETEST_KEY,
+            400,
+            'Invalid level'
+        );
+
+        // Ambil semua sesi Boss Battle yang sudah selesai, lalu klasifikasi
+        // di PHP berdasarkan pretest_score user. Mahasiswa pretest=Easy yang
+        // sudah progresi ke Boss Medium tetap masuk ke kelompok Easy.
+        // Responden yang belum punya pretest_score masuk ke "NoPretest".
+        $items = $this->bossSessionsBaseQuery()
             ->orderBy('user_id')
             ->orderBy('waktu_selesai')
             ->get()
+            ->filter(function ($session) use ($adaptiveLevel) {
+                $score = $session->user->pretest_score;
+                $score = $score !== null ? (int) $score : null;
+                return $this->classifyAdaptive($score) === $adaptiveLevel;
+            })
+            // Per responden ambil sesi Boss Battle finish PERTAMA
             ->groupBy('user_id')
             ->map(fn ($group) => $group->first())
             ->values();
 
-        $filename = 'boss-battle-' . strtolower($adaptiveLevel) . '-' . date('Y-m-d-His') . '.csv';
+        $filenameLabel = $adaptiveLevel === self::NO_PRETEST_KEY ? 'no-pretest' : strtolower($adaptiveLevel);
+        $filename = 'boss-battle-' . $filenameLabel . '-' . date('Y-m-d-His') . '.csv';
 
         return $this->streamCsv($filename, function ($file) use ($items) {
             fputcsv($file, $this->bossBattleHeader(), ';');
@@ -320,10 +354,11 @@ class ReportController extends Controller
         $rankAfter  = $this->rankAt($user, $xpAfter);
 
         // level_adaptif diturunkan dari pretest_score — stabil walau current_section
-        // sudah naik karena menang boss.
+        // sudah naik karena menang boss. Untuk responden tanpa pretest_score,
+        // ditandai 'NoPretest' supaya analisis tahu data ini tidak punya baseline.
         $levelAdaptif = $user->pretest_score !== null
-            ? app(PreTestService::class)->determineSection((float) $user->pretest_score)
-            : ($user->current_section ?? '-');
+            ? $this->classifyAdaptive((int) $user->pretest_score)
+            : self::NO_PRETEST_KEY;
 
         return [
             $user->nim ?? '-',

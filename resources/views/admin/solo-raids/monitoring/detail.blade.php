@@ -8,7 +8,17 @@
                 <h1 class="text-4xl font-black text-text-primary tracking-tight">Timeline Aktivitas</h1>
             </div>
             <p class="text-text-muted mt-2 font-medium">Event: <span class="text-primary font-bold">{{ $soloRaid->nama }}</span></p>
-            <p class="text-text-muted mt-1 font-medium">Mahasiswa: <span class="text-text-primary font-bold">{{ $user->name }}</span></p>
+            <p class="text-text-muted mt-1 font-medium">
+                Mahasiswa:
+                <span class="text-text-primary font-bold">{{ $user->nama ?? '-' }}</span>
+                @if($user->nim)
+                    <span class="text-text-muted text-sm">({{ $user->nim }})</span>
+                @endif
+                <span class="text-text-muted text-sm">— {{ $user->email }}</span>
+                @if($user->kelas)
+                    <span class="text-primary text-sm">· {{ $user->kelas }}</span>
+                @endif
+            </p>
         </div>
     </div>
 

@@ -33,8 +33,20 @@
                 @forelse($monitoringData as $data)
                     <tr class="border-b border-border hover:bg-primary/10">
                         <td class="px-4 py-3">
-                            <div class="font-bold text-sm text-text-primary">{{ $data['user']->name }}</div>
-                            <div class="text-xs text-text-muted">{{ $data['user']->email }}</div>
+                            <div class="font-bold text-sm text-text-primary">
+                                {{ $data['user']->nama ?? '-' }}
+                            </div>
+                            <div class="text-xs text-text-muted flex flex-wrap gap-x-2 gap-y-0.5">
+                                @if($data['user']->nim)
+                                    <span class="font-semibold text-text-light-secondary">{{ $data['user']->nim }}</span>
+                                    <span class="text-border">·</span>
+                                @endif
+                                <span>{{ $data['user']->email }}</span>
+                                @if($data['user']->kelas)
+                                    <span class="text-border">·</span>
+                                    <span class="text-primary/80 font-medium">{{ $data['user']->kelas }}</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-4 py-3 text-sm capitalize">
                             @if($data['progress'] === 'completed')

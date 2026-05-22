@@ -130,8 +130,14 @@
                             <tr class="hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
                                 <td class="px-6 py-4 font-mono text-text-muted">#{{ $session->id }}</td>
                                 <td class="px-6 py-4">
-                                    <div class="font-bold text-text-primary">{{ $session->user->name ?? 'Unknown' }}</div>
-                                    <div class="text-xs text-text-muted">{{ $session->user->email ?? '' }}</div>
+                                    <div class="font-bold text-text-primary">{{ $session->user->nama ?? 'Unknown' }}</div>
+                                    <div class="text-xs text-text-muted">
+                                        @if($session->user?->nim)
+                                            <span class="font-semibold">{{ $session->user->nim }}</span>
+                                            <span class="opacity-60">·</span>
+                                        @endif
+                                        {{ $session->user->email ?? '' }}
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-text-primary">{{ $session->soloRaid->name ?? 'Unknown Raid' }}</div>
@@ -223,7 +229,12 @@
                                     @foreach($participants as $participant)
                                     <tr class="hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
                                         <td class="px-6 py-3">
-                                            <div class="font-bold text-text-primary">{{ $participant->user->name ?? 'Unknown' }}</div>
+                                            <div class="font-bold text-text-primary">{{ $participant->user->nama ?? 'Unknown' }}</div>
+                                            @if($participant->user?->nim)
+                                                <div class="text-xs text-text-muted">{{ $participant->user->nim }} · {{ $participant->user->email }}</div>
+                                            @else
+                                                <div class="text-xs text-text-muted">{{ $participant->user->email ?? '' }}</div>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-3">
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 

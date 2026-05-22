@@ -17,7 +17,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
                 <div class="text-sm text-text-muted mb-1">User</div>
-                <div class="font-bold text-lg text-text-primary">{{ $session->user->name ?? 'Unknown' }}</div>
+                <div class="font-bold text-lg text-text-primary">{{ $session->user->nama ?? 'Unknown' }}</div>
+                @if($session->user?->nim)
+                    <div class="text-xs text-text-muted">NIM: {{ $session->user->nim }}</div>
+                @endif
                 <div class="text-xs text-text-muted">{{ $session->user->email ?? '' }}</div>
             </div>
             <div>

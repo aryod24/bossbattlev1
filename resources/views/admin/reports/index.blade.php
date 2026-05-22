@@ -45,23 +45,23 @@
                             </option>
                         </optgroup>
 
-                        <optgroup label="Boss Battle — auto-group by level_adaptif">
+                        <optgroup label="Boss Battle — group by level_adaptif (pretest)">
                             <option value="boss:Easy">
-                                Boss Easy (responden level Easy)
+                                Kelompok Easy (pretest 0–40%)
                                 @if(($bossStats['Easy'] ?? 0) > 0)
-                                    ({{ $bossStats['Easy'] }} sesi)
+                                    ({{ $bossStats['Easy'] }} responden)
                                 @endif
                             </option>
                             <option value="boss:Medium">
-                                Boss Medium (responden level Medium)
+                                Kelompok Medium (pretest 41–70%)
                                 @if(($bossStats['Medium'] ?? 0) > 0)
-                                    ({{ $bossStats['Medium'] }} sesi)
+                                    ({{ $bossStats['Medium'] }} responden)
                                 @endif
                             </option>
                             <option value="boss:Hard">
-                                Boss Hard (responden level Hard)
+                                Kelompok Hard (pretest 71–100%)
                                 @if(($bossStats['Hard'] ?? 0) > 0)
-                                    ({{ $bossStats['Hard'] }} sesi)
+                                    ({{ $bossStats['Hard'] }} responden)
                                 @endif
                             </option>
                         </optgroup>
@@ -111,13 +111,15 @@
                             tidak terikat raid). Diambil sesi finish pertama per responden.
                         </li>
                         <li>
-                            <strong>Boss Easy / Medium / Hard</strong> hanya memuat sesi di mana
-                            <code>solo_raid.section</code> sama dengan <code>level_adaptif</code> mahasiswa
-                            (skor pre-test 0–40 = Easy, 41–70 = Medium, 71–100 = Hard).
-                            Mahasiswa yang belum mengerjakan Pre-Test tidak akan muncul di sini.
+                            <strong>Boss Battle</strong> dikelompokkan murni dari <code>pretest_score</code>
+                            mahasiswa: 0–40 = Easy, 41–70 = Medium, 71–100 = Hard. Boss yang dimainkan
+                            (Easy/Medium/Hard) tidak menyaring data — tercatat di kolom <code>level_sesi</code>.
+                            Jadi mahasiswa pretest=Easy yang sudah progresi ke Boss Medium tetap masuk ke
+                            kelompok Easy.
                         </li>
                         <li>
-                            Akun uji (<code>usertest@gmail.com</code>) dan sesi yang belum selesai selalu dieksklusi.
+                            Mahasiswa tanpa <code>pretest_score</code> tidak akan muncul. Akun uji
+                            (<code>usertest@gmail.com</code>) dan sesi yang belum selesai selalu dieksklusi.
                         </li>
                     </ul>
                 </div>

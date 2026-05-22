@@ -39,7 +39,8 @@ class ReportController extends Controller
             ->groupBy('users.kelas')
             ->pluck('total', 'kelas');
 
-        // Hitung sesi Boss Battle per section (raid section + user level_adaptif cocok).
+        // Hitung sesi Boss Battle per kelompok level_adaptif (pretest-derived).
+        // Sesi dihitung berdasarkan pretest mahasiswa, BUKAN section raid.
         $bossStats = [];
         foreach (array_keys(self::ADAPTIVE_RANGES) as $section) {
             $bossStats[$section] = $this->bossSessionsQuery($section)->count();
@@ -75,18 +76,23 @@ class ReportController extends Controller
     /**
      * Build base query for Boss Battle sessions where:
      *   - solo_raid.type = 'boss'
-     *   - solo_raid.section = $section
-     *   - user's level_adaptif (derived from pretest_score) = $section
+     *   - user's level_adaptif (derived from pretest_score) = $adaptiveLevel
      *   - is_pretest != true
      *   - session finished
      *   - non-test user
+     *
+     * Catatan: filter HANYA dari pretest_score mahasiswa.
+     * Section raid yang dimainkan (Easy/Medium/Hard) tidak ikut menyaring,
+     * karena kelompok dianalisis berdasarkan level_adaptif — mahasiswa
+     * pre-test Easy yang sudah progresi & main Boss Medium tetap dihitung
+     * sebagai kelompok Easy. Boss yang dimainkan tercatat di kolom level_sesi.
      */
-    private function bossSessionsQuery(string $section)
+    private function bossSessionsQuery(string $adaptiveLevel)
     {
-        $section = ucfirst(strtolower($section));
-        abort_unless(isset(self::ADAPTIVE_RANGES[$section]), 400, 'Invalid section');
+        $adaptiveLevel = ucfirst(strtolower($adaptiveLevel));
+        abort_unless(isset(self::ADAPTIVE_RANGES[$adaptiveLevel]), 400, 'Invalid level');
 
-        [$min, $max] = self::ADAPTIVE_RANGES[$section];
+        [$min, $max] = self::ADAPTIVE_RANGES[$adaptiveLevel];
 
         return SessionSolo::query()
             ->with(['user', 'soloRaid'])
@@ -94,8 +100,8 @@ class ReportController extends Controller
             ->where(function ($q) {
                 $q->whereNull('is_pretest')->orWhere('is_pretest', false);
             })
-            ->whereHas('soloRaid', function ($q) use ($section) {
-                $q->where('type', 'boss')->where('section', $section);
+            ->whereHas('soloRaid', function ($q) {
+                $q->where('type', 'boss');
             })
             ->whereHas('user', function ($q) use ($min, $max) {
                 $q->whereNotIn('email', $this->excludedEmails)
@@ -104,15 +110,16 @@ class ReportController extends Controller
             });
     }
 
-    private function exportBossBattleBySection(string $section)
+    private function exportBossBattleBySection(string $adaptiveLevel)
     {
-        $section = ucfirst(strtolower($section));
-        abort_unless(isset(self::ADAPTIVE_RANGES[$section]), 400);
+        $adaptiveLevel = ucfirst(strtolower($adaptiveLevel));
+        abort_unless(isset(self::ADAPTIVE_RANGES[$adaptiveLevel]), 400);
 
-        // Per responden ambil sesi pertama yang selesai pada section itu.
-        // Kalau seorang mahasiswa mencoba >1 kali Boss Battle Medium,
-        // baris pertama (urut waktu_selesai) yang dipakai sebagai data riset.
-        $items = $this->bossSessionsQuery($section)
+        // Per responden ambil sesi Boss Battle PERTAMA yang selesai (urut waktu).
+        // Mahasiswa Easy yang langsung main Boss Easy → baris itu masuk.
+        // Mahasiswa Easy yang sudah lanjut ke Boss Medium juga masuk grup Easy
+        // (boss yang dimainkan terlihat di kolom level_sesi).
+        $items = $this->bossSessionsQuery($adaptiveLevel)
             ->orderBy('user_id')
             ->orderBy('waktu_selesai')
             ->get()
@@ -120,7 +127,7 @@ class ReportController extends Controller
             ->map(fn ($group) => $group->first())
             ->values();
 
-        $filename = 'boss-battle-' . strtolower($section) . '-' . date('Y-m-d-His') . '.csv';
+        $filename = 'boss-battle-' . strtolower($adaptiveLevel) . '-' . date('Y-m-d-His') . '.csv';
 
         return $this->streamCsv($filename, function ($file) use ($items) {
             fputcsv($file, $this->bossBattleHeader(), ';');

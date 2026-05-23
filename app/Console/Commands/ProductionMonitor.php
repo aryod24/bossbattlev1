@@ -60,7 +60,7 @@ class ProductionMonitor extends Command
         }
 
         // 5. Active Users
-        $activeUsers = User::where('role', 'student')
+        $activeUsers = User::whereRoleName('student')
             ->whereHas('sessionSolos', function($q) {
                 $q->where('created_at', '>=', now()->subMinutes(30));
             })

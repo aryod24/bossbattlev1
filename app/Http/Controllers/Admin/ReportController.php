@@ -541,7 +541,7 @@ class ReportController extends Controller
             return null;
         }
 
-        $higher = User::where('role', 'student')
+        $higher = User::whereRoleName('student')
             ->where('kelas', $user->kelas)
             ->whereNotIn('email', $this->excludedEmails)
             ->where('id', '!=', $user->id)

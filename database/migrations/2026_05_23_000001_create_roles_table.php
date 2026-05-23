@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 50)->unique();
+            $table->string('display_name', 100)->nullable();
+            $table->string('description', 255)->nullable();
+            $table->timestamps();
+        });
+
+        // Seed data role default sehingga migrasi user berikutnya
+        // memiliki referensi yang valid.
+        DB::table('roles')->insert([
+            [
+                'name'         => 'admin',
+                'display_name' => 'Administrator',
+                'description'  => 'Akses penuh ke sistem.',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+            [
+                'name'         => 'dosen',
+                'display_name' => 'Dosen',
+                'description'  => 'Mengelola event dan bank soal.',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+            [
+                'name'         => 'student',
+                'display_name' => 'Student',
+                'description'  => 'Peserta pembelajaran.',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+        ]);
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('roles');
+    }
+};

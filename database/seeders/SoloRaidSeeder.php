@@ -12,7 +12,7 @@ class SoloRaidSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin   = User::where('role', 'admin')->first();
+        $admin   = User::whereRoleName('admin')->first();
         $adminId = $admin ? $admin->id : 1;
 
         // ================================================================

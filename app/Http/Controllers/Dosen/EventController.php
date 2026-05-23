@@ -257,7 +257,7 @@ class EventController extends Controller
         $nodeIds = $soloRaid->nodes->pluck('id');
         
         // Load semua data sekaligus dengan eager loading
-        $students = \App\Models\User::where('role', 'student')
+        $students = \App\Models\User::whereRoleName('student')
             ->with([
                 'eventProgress' => function($q) use ($soloRaid) {
                     $q->where('solo_raid_id', $soloRaid->id);

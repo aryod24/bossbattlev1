@@ -164,7 +164,7 @@ class LoadTestBattle extends Command
 
     protected function prepareUsers($count)
     {
-        $existing = User::where('role', 'student')
+        $existing = User::whereRoleName('student')
             ->where('email', 'like', 'loadtest%@test.com')
             ->get();
 
@@ -188,7 +188,7 @@ class LoadTestBattle extends Command
             ]);
         }
 
-        return User::where('role', 'student')
+        return User::whereRoleName('student')
             ->where('email', 'like', 'loadtest%@test.com')
             ->take($count)
             ->get();

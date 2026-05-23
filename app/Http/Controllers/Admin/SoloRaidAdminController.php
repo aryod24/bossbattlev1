@@ -203,7 +203,7 @@ class SoloRaidAdminController extends Controller
         $soloRaid->load('nodes');
         
         // Get all students
-        $students = \App\Models\User::where('role', 'student')->get();
+        $students = \App\Models\User::whereRoleName('student')->get();
         
         $monitoringData = [];
         

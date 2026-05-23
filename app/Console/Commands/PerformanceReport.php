@@ -33,7 +33,7 @@ class PerformanceReport extends Command
             ->avg('durasi_detik');
 
         // User stats
-        $activeUsers = User::where('role', 'student')
+        $activeUsers = User::whereRoleName('student')
             ->whereHas('sessionSolos', function($q) use ($startDate) {
                 $q->where('created_at', '>=', $startDate);
             })

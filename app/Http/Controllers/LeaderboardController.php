@@ -27,7 +27,7 @@ class LeaderboardController extends Controller
         };
 
         // Fetch top students ordered by XP (excluding test accounts, only TI-2E)
-        $users = User::where('role', 'student')
+        $users = User::whereRoleName('student')
             ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')
@@ -64,7 +64,7 @@ class LeaderboardController extends Controller
         $currentUser = Auth::user();
 
         // Calculate current user's rank (excluding test accounts, only TI-2E)
-        $currentUserRank = User::where('role', 'student')
+        $currentUserRank = User::whereRoleName('student')
             ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->where('total_xp', '>', $currentUser->total_xp)
@@ -73,7 +73,7 @@ class LeaderboardController extends Controller
         // Get user above (target) if not first (excluding test accounts, only TI-2E)
         $targetUser = null;
         if ($currentUserRank > 1) {
-            $targetUser = User::where('role', 'student')
+            $targetUser = User::whereRoleName('student')
                 ->where('kelas', 'TI-2E')
                 ->whereNotIn('email', $this->excludedEmails)
                 ->where('total_xp', '>', $currentUser->total_xp)
@@ -82,7 +82,7 @@ class LeaderboardController extends Controller
         }
 
         // Get Top 3 explicitly for podium (excluding test accounts, only TI-2E)
-        $topUsers = User::where('role', 'student')
+        $topUsers = User::whereRoleName('student')
             ->where('kelas', 'TI-2E')
             ->whereNotIn('email', $this->excludedEmails)
             ->orderBy('total_xp', 'desc')

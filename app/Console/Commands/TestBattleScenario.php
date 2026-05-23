@@ -61,7 +61,7 @@ class TestBattleScenario extends Command
         }
 
         // Get first student
-        $user = User::where('role', 'student')->first();
+        $user = User::whereRoleName('student')->first();
         
         if (!$user) {
             $this->warn('No student found. Creating test student...');

@@ -49,12 +49,6 @@ class EventController extends Controller
             'type' => 'required|in:learning,boss',
             'section' => 'required|in:Easy,Medium,Hard',
             'section_order' => 'required|integer|min:1|max:6',
-            'boss_easy_name' => 'nullable|string',
-            'boss_medium_name' => 'nullable|string',
-            'boss_hard_name' => 'nullable|string',
-            'easy_enabled' => 'boolean',
-            'medium_enabled' => 'boolean',
-            'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
             // Dynamic nodes
             'nodes' => 'nullable|array|exclude_if:type,boss',
@@ -65,9 +59,6 @@ class EventController extends Controller
         ]);
 
         $validated['created_by'] = auth()->id();
-        $validated['easy_enabled'] = $request->has('easy_enabled');
-        $validated['medium_enabled'] = $request->has('medium_enabled');
-        $validated['hard_enabled'] = $request->has('hard_enabled');
 
         DB::transaction(function () use ($validated) {
             $nodes = $validated['nodes'] ?? [];
@@ -127,12 +118,6 @@ class EventController extends Controller
             'type' => 'required|in:learning,boss',
             'section' => 'required|in:Easy,Medium,Hard',
             'section_order' => 'required|integer|min:1|max:6',
-            'boss_easy_name' => 'nullable|string',
-            'boss_medium_name' => 'nullable|string',
-            'boss_hard_name' => 'nullable|string',
-            'easy_enabled' => 'boolean',
-            'medium_enabled' => 'boolean',
-            'hard_enabled' => 'boolean',
             'status' => 'required|in:draft,active,selesai',
             // Dynamic nodes
             'nodes' => 'nullable|array|exclude_if:type,boss',
@@ -142,10 +127,6 @@ class EventController extends Controller
             'nodes.*.content' => 'nullable|string|exclude_if:type,boss',
             'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
-
-        $validated['easy_enabled'] = $request->has('easy_enabled');
-        $validated['medium_enabled'] = $request->has('medium_enabled');
-        $validated['hard_enabled'] = $request->has('hard_enabled');
 
         DB::transaction(function () use ($validated, $soloRaid) {
             $nodes = $validated['nodes'] ?? [];
@@ -230,20 +211,8 @@ class EventController extends Controller
      */
     public function toggleLevel(Request $request, SoloRaid $soloRaid)
     {
-        // Allow all dosen to toggle (not just creator)
-        // if ($soloRaid->created_by !== auth()->id()) {
-        //     abort(403, 'Unauthorized action.');
-        // }
-
-        $level = $request->level;
-        $field = $level . '_enabled';
-        
-        if (in_array($field, ['easy_enabled', 'medium_enabled', 'hard_enabled'])) {
-            $soloRaid->$field = !$soloRaid->$field;
-            $soloRaid->save();
-        }
-
-        return back()->with('success', ucfirst($level) . ' level toggled.');
+        // Kolom *_enabled sudah dihapus, semua level kini selalu aktif.
+        return back()->with('success', ucfirst((string) $request->level) . ' level toggled.');
     }
 
     public function monitoring(SoloRaid $soloRaid)

@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\UserBadge;
 use App\Models\Badge;
 use App\Models\SessionSolo;
-use App\Models\EventParticipant;
 use App\Models\UserNodeCompletion;
 use Carbon\Carbon;
 
@@ -21,7 +20,7 @@ class BadgeService
      * Check all badges for a user.
      * 
      * @param User $user
-     * @param mixed $currentSession - Instance of SessionSolo or EventParticipant (optional)
+     * @param mixed $currentSession - Instance of SessionSolo (optional)
      * @return array - List of newly unlocked badge models
      */
     public function checkAll(User $user, $currentSession = null)
@@ -165,22 +164,13 @@ class BadgeService
     // 1. Boss Novice: Kalahkan 1 boss any level
     public function checkBossNovice(User $user)
     {
-        // Check Solo Sessions (hanya yang tipe boss)
-        $soloWin = SessionSolo::where('user_id', $user->id)
+        // Hanya cek Solo Sessions (event multiplayer sudah dihapus)
+        return SessionSolo::where('user_id', $user->id)
             ->where('boss_kalah', true)
             ->whereHas('soloRaid', function($q) {
                 $q->where('type', 'boss');
             })
             ->exists();
-            
-        if ($soloWin) return true;
-
-        // Check Event Participants
-        $eventWin = EventParticipant::where('user_id', $user->id)
-             ->where('boss_kalah', true)
-             ->exists();
-             
-        return $eventWin;
     }
 
     // 2. Boss Veteran: Win Easy, Medium, AND Hard in Solo (hanya boss events)

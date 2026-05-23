@@ -82,12 +82,7 @@ class SoloBattleController extends Controller
         $timeRemaining = max(0, now()->diffInSeconds($deadline, false));
 
         // Get boss name based on level
-        $bossName = match($session->level) {
-            'Easy' => $soloRaid->boss_easy_name,
-            'Medium' => $soloRaid->boss_medium_name,
-            'Hard' => $soloRaid->boss_hard_name,
-            default => 'Boss'
-        };
+        $bossName = $soloRaid->bossName($session->level);
 
         return view('solo.play', compact('soloRaid', 'session', 'questions', 'timeRemaining', 'deadline', 'bossName'));
     }

@@ -84,14 +84,14 @@
                                         <span class="material-symbols-outlined text-primary">event</span>
                                     </div>
                                     <div>
-                                        <h4 class="font-bold text-text-primary">{{ $event->nama_event }}</h4>
+                                        <h4 class="font-bold text-text-primary">{{ $event->nama }}</h4>
                                         <p class="text-sm text-text-muted">{{ $event->tanggal_mulai ? $event->tanggal_mulai->format('d M Y') : '-' }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    @if($event->status === 'ongoing')
+                                    @if($event->status === 'active')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-green-bg text-status-green-text border border-status-green-text/20">
-                                            Ongoing
+                                            Active
                                         </span>
                                     @elseif($event->status === 'draft')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-gray-bg text-status-gray-text border border-status-gray-text/20">
@@ -99,7 +99,7 @@
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-status-red-bg text-status-red-text border border-status-red-text/20">
-                                            Finished
+                                            Selesai
                                         </span>
                                     @endif
                                     <a href="{{ route('dosen.events.edit', $event) }}" class="p-2 text-info hover:bg-info/10 rounded-lg transition-colors">

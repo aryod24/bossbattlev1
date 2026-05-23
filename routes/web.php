@@ -40,14 +40,8 @@ Route::get('/dashboard', function () {
     
     // Get last raid session
     $lastRaidSession = $user->sessionSolos()->with('soloRaid')->latest()->first();
-    
-    // Get active event (prioritize ongoing, then upcoming)
-    $activeEvent = \App\Models\Event::where('status', 'ongoing')->latest()->first();
-    if (!$activeEvent) {
-         $activeEvent = \App\Models\Event::where('status', 'draft')->latest()->first();
-    }
 
-    return view('dashboard', compact('latestBadge', 'lastRaidSession', 'activeEvent'));
+    return view('dashboard', compact('latestBadge', 'lastRaidSession'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

@@ -224,12 +224,7 @@ class SoloRaidController extends Controller
         $section = $soloRaid->section ?? 'Easy';
 
         // Boss name based on section
-        $bossName = match ($section) {
-            'Easy'   => $soloRaid->boss_easy_name,
-            'Medium' => $soloRaid->boss_medium_name,
-            'Hard'   => $soloRaid->boss_hard_name,
-            default  => $soloRaid->boss_easy_name,
-        };
+        $bossName = $soloRaid->bossName($section);
 
         $levelConfig = SoloBattleService::LEVEL_CONFIG[$section] ?? SoloBattleService::LEVEL_CONFIG['Easy'];
 
@@ -250,10 +245,13 @@ class SoloRaidController extends Controller
 
     public function levelSelect(SoloRaid $soloRaid)
     {
+        // Semua level selalu tersedia sekarang — kolom *_enabled sudah
+        // dihapus dari skema. Endpoint ini tetap dipertahankan supaya
+        // route lama tidak putus.
         $levels = [
-            'easy'   => ['enabled' => $soloRaid->easy_enabled,   'available' => $soloRaid->easy_enabled],
-            'medium' => ['enabled' => $soloRaid->medium_enabled, 'available' => $soloRaid->medium_enabled],
-            'hard'   => ['enabled' => $soloRaid->hard_enabled,   'available' => $soloRaid->hard_enabled],
+            'easy'   => ['enabled' => true, 'available' => true],
+            'medium' => ['enabled' => true, 'available' => true],
+            'hard'   => ['enabled' => true, 'available' => true],
         ];
         return response()->json($levels);
     }

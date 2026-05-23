@@ -65,11 +65,6 @@ class User extends Authenticatable
         return $this->hasMany(SessionSolo::class);
     }
 
-    public function eventParticipants()
-    {
-        return $this->hasMany(EventParticipant::class);
-    }
-
     public function userBadges()
     {
         return $this->hasMany(UserBadge::class);

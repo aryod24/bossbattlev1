@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Event;
-use App\Models\EventParticipant;
 use App\Models\SessionAnswer;
 use App\Models\SessionSolo;
 use App\Models\User;
@@ -81,8 +79,8 @@ class ReportController extends Controller
             }
         }
 
-        // Event multiplayer (opsional, tetap diekspos kalau ada datanya).
-        $events = Event::orderBy('created_at', 'desc')->get();
+        // Event multiplayer sudah dihapus dari sistem.
+        $events = collect();
 
         return view('admin.reports.index', compact('pretestStats', 'bossStats', 'events'));
     }
@@ -91,7 +89,7 @@ class ReportController extends Controller
     {
         $request->validate([
             'report_source' => 'required|string',
-            // "pretest:all|TI-2D|TI-2E" | "boss:Easy|Medium|Hard" | "event:{id}"
+            // "pretest:all|TI-2D|TI-2E" | "boss:Easy|Medium|Hard"
         ]);
 
         [$type, $id] = explode(':', $request->report_source, 2);
@@ -99,7 +97,6 @@ class ReportController extends Controller
         return match ($type) {
             'pretest' => $this->exportPretest($id),
             'boss'    => $this->exportBossBattleBySection($id),
-            'event'   => $this->exportBossBattleEvent((int) $id),
             default   => abort(400, 'Unknown report source'),
         };
     }
@@ -171,33 +168,6 @@ class ReportController extends Controller
                     $this->bossBattleRow($session, $session->soloRaid->nama ?? '-', 'Solo Raid'),
                     ';'
                 );
-            }
-        });
-    }
-
-    // ===================================================================
-    // BOSS BATTLE — Event (multiplayer)
-    // ===================================================================
-
-    private function exportBossBattleEvent(int $eventId)
-    {
-        $event = Event::findOrFail($eventId);
-
-        $items = EventParticipant::with(['user'])
-            ->where('event_id', $eventId)
-            ->whereNotNull('waktu_selesai')
-            ->whereHas('user', function ($q) {
-                $q->whereNotIn('email', $this->excludedEmails);
-            })
-            ->orderBy('waktu_selesai')
-            ->get();
-
-        $filename = 'boss-battle-event-' . $eventId . '-' . date('Y-m-d-His') . '.csv';
-
-        return $this->streamCsv($filename, function ($file) use ($items, $event) {
-            fputcsv($file, $this->bossBattleHeader(), ';');
-            foreach ($items as $participant) {
-                fputcsv($file, $this->bossBattleRow($participant, $event->title, 'Event'), ';');
             }
         });
     }
@@ -323,11 +293,11 @@ class ReportController extends Controller
     // ROW BUILDERS
     // ===================================================================
 
-    /** @param SessionSolo|EventParticipant $session */
+    /** @param SessionSolo $session */
     private function bossBattleRow($session, string $sourceTitle, string $tipeSesi): array
     {
         $user = $session->user;
-        $isSolo = $session instanceof SessionSolo;
+        $isSolo = true; // Sekarang hanya ada SessionSolo
 
         $jumlahSoal  = (int) ($session->jumlah_soal ?? 0);
         $jumlahBenar = (int) ($session->jumlah_benar ?? 0);
@@ -458,7 +428,7 @@ class ReportController extends Controller
         }, 200, $headers);
     }
 
-    /** @param SessionSolo|EventParticipant $session */
+    /** @param SessionSolo $session */
     private function resolveBossStatus($session, bool $isSolo): string
     {
         if ($session->boss_kalah) {
@@ -526,13 +496,7 @@ class ReportController extends Controller
             ->when($current instanceof SessionSolo, fn ($q) => $q->where('id', '!=', $current->id))
             ->sum('xp_diperoleh');
 
-        $eventXp = EventParticipant::where('user_id', $userId)
-            ->whereNotNull('waktu_selesai')
-            ->where('waktu_selesai', '<', $beforeTime)
-            ->when($current instanceof EventParticipant, fn ($q) => $q->where('event_participant_id', '!=', $current->event_participant_id))
-            ->sum('xp_diperoleh');
-
-        return (int) ($soloXp + $eventXp);
+        return (int) $soloXp;
     }
 
     private function rankAt(User $user, int $xpSnapshot): ?int

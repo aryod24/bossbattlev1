@@ -71,17 +71,6 @@
                                 @endif
                             </option>
                         </optgroup>
-
-                        @if($events->count())
-                            <optgroup label="Boss Battle — Event (Multiplayer)">
-                                @foreach($events as $event)
-                                    <option value="event:{{ $event->id }}">
-                                        {{ $event->title }}
-                                        (Created: {{ $event->created_at->format('d M Y') }})
-                                    </option>
-                                @endforeach
-                            </optgroup>
-                        @endif
                     </select>
                 </div>
 

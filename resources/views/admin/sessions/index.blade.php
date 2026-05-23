@@ -18,11 +18,6 @@
                         class="px-4 py-2 rounded-md text-sm font-medium transition-all">
                     Solo Sessions
                 </button>
-                <button @click="activeTab = 'events'" 
-                        :class="activeTab === 'events' ? 'bg-primary text-black shadow' : 'text-text-muted hover:text-text-primary'"
-                        class="px-4 py-2 rounded-md text-sm font-medium transition-all">
-                    Event Participants
-                </button>
             </div>
         </div>
 
@@ -40,7 +35,7 @@
 
         <!-- TAB: OVERVIEW -->
         <div x-show="activeTab === 'overview'" x-transition>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <!-- Session Solo -->
                 <div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark p-6">
                     <h3 class="text-lg font-bold text-text-primary mb-2">Solo Sessions</h3>
@@ -77,21 +72,6 @@
                         </button>
                     </form>
                 </div>
-
-                <!-- Event Participants -->
-                <div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark p-6">
-                    <h3 class="text-lg font-bold text-text-primary mb-2">Event Participants</h3>
-                    <p class="text-3xl font-black text-primary mb-4">{{ $stats['event_participants'] }}</p>
-                    <p class="text-sm text-text-muted mb-4">Total records in event_participant table</p>
-                    
-                    <form action="{{ route('admin.sessions.clear') }}" method="POST" onsubmit="return confirm('Are you sure? This will delete ALL event participant records.');">
-                        @csrf
-                        <input type="hidden" name="table" value="event_participants">
-                        <button type="submit" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/50 font-bold py-2 px-4 rounded transition-colors">
-                            Clear Participants
-                        </button>
-                    </form>
-                </div>
             </div>
 
             <!-- Global Actions -->
@@ -99,7 +79,7 @@
                 <h2 class="text-2xl font-bold text-text-primary mb-4">Danger Zone</h2>
                 <p class="text-text-muted mb-6">This action will wipe all session data from all tables. Use with caution.</p>
                 
-                <form action="{{ route('admin.sessions.clear') }}" method="POST" onsubmit="return confirm('WARNING: This will delete EVERYTHING (Sessions, Answers, Participants). Are you absolutely sure?');">
+                <form action="{{ route('admin.sessions.clear') }}" method="POST" onsubmit="return confirm('WARNING: This will delete EVERYTHING (Sessions, Answers). Are you absolutely sure?');">
                     @csrf
                     <input type="hidden" name="table" value="all">
                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
@@ -198,73 +178,6 @@
                     {{ $soloSessions->links() }}
                 </div>
             </div>
-        </div>
-
-        <!-- TAB: EVENT PARTICIPANTS -->
-        <div x-show="activeTab === 'events'" x-transition>
-            @if(empty($eventParticipants))
-                <div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark p-8 text-center text-text-muted">
-                    No event participants data found.
-                </div>
-            @else
-                <div class="space-y-6">
-                    @foreach($eventParticipants as $eventName => $participants)
-                    <div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark overflow-hidden">
-                        <div class="px-6 py-4 bg-background-light dark:bg-background-dark border-b border-border-light dark:border-border-dark flex justify-between items-center">
-                            <h3 class="font-bold text-lg text-text-primary">{{ $eventName }}</h3>
-                            <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">{{ $participants->count() }} Participants</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="text-text-muted uppercase font-bold border-b border-border-light dark:border-border-dark">
-                                    <tr>
-                                        <th class="px-6 py-3">User</th>
-                                        <th class="px-6 py-3">Status</th>
-                                        <th class="px-6 py-3">Score</th>
-                                        <th class="px-6 py-3">Boss HP</th>
-                                        <th class="px-6 py-3 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-border-light dark:divide-border-dark">
-                                    @foreach($participants as $participant)
-                                    <tr class="hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
-                                        <td class="px-6 py-3">
-                                            <div class="font-bold text-text-primary">{{ $participant->user->nama ?? 'Unknown' }}</div>
-                                            @if($participant->user?->nim)
-                                                <div class="text-xs text-text-muted">{{ $participant->user->nim }} · {{ $participant->user->email }}</div>
-                                            @else
-                                                <div class="text-xs text-text-muted">{{ $participant->user->email ?? '' }}</div>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-3">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium 
-                                                {{ $participant->status === 'finished' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500' }}">
-                                                {{ ucfirst($participant->status) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-3 text-text-primary">
-                                            {{ $participant->skor_akhir ?? '-' }}
-                                        </td>
-                                        <td class="px-6 py-3 text-text-muted">
-                                            {{ $participant->boss_hp_akhir }} / {{ $participant->boss_hp_awal }}
-                                        </td>
-                                        <td class="px-6 py-3 text-right">
-                                            <form action="{{ route('admin.sessions.destroy') }}" method="POST" class="inline-block" onsubmit="return confirm('Remove this participant?');">
-                                                @csrf
-                                                <input type="hidden" name="type" value="participant">
-                                                <input type="hidden" name="id" value="{{ $participant->event_participant_id }}">
-                                                <button type="submit" class="text-red-500 hover:text-red-400 font-medium text-sm">Remove</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            @endif
         </div>
     </div>
 </x-admin-layout>

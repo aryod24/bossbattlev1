@@ -30,8 +30,6 @@ class SoloRaidSeeder extends Seeder
             'type'            => 'learning',
             'section'         => 'Easy',
             'section_order'   => 1,
-            'boss_easy_name'  => 'Goblin King',
-            'easy_enabled'    => true,
         ]);
 
         $raid1Nodes = [
@@ -249,8 +247,6 @@ EOT
             'type'            => 'boss',
             'section'         => 'Easy',
             'section_order'   => 2,
-            'boss_easy_name'  => 'Goblin King',
-            'easy_enabled'    => true,
         ]);
 
         // ================================================================
@@ -268,8 +264,6 @@ EOT
             'type'            => 'learning',
             'section'         => 'Medium',
             'section_order'   => 1,
-            'boss_medium_name'=> 'Array Arachnid',
-            'medium_enabled'  => true,
         ]);
 
         $raid2Nodes = [
@@ -296,8 +290,6 @@ EOT
             'type'            => 'boss',
             'section'         => 'Medium',
             'section_order'   => 2,
-            'boss_medium_name'=> 'Array Arachnid',
-            'medium_enabled'  => true,
         ]);
 
         // ================================================================
@@ -315,8 +307,6 @@ EOT
             'type'            => 'learning',
             'section'         => 'Hard',
             'section_order'   => 1,
-            'boss_hard_name'  => 'MVC Monarch',
-            'hard_enabled'    => true,
         ]);
 
         $raid3Nodes = [
@@ -343,8 +333,6 @@ EOT
             'type'            => 'boss',
             'section'         => 'Hard',
             'section_order'   => 2,
-            'boss_hard_name'  => 'MVC Monarch',
-            'hard_enabled'    => true,
         ]);
     }
 }

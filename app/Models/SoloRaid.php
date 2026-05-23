@@ -9,29 +9,34 @@ use Illuminate\Database\Eloquent\Model;
 class SoloRaid extends Model
 {
     protected $table = 'solo_raid';
+
     protected $fillable = [
-        'nama', 'deskripsi', 'tanggal_mulai', 'tanggal_selesai', 
+        'nama', 'deskripsi', 'tanggal_mulai', 'tanggal_selesai',
         'status', 'created_by', 'question_bank_id',
         'type', 'section', 'section_order',
-        'boss_easy_name', 'boss_medium_name', 'boss_hard_name',
-        'easy_enabled', 'medium_enabled', 'hard_enabled',
-        'easy_date_start', 'easy_date_end',
-        'medium_date_start', 'medium_date_end',
-        'hard_date_start', 'hard_date_end'
     ];
+
     protected $casts = [
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
-        'easy_enabled' => 'boolean',
-        'medium_enabled' => 'boolean',
-        'hard_enabled' => 'boolean',
+    ];
+
+    /**
+     * Default boss name per-section. Sebelumnya disimpan per kolom
+     * (`boss_easy_name`, dst.) dan tidak pernah benar-benar diubah,
+     * jadi sekarang dikonstanta saja.
+     */
+    public const BOSS_NAMES = [
+        'Easy'   => 'Goblin King',
+        'Medium' => 'Array Arachnid',
+        'Hard'   => 'MVC Monarch',
     ];
 
     // Relationships
     public function creator() {
         return $this->belongsTo(User::class, 'created_by');
     }
-    
+
     public function questionBank() {
         return $this->belongsTo(QuestionBank::class, 'question_bank_id');
     }
@@ -82,5 +87,15 @@ class SoloRaid extends Model
 
     public function isBoss(): bool {
         return $this->type === 'boss';
+    }
+
+    /**
+     * Nama boss berdasarkan level / section.
+     * Menggantikan kolom `boss_easy_name` / `boss_medium_name` / `boss_hard_name`.
+     */
+    public function bossName(?string $level = null): string
+    {
+        $key = $level ?? $this->section ?? 'Easy';
+        return self::BOSS_NAMES[$key] ?? 'Boss';
     }
 }

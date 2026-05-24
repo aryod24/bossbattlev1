@@ -134,7 +134,8 @@ Route::middleware(['auth', 'verified', 'role:dosen'])->prefix('dosen')->name('do
     Route::put('password', [\App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('password.update');
 
     // Event Management (same as solo-raids for dosen)
-    Route::resource('events', \App\Http\Controllers\Dosen\EventController::class);
+    Route::resource('events', \App\Http\Controllers\Dosen\EventController::class)
+        ->parameters(['events' => 'soloRaid']);
     Route::get('events/{soloRaid}/monitoring', [\App\Http\Controllers\Dosen\EventController::class, 'monitoring'])->name('events.monitoring');
     Route::get('events/{soloRaid}/monitoring/{user}', [\App\Http\Controllers\Dosen\EventController::class, 'monitoringDetail'])->name('events.monitoring.detail');
     Route::post('events/{soloRaid}/duplicate', [\App\Http\Controllers\Dosen\EventController::class, 'duplicate'])->name('events.duplicate');

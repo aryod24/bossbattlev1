@@ -210,6 +210,47 @@
     <!-- Materi Modal Component -->
     <x-solo.materi-modal />
 
+    <!-- Modal Badge Unlocked -->
+    <div x-show="showBadgeModal" class="fixed inset-0 z-[60] overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div x-show="showBadgeModal" class="fixed inset-0 bg-black opacity-80"></div>
+
+            <div x-show="showBadgeModal"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-90"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 class="relative inline-block rounded-2xl text-center overflow-hidden shadow-2xl max-w-sm w-full"
+                 style="background: rgba(25, 25, 28, 0.97); backdrop-filter: blur(20px); border: 1px solid rgba(250, 204, 21, 0.55); box-shadow: 0 0 60px rgba(250, 204, 21, 0.35);">
+
+                <template x-if="currentBadge">
+                    <div class="p-8">
+                        <p class="font-mono-label text-[11px] uppercase tracking-[0.2em] mb-4" style="color: #facc15;">Badge Unlocked</p>
+
+                        <div class="flex items-center justify-center mb-5">
+                            <div class="w-24 h-24 rounded-full flex items-center justify-center text-5xl animate-float"
+                                 style="background: linear-gradient(135deg, rgba(250,204,21,0.25), rgba(206,93,255,0.18)); border: 2px solid rgba(250,204,21,0.6); box-shadow: 0 0 30px rgba(250,204,21,0.45);">
+                                <span x-text="currentBadge.emoji || '🏆'"></span>
+                            </div>
+                        </div>
+
+                        <h3 class="font-headline text-2xl font-bold mb-2" style="color: #e5e2e3;" x-text="currentBadge.name"></h3>
+                        <p class="font-body text-sm text-soft mb-6" x-text="currentBadge.description"></p>
+
+                        <div class="flex items-center justify-center gap-2 text-xs text-faint mb-5"
+                             x-show="newBadgesQueue.length > 1">
+                            <span x-text="(currentBadgeIndex + 1) + ' / ' + newBadgesQueue.length"></span>
+                        </div>
+
+                        <button type="button" @click="dismissBadge()"
+                                class="btn-cyber-primary font-headline w-full inline-flex justify-center rounded-lg px-5 py-2.5 text-sm font-bold">
+                            <span x-text="currentBadgeIndex < newBadgesQueue.length - 1 ? 'Selanjutnya' : 'Mantap!'"></span>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Konfirmasi Mulai Latihan -->
     <div x-show="showConfirmModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div class="flex items-center justify-center min-h-screen px-4">
@@ -234,14 +275,30 @@
                          style="background-color: rgba(32, 31, 32, 0.6); border: 1px solid rgba(58, 73, 75, 0.5);">
                         <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Event</p>
                         <p class="font-headline text-base font-bold mb-3" style="color: #e5e2e3;">{{ $soloRaid->nama }}</p>
-                        <div class="pt-3" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
-                            <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Percobaan ke-</p>
-                            <p class="font-headline text-sm font-bold text-cyan-glow">#{{ $userStats['attempts'] + 1 }}</p>
+
+                        <div class="pt-3 grid grid-cols-2 gap-3" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                            <div>
+                                <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Jumlah Soal</p>
+                                <p class="font-headline text-sm font-bold" style="color: #e5e2e3;">{{ $levelConfig['questions'] }} soal</p>
+                            </div>
+                            <div>
+                                <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Batas Lulus</p>
+                                <p class="font-headline text-sm font-bold text-cyan-glow">≥ {{ $levelConfig['min_correct'] }} benar</p>
+                            </div>
+                            <div>
+                                <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Durasi</p>
+                                <p class="font-headline text-sm font-bold" style="color: #e5e2e3;">{{ $levelConfig['timer_minutes'] }} menit</p>
+                            </div>
+                            <div>
+                                <p class="font-mono-label text-[10px] uppercase tracking-wider text-soft mb-1">Percobaan ke-</p>
+                                <p class="font-headline text-sm font-bold text-cyan-glow">#{{ $userStats['attempts'] + 1 }}</p>
+                            </div>
                         </div>
                     </div>
 
                     <p class="font-body text-xs text-soft">
-                        ⏱️ Timer akan langsung mulai setelah konfirmasi.
+                        ⏱️ Timer akan langsung mulai setelah konfirmasi. Untuk lulus, jawab minimal
+                        <strong class="text-cyan-glow">{{ $levelConfig['min_correct'] }} dari {{ $levelConfig['questions'] }}</strong> soal dengan benar.
                     </p>
                 </div>
 
@@ -400,6 +457,13 @@
                 infoTitle: '',
                 infoContent: '',
                 renderedContent: '',
+                // Badge unlock modal state
+                showBadgeModal: false,
+                newBadgesQueue: [],
+                currentBadgeIndex: 0,
+                get currentBadge() {
+                    return this.newBadgesQueue[this.currentBadgeIndex] ?? null;
+                },
                 // Modal & battle state
                 showConfirmModal: false,
                 showBossConfirmModal: false,
@@ -458,12 +522,30 @@
                         }
                         this.showInfoModal = false;
                         this.isMarkingDone = false;
-                        // Reload to re-render map-visual with updated state
+
+                        const newBadges = Array.isArray(data.new_badges) ? data.new_badges : [];
+                        if (newBadges.length > 0) {
+                            // Tunda reload sampai user selesai melihat badge popup
+                            this.newBadgesQueue = newBadges;
+                            this.currentBadgeIndex = 0;
+                            this.showBadgeModal = true;
+                            return;
+                        }
+
                         window.location.reload();
                     })
                     .catch(() => {
                         this.isMarkingDone = false;
                     });
+                },
+
+                dismissBadge() {
+                    if (this.currentBadgeIndex < this.newBadgesQueue.length - 1) {
+                        this.currentBadgeIndex++;
+                        return;
+                    }
+                    this.showBadgeModal = false;
+                    window.location.reload();
                 },
 
                 startLatihan() {

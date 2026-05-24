@@ -74,20 +74,30 @@ class SoloBattleService
                  throw new \Exception("Level {$level} sudah berakhir.");
             }
 
-            $session = SessionSolo::create([
+            $isLearning = $soloRaid->type === 'learning';
+
+            $sessionData = [
                 'user_id' => $user->id,
                 'solo_raid_id' => $soloRaid->id,
                 'level' => $level,
                 'waktu_mulai' => now(),
                 'jumlah_soal' => $config['questions'],
-                'boss_hp_awal' => $config['boss_hp'],
-                'boss_hp_akhir' => $config['boss_hp'],
-                'player_hp_awal' => $config['player_hp'] ?? 5,
-                'player_hp_akhir' => $config['player_hp'] ?? 5,
                 'attempt_number' => $attemptNumber,
                 'is_counted_research' => ($attemptNumber === 1),
                 'is_first_attempt' => ($attemptNumber === 1),
-            ]);
+            ];
+
+            // Mode boss: simpan kondisi pertarungan (HP boss, HP player, status menang).
+            // Mode learning: kolom-kolom HP/boss_kalah biarkan default null/false agar
+            // tidak membebani DB dengan data yang tidak dipakai.
+            if (!$isLearning) {
+                $sessionData['boss_hp_awal']    = $config['boss_hp'];
+                $sessionData['boss_hp_akhir']   = $config['boss_hp'];
+                $sessionData['player_hp_awal']  = $config['player_hp'] ?? 5;
+                $sessionData['player_hp_akhir'] = $config['player_hp'] ?? 5;
+            }
+
+            $session = SessionSolo::create($sessionData);
 
             // 3. Randomize and assign questions
             $this->assignQuestionsToSession($session, $soloRaid->question_bank_id, $level, $config['questions']);
@@ -323,10 +333,18 @@ class SoloBattleService
         // 3. Determine if boss defeated / quiz passed
         $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
         $minDamage = $config['min_correct'];
-        
-        // WIN condition: Correct >= threshold AND Player still alive
-        $isPlayerAlive = $session->player_hp_akhir > 0;
-        $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100) && $isPlayerAlive;
+
+        $isLearning = $session->soloRaid && $session->soloRaid->type === 'learning';
+
+        // WIN condition:
+        //  - Boss mode: jawaban benar >= threshold (atau perfect score) DAN player masih hidup.
+        //  - Learning mode: jawaban benar >= threshold (atau perfect score). Tidak ada HP player.
+        if ($isLearning) {
+            $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100);
+        } else {
+            $isPlayerAlive = $session->player_hp_akhir > 0;
+            $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100) && $isPlayerAlive;
+        }
 
         // 4. Calculate XP using XpService
         $finalXP = $this->xpService->calculateSessionXP($session);

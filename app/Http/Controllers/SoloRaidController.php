@@ -131,8 +131,12 @@ class SoloRaidController extends Controller
             'total_nodes'     => $nodes->where('type', 'content')->count(),
         ];
 
+        // Konfigurasi quiz untuk section ini (jumlah soal & batas lulus)
+        $section = $soloRaid->section ?? 'Easy';
+        $levelConfig = SoloBattleService::LEVEL_CONFIG[$section] ?? SoloBattleService::LEVEL_CONFIG['Easy'];
+
         return view('solo.map', compact(
-            'soloRaid', 'nodes', 'completedNodeIds', 'activeSession', 'sessionHistory', 'userStats'
+            'soloRaid', 'nodes', 'completedNodeIds', 'activeSession', 'sessionHistory', 'userStats', 'levelConfig'
         ));
     }
 
@@ -148,8 +152,8 @@ class SoloRaidController extends Controller
             'raid_node_id' => $node->id,
         ]);
 
-        // Check for badges (e.g. content completion count)
-        $badgeService->checkAll($user);
+        // Check for badges (e.g. content completion count) and capture newly unlocked
+        $newBadges = $badgeService->checkAll($user);
 
         // Check if ALL content nodes for this event are now done
         $soloRaid    = $node->soloRaid;
@@ -179,6 +183,13 @@ class SoloRaidController extends Controller
             'success'      => true,
             'all_done'     => $allDone,
             'next_order'   => $nextNode?->order,
+            'new_badges'   => collect($newBadges)->map(fn ($b) => [
+                'id'          => $b->id,
+                'name'        => $b->name,
+                'description' => $b->description,
+                'emoji'       => $b->emoji,
+                'slug'        => $b->slug,
+            ])->values(),
         ]);
     }
 

@@ -7,13 +7,21 @@
     <title>{{ config('app.name', 'Laravel') }} - Dosen</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
-        *:not(.material-symbols-outlined) {
+        *:not(.material-symbols-outlined):not([class*="fa-"]):not(.fa):not(.fas):not(.far):not(.fab):not(.fa-solid):not(.fa-regular):not(.fa-brands) {
             font-family: 'Outfit', sans-serif !important;
+        }
+
+        /* Pastikan Font Awesome tetap pakai font-nya sendiri (tidak ditimpa rule global) */
+        .fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands,
+        .fa::before, .fas::before, .far::before, .fab::before,
+        .fa-solid::before, .fa-regular::before, .fa-brands::before {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome" !important;
         }
     </style>
 

@@ -69,9 +69,8 @@
                     <div class="text-xs text-text-muted bg-surface-light dark:bg-black/20 p-3 rounded-lg border border-border">
                         <p class="font-bold mb-1">Common Examples:</p>
                         <code class="block text-primary mb-1">{"type": "solo_victory_count", "count": 10}</code>
-                        <code class="block text-primary mb-1">{"type": "complete_difficulties", "levels": ["Easy", "Hard"]}</code>
-                        <code class="block text-primary mb-1">{"type": "solo_victory_count", "count": 6, "unique_raid": true}</code>
-                        <code class="block text-primary">{"type": "event_participation_count", "count": 5}</code>
+                        <code class="block text-primary mb-1">{"type": "perfect_score_count", "count": 6 }</code>
+                        <code class="block text-primary">{"type": "node_completion_count", "count": 5}</code>
                     </div>
                 </div>
                 @error('requirements') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror

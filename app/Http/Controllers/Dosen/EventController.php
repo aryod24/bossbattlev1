@@ -15,12 +15,16 @@ class EventController extends Controller
      */
     public function index()
     {
-        // Show all events for monitoring, not just created by this dosen
-        $raids = SoloRaid::latest()
-            ->with('creator:id,nama')
+        $raids = SoloRaid::with('creator:id,nama')
+            ->latest()
             ->get();
 
-        return view('dosen.events.index', compact('raids'));
+        // Lookup bank_group → bank_name (since solo_raid.question_bank_id stores bank_group, not the PK)
+        $banksByGroup = \App\Models\QuestionBank::select('bank_group', 'bank_name')
+            ->groupBy('bank_group', 'bank_name')
+            ->pluck('bank_name', 'bank_group');
+
+        return view('dosen.events.index', compact('raids', 'banksByGroup'));
     }
 
     /**
@@ -57,6 +61,15 @@ class EventController extends Controller
             'nodes.*.content' => 'nullable|string|exclude_if:type,boss',
             'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
+
+        $clash = SoloRaid::where('section', $validated['section'])
+            ->where('section_order', $validated['section_order'])
+            ->first(['id', 'nama']);
+        if ($clash) {
+            return back()->withInput()->withErrors([
+                'section_order' => "Slot Section {$validated['section']} urutan #{$validated['section_order']} sudah dipakai event \"{$clash->nama}\". Pilih urutan lain.",
+            ]);
+        }
 
         $validated['created_by'] = auth()->id();
 
@@ -128,6 +141,16 @@ class EventController extends Controller
             'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
+        $clash = SoloRaid::where('section', $validated['section'])
+            ->where('section_order', $validated['section_order'])
+            ->where('id', '!=', $soloRaid->id)
+            ->first(['id', 'nama']);
+        if ($clash) {
+            return back()->withInput()->withErrors([
+                'section_order' => "Slot Section {$validated['section']} urutan #{$validated['section_order']} sudah dipakai event \"{$clash->nama}\". Pilih urutan lain, atau ubah/hapus event tersebut dulu.",
+            ]);
+        }
+
         DB::transaction(function () use ($validated, $soloRaid) {
             $nodes = $validated['nodes'] ?? [];
             unset($validated['nodes']);
@@ -195,15 +218,36 @@ class EventController extends Controller
         $newRaid->nama = $newRaid->nama . ' (Copy)';
         $newRaid->status = 'draft';
         $newRaid->created_by = auth()->id();
-        $newRaid->save();
 
-        foreach ($soloRaid->nodes as $node) {
-            $newNode = $node->replicate();
-            $newNode->solo_raid_id = $newRaid->id;
-            $newNode->save();
+        $used = SoloRaid::where('section', $newRaid->section)
+            ->pluck('section_order')
+            ->all();
+
+        $nextFree = null;
+        for ($i = 1; $i <= 6; $i++) {
+            if (!in_array($i, $used, true)) {
+                $nextFree = $i;
+                break;
+            }
         }
 
-        return redirect()->route('dosen.events.edit', $newRaid->id)->with('success', 'Solo Raid duplicated. Please update details.');
+        if ($nextFree !== null) {
+            $newRaid->section_order = $nextFree;
+            $newRaid->save();
+
+            foreach ($soloRaid->nodes as $node) {
+                $newNode = $node->replicate();
+                $newNode->solo_raid_id = $newRaid->id;
+                $newNode->save();
+            }
+
+            return redirect()->route('dosen.events.edit', $newRaid->id)
+                ->with('success', "Event diduplikat ke Section {$newRaid->section} urutan #{$newRaid->section_order}. Sesuaikan detailnya bila perlu.");
+        }
+
+        return back()->with('error',
+            "Section {$newRaid->section} sudah penuh (slot 1–6 terpakai). Hapus atau pindahkan salah satu event di section tersebut sebelum melakukan duplicate."
+        );
     }
 
     /**

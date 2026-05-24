@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\QuestionBank;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuestionBankController extends Controller
 {
@@ -18,6 +19,7 @@ class QuestionBankController extends Controller
         // Get bank metadata from database (group by bank_group, get first question's metadata)
         $bankConfig = QuestionBank::select('bank_group', 'bank_name', 'bank_icon', 'bank_description')
             ->groupBy('bank_group', 'bank_name', 'bank_icon', 'bank_description')
+            ->orderBy('bank_group')
             ->get()
             ->keyBy('bank_group')
             ->map(function ($item) {
@@ -30,7 +32,7 @@ class QuestionBankController extends Controller
             ->toArray();
 
         // Get question counts per bank
-        $bankCounts = QuestionBank::select('bank_group', \DB::raw('COUNT(*) as count'))
+        $bankCounts = QuestionBank::select('bank_group', DB::raw('COUNT(*) as count'))
             ->groupBy('bank_group')
             ->pluck('count', 'bank_group');
 
@@ -39,12 +41,12 @@ class QuestionBankController extends Controller
         $query->where('bank_group', $currentBank);
 
         // Filter by level
-        if ($request->has('level') && $request->level != '') {
+        if ($request->filled('level')) {
             $query->where('level', $request->level);
         }
 
         // Search by question text
-        if ($request->has('search') && $request->search != '') {
+        if ($request->filled('search')) {
             $query->where('soal_text', 'like', '%' . $request->search . '%');
         }
 
@@ -67,7 +69,7 @@ class QuestionBankController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bank_group' => 'sometimes|integer|in:1,2,3,4,5,6,7,8,9',
+            'bank_group' => 'required|integer|min:1',
             'bank_name' => 'nullable|string|max:255',
             'bank_icon' => 'nullable|string|max:50',
             'bank_description' => 'nullable|string',
@@ -81,9 +83,6 @@ class QuestionBankController extends Controller
             'jawaban_benar' => 'required|string',
             'bobot_xp' => 'required|integer|min:1',
         ]);
-
-        // Default to Bank 1 if not provided
-        $validated['bank_group'] = $validated['bank_group'] ?? 1;
 
         // If no metadata provided, get from existing question in same bank
         if (empty($validated['bank_name'])) {
@@ -123,7 +122,7 @@ class QuestionBankController extends Controller
     public function update(Request $request, QuestionBank $question)
     {
         $validated = $request->validate([
-            'bank_group' => 'sometimes|integer|in:1,2,3',
+            'bank_group' => 'sometimes|integer|min:1',
             'level' => 'required|in:Easy,Medium,Hard',
             'soal_text' => 'required|string',
             'tipe' => 'required|in:multiple_choice,short_answer',
@@ -148,147 +147,293 @@ class QuestionBankController extends Controller
      */
     public function destroy(QuestionBank $question)
     {
+        $bankGroup = $question->bank_group;
         $question->delete();
 
-        return redirect()->route('admin.questions.index')
+        return redirect()->route('admin.questions.index', ['bank' => $bankGroup])
             ->with('success', 'Question deleted successfully.');
     }
 
     /**
-     * Download JSON template for bulk upload.
+     * Show form to create a new question bank (with multiple questions inline).
+     */
+    public function createBank()
+    {
+        return view('admin.questions.bank-create');
+    }
+
+    /**
+     * Store a brand new question bank with multiple questions in one go.
+     */
+    public function storeBank(Request $request)
+    {
+        $validated = $request->validate([
+            'bank_name'        => 'required|string|max:255',
+            'bank_icon'        => 'nullable|string|max:50',
+            'bank_description' => 'nullable|string',
+            'questions'                       => 'required|array|min:1',
+            'questions.*.level'               => 'required|in:Easy,Medium,Hard',
+            'questions.*.soal_text'           => 'required|string',
+            'questions.*.tipe'                => 'required|in:multiple_choice,short_answer',
+            'questions.*.pilihan_a'           => 'nullable|required_if:questions.*.tipe,multiple_choice|string',
+            'questions.*.pilihan_b'           => 'nullable|required_if:questions.*.tipe,multiple_choice|string',
+            'questions.*.pilihan_c'           => 'nullable|required_if:questions.*.tipe,multiple_choice|string',
+            'questions.*.pilihan_d'           => 'nullable|required_if:questions.*.tipe,multiple_choice|string',
+            'questions.*.jawaban_benar'       => 'required|string',
+            'questions.*.bobot_xp'            => 'required|integer|min:1',
+        ]);
+
+        // Pastikan nama bank unik (case-insensitive)
+        $exists = QuestionBank::whereRaw('LOWER(bank_name) = ?', [strtolower($validated['bank_name'])])->exists();
+        if ($exists) {
+            return back()->withInput()->withErrors([
+                'bank_name' => 'Nama bank soal sudah dipakai. Gunakan nama lain.',
+            ]);
+        }
+
+        $newBankGroup = ((int) (QuestionBank::max('bank_group') ?? 0)) + 1;
+
+        DB::transaction(function () use ($validated, $newBankGroup) {
+            foreach ($validated['questions'] as $q) {
+                QuestionBank::create([
+                    'bank_group'       => $newBankGroup,
+                    'bank_name'        => $validated['bank_name'],
+                    'bank_icon'        => ($validated['bank_icon'] ?? null) ?: 'quiz',
+                    'bank_description' => $validated['bank_description'] ?? null,
+                    'level'            => $q['level'],
+                    'soal_text'        => $q['soal_text'],
+                    'tipe'             => $q['tipe'],
+                    'pilihan_a'        => $q['pilihan_a'] ?? null,
+                    'pilihan_b'        => $q['pilihan_b'] ?? null,
+                    'pilihan_c'        => $q['pilihan_c'] ?? null,
+                    'pilihan_d'        => $q['pilihan_d'] ?? null,
+                    'jawaban_benar'    => $q['jawaban_benar'],
+                    'bobot_xp'         => $q['bobot_xp'],
+                ]);
+            }
+        });
+
+        return redirect()->route('admin.questions.index', ['bank' => $newBankGroup])
+            ->with('success', 'Bank soal "' . $validated['bank_name'] . '" berhasil dibuat dengan ' . count($validated['questions']) . ' soal.');
+    }
+
+    /**
+     * Delete an entire question bank (all questions in that bank_group).
+     * Refuse if the bank is still referenced by any solo_raid event.
+     */
+    public function destroyBank(int $bank)
+    {
+        $exists = QuestionBank::where('bank_group', $bank)->exists();
+        if (!$exists) {
+            return back()->with('error', 'Bank soal tidak ditemukan.');
+        }
+
+        $bankName = QuestionBank::where('bank_group', $bank)->value('bank_name') ?: ('Bank #' . $bank);
+
+        // Cek apakah ada event yang masih memakai bank ini
+        $usedBy = \App\Models\SoloRaid::where('question_bank_id', $bank)
+            ->select('id', 'nama')
+            ->limit(5)
+            ->get();
+
+        if ($usedBy->isNotEmpty()) {
+            $names = $usedBy->pluck('nama')->implode(', ');
+            return back()->with('error',
+                "Bank soal \"$bankName\" masih dipakai oleh event: $names. Hapus atau ubah event tersebut terlebih dulu."
+            );
+        }
+
+        $deleted = DB::transaction(function () use ($bank) {
+            return QuestionBank::where('bank_group', $bank)->delete();
+        });
+
+        return redirect()->route('admin.questions.index')
+            ->with('success', "Bank soal \"$bankName\" beserta $deleted soal di dalamnya berhasil dihapus.");
+    }
+
+    /**
+     * Download CSV template for bulk upload (Excel-compatible).
      */
     public function downloadTemplate()
     {
-        $template = [
-            [
-                'level' => 'Easy',
-                'soal_text' => 'Contoh Pertanyaan Pilihan Ganda?',
-                'tipe' => 'multiple_choice',
-                'pilihan_a' => 'Opsi A',
-                'pilihan_b' => 'Opsi B',
-                'pilihan_c' => 'Opsi C',
-                'pilihan_d' => 'Opsi D',
-                'jawaban_benar' => 'Opsi A',
-                'bobot_xp' => 10
-            ],
-            [
-                'level' => 'Medium',
-                'soal_text' => 'Contoh Pertanyaan Isian Singkat?',
-                'tipe' => 'short_answer',
-                'pilihan_a' => null,
-                'pilihan_b' => null,
-                'pilihan_c' => null,
-                'pilihan_d' => null,
-                'jawaban_benar' => 'Jawaban Singkat',
-                'bobot_xp' => 20
-            ]
+        $headers = [
+            'level', 'soal_text', 'tipe',
+            'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d',
+            'jawaban_benar', 'bobot_xp',
         ];
 
-        return response()->json($template, 200, [
-            'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="question_bank_template.json"',
+        $samples = [
+            ['Easy', 'Apa kepanjangan dari PHP?', 'multiple_choice', 'PHP Hypertext Preprocessor', 'Personal Home Page', 'Private Hosting Page', 'Pre Hyper Process', 'PHP Hypertext Preprocessor', 10],
+            ['Medium', 'Tag pembuka skrip PHP yang benar adalah?', 'short_answer', '', '', '', '', '<?php', 15],
+            ['Hard', 'Manakah yang termasuk superglobal di PHP?', 'multiple_choice', '$_VARS', '$_SERVER', '$_GLOBAL', '$_THIS', '$_SERVER', 20],
+        ];
+
+        $callback = function () use ($headers, $samples) {
+            $out = fopen('php://output', 'w');
+            // BOM agar Excel mengenali UTF-8
+            fputs($out, "\xEF\xBB\xBF");
+            fputcsv($out, $headers);
+            foreach ($samples as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+        };
+
+        return response()->streamDownload($callback, 'question_bank_template.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 
     /**
-     * Handle bulk upload of questions via JSON.
+     * Handle bulk upload of questions via CSV (one upload = one bank).
+     *
+     * Modes:
+     *  - target_bank = 'new'  → buat bank baru (butuh new_bank_name)
+     *  - target_bank = <id>   → tambahkan soal ke bank yang sudah ada
      */
     public function bulkUpload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:json,txt',
+            'file'           => 'required|file|mimes:csv,txt|max:5120',
+            'target_bank'    => 'required|string',
+            'new_bank_name'  => 'nullable|required_if:target_bank,new|string|max:255',
+            'new_bank_icon'  => 'nullable|string|max:50',
+            'new_bank_description' => 'nullable|string',
         ]);
 
         try {
-            $jsonContent = file_get_contents($request->file('file')->getRealPath());
-            $data = json_decode($jsonContent, true);
+            $rows = $this->parseCsv($request->file('file')->getRealPath());
 
-            if (!is_array($data)) {
-                return back()->withErrors(['file' => 'Invalid JSON format.']);
+            if (empty($rows)) {
+                return back()->withErrors(['file' => 'File CSV kosong atau tidak valid.']);
             }
 
-            // Check if new format with bank metadata or old format (array of questions)
-            $bankName = $data['bank_name'] ?? null;
-            $bankIcon = $data['bank_icon'] ?? 'quiz';
-            $bankDescription = $data['bank_description'] ?? '';
-            $questions = $data['questions'] ?? $data; // Support both formats
+            // Tentukan bank tujuan dan metadata
+            if ($request->input('target_bank') === 'new') {
+                $bankName = trim((string) $request->input('new_bank_name'));
 
-            // Determine bank_group - search in DATABASE instead of config
-            $targetBankGroup = null;
-            $isNewBank = false;
-
-            if ($bankName) {
-                // Search for existing bank by name in database
-                $existingBank = QuestionBank::where('bank_name', 'LIKE', $bankName)
-                    ->first();
-
-                if ($existingBank) {
-                    $targetBankGroup = $existingBank->bank_group;
-                    // Use existing metadata
-                    $bankIcon = $existingBank->bank_icon;
-                    $bankDescription = $existingBank->bank_description;
-                    $isNewBank = false;
-                } else {
-                    // Create new bank_group
-                    $maxBankGroup = QuestionBank::max('bank_group') ?? 0;
-                    $targetBankGroup = $maxBankGroup + 1;
-                    $isNewBank = true;
+                $exists = QuestionBank::whereRaw('LOWER(bank_name) = ?', [strtolower($bankName)])->exists();
+                if ($exists) {
+                    return back()->withErrors(['new_bank_name' => 'Nama bank soal sudah dipakai. Gunakan nama lain.']);
                 }
+
+                $targetBankGroup = ((int) (QuestionBank::max('bank_group') ?? 0)) + 1;
+                $bankIcon        = $request->input('new_bank_icon') ?: 'quiz';
+                $bankDescription = $request->input('new_bank_description');
+                $isNewBank = true;
             } else {
-                // Old format without bank_name, use Bank 1 as default
-                $existingBank = QuestionBank::where('bank_group', 1)->first();
-                $targetBankGroup = 1;
-                $bankName = $existingBank->bank_name ?? 'Default Bank';
-                $bankIcon = $existingBank->bank_icon ?? 'quiz';
-                $bankDescription = $existingBank->bank_description ?? '';
+                $targetBankGroup = (int) $request->input('target_bank');
+                $existingBank = QuestionBank::where('bank_group', $targetBankGroup)->first();
+
+                if (!$existingBank) {
+                    return back()->withErrors(['target_bank' => 'Bank soal tujuan tidak ditemukan.']);
+                }
+                $bankName        = $existingBank->bank_name;
+                $bankIcon        = $existingBank->bank_icon ?: 'quiz';
+                $bankDescription = $existingBank->bank_description;
                 $isNewBank = false;
             }
 
-            // Insert questions with metadata
-            $count = 0;
-            foreach ($questions as $q) {
-                // Basic validation
-                if (empty($q['level']) || empty($q['soal_text']) || empty($q['tipe']) || empty($q['jawaban_benar'])) {
-                    continue;
+            $count   = 0;
+            $skipped = [];
+
+            DB::transaction(function () use ($rows, $targetBankGroup, $bankName, $bankIcon, $bankDescription, &$count, &$skipped) {
+                foreach ($rows as $i => $row) {
+                    $level         = trim((string) ($row['level'] ?? ''));
+                    $soal          = trim((string) ($row['soal_text'] ?? ''));
+                    $tipe          = trim((string) ($row['tipe'] ?? ''));
+                    $jawabanBenar  = trim((string) ($row['jawaban_benar'] ?? ''));
+
+                    if ($soal === '' || $jawabanBenar === '') {
+                        $skipped[] = ($i + 2); // +2: 1 header row + 1 indexed
+                        continue;
+                    }
+
+                    if (!in_array($level, ['Easy', 'Medium', 'Hard'], true)) {
+                        $skipped[] = ($i + 2);
+                        continue;
+                    }
+
+                    if (!in_array($tipe, ['multiple_choice', 'short_answer'], true)) {
+                        $skipped[] = ($i + 2);
+                        continue;
+                    }
+
+                    QuestionBank::create([
+                        'bank_group'       => $targetBankGroup,
+                        'bank_name'        => $bankName,
+                        'bank_icon'        => $bankIcon,
+                        'bank_description' => $bankDescription,
+                        'level'            => $level,
+                        'soal_text'        => $soal,
+                        'tipe'             => $tipe,
+                        'pilihan_a'        => trim((string) ($row['pilihan_a'] ?? '')) ?: null,
+                        'pilihan_b'        => trim((string) ($row['pilihan_b'] ?? '')) ?: null,
+                        'pilihan_c'        => trim((string) ($row['pilihan_c'] ?? '')) ?: null,
+                        'pilihan_d'        => trim((string) ($row['pilihan_d'] ?? '')) ?: null,
+                        'jawaban_benar'    => $jawabanBenar,
+                        'bobot_xp'         => (int) ($row['bobot_xp'] ?? match ($level) {
+                            'Easy' => 10, 'Medium' => 15, 'Hard' => 20, default => 10,
+                        }),
+                    ]);
+                    $count++;
                 }
+            });
 
-                QuestionBank::create([
-                    'bank_group' => $targetBankGroup,
-                    'bank_name' => $bankName,
-                    'bank_icon' => $bankIcon,
-                    'bank_description' => $bankDescription,
-                    'level' => $q['level'],
-                    'soal_text' => $q['soal_text'],
-                    'tipe' => $q['tipe'],
-                    'pilihan_a' => $q['pilihan_a'] ?? null,
-                    'pilihan_b' => $q['pilihan_b'] ?? null,
-                    'pilihan_c' => $q['pilihan_c'] ?? null,
-                    'pilihan_d' => $q['pilihan_d'] ?? null,
-                    'jawaban_benar' => $q['jawaban_benar'],
-                    'bobot_xp' => $q['bobot_xp'] ?? match($q['level']) {
-                        'Easy' => 10,
-                        'Medium' => 15,
-                        'Hard' => 20,
-                        default => 10
-                    },
-                ]);
-                $count++;
+            $message = "Berhasil mengimpor $count soal";
+            if ($isNewBank) {
+                $message .= " ke bank baru \"$bankName\".";
+            } else {
+                $message .= " ke bank \"$bankName\".";
             }
-
-            // Build success message
-            $message = "Successfully imported $count questions";
-            if ($isNewBank && $bankName) {
-                $message .= " to NEW bank: \"$bankName\" (Bank Group $targetBankGroup)";
-                $message .= "\n\n✅ Bank akan otomatis muncul di tabs! Refresh halaman untuk melihat.";
-            } elseif ($bankName) {
-                $message .= " to existing bank: \"$bankName\"";
+            if (!empty($skipped)) {
+                $message .= ' Baris dilewati (data tidak valid): ' . implode(', ', $skipped) . '.';
             }
 
             return redirect()->route('admin.questions.index', ['bank' => $targetBankGroup])
                 ->with('success', $message);
 
-        } catch (\Exception $e) {
-            return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
+        } catch (\Throwable $e) {
+            return back()->withErrors(['file' => 'Gagal memproses file: ' . $e->getMessage()]);
         }
+    }
+
+    /**
+     * Parse a CSV file (UTF-8, optional BOM) into associative rows keyed by header.
+     */
+    private function parseCsv(string $path): array
+    {
+        if (!is_file($path)) {
+            return [];
+        }
+        $handle = fopen($path, 'r');
+        if (!$handle) return [];
+
+        // Skip UTF-8 BOM if present
+        $bom = fread($handle, 3);
+        if ($bom !== "\xEF\xBB\xBF") {
+            rewind($handle);
+        }
+
+        $headers = fgetcsv($handle);
+        if (!$headers) {
+            fclose($handle);
+            return [];
+        }
+        $headers = array_map(fn ($h) => strtolower(trim((string) $h)), $headers);
+
+        $rows = [];
+        while (($data = fgetcsv($handle)) !== false) {
+            // Lewati baris kosong
+            if (count($data) === 1 && trim((string) $data[0]) === '') {
+                continue;
+            }
+            // Pad / truncate
+            $data = array_pad($data, count($headers), null);
+            $data = array_slice($data, 0, count($headers));
+            $rows[] = array_combine($headers, $data);
+        }
+        fclose($handle);
+        return $rows;
     }
 }

@@ -23,7 +23,7 @@
                                         ->get();
                                 @endphp
                                 @foreach($availableBanks as $bank)
-                                    <option value="{{ $bank->bank_group }}" {{ old('bank_group', 1) == $bank->bank_group ? 'selected' : '' }}>
+                                    <option value="{{ $bank->bank_group }}" {{ old('bank_group', request('bank', 1)) == $bank->bank_group ? 'selected' : '' }}>
                                         {{ $bank->bank_name }}
                                     </option>
                                 @endforeach

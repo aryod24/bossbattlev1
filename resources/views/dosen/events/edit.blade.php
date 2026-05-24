@@ -75,6 +75,7 @@
                             <div>
                                 <label for="section_order" class="block text-sm font-medium text-text-muted">Order in Section</label>
                                 <input type="number" name="section_order" id="section_order" value="{{ $soloRaid->section_order }}" min="1" max="6" class="mt-1 block w-full rounded-md bg-background-dark border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary" required>
+                                <p class="text-xs text-text-muted mt-1">Urutan di dalam section. Konvensi: <strong>1</strong> = Materi, <strong>2</strong> = Boss.</p>
                             </div>
                             <div>
                                 <label for="status" class="block text-sm font-medium text-text-muted">Status</label>

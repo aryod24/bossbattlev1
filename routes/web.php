@@ -98,6 +98,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     
     Route::get('questions/template', [\App\Http\Controllers\Admin\QuestionBankController::class, 'downloadTemplate'])->name('questions.template');
     Route::post('questions/bulk-upload', [\App\Http\Controllers\Admin\QuestionBankController::class, 'bulkUpload'])->name('questions.bulk-upload');
+    Route::get('question-banks/create', [\App\Http\Controllers\Admin\QuestionBankController::class, 'createBank'])->name('questions.banks.create');
+    Route::post('question-banks', [\App\Http\Controllers\Admin\QuestionBankController::class, 'storeBank'])->name('questions.banks.store');
+    Route::delete('question-banks/{bank}', [\App\Http\Controllers\Admin\QuestionBankController::class, 'destroyBank'])->name('questions.banks.destroy');
     Route::resource('questions', \App\Http\Controllers\Admin\QuestionBankController::class);
 
     // Session Monitor
@@ -140,6 +143,9 @@ Route::middleware(['auth', 'verified', 'role:dosen'])->prefix('dosen')->name('do
     // Question Bank Management
     Route::get('questions/template', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'downloadTemplate'])->name('questions.template');
     Route::post('questions/bulk-upload', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'bulkUpload'])->name('questions.bulk-upload');
+    Route::get('question-banks/create', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'createBank'])->name('questions.banks.create');
+    Route::post('question-banks', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'storeBank'])->name('questions.banks.store');
+    Route::delete('question-banks/{bank}', [\App\Http\Controllers\Dosen\QuestionBankController::class, 'destroyBank'])->name('questions.banks.destroy');
     Route::resource('questions', \App\Http\Controllers\Dosen\QuestionBankController::class);
 });
 

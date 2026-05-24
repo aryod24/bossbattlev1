@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SessionAnswer;
 use App\Models\SessionSolo;
-use App\Models\User;
 use App\Models\UserBadge;
 use App\Services\PreTestService;
 use App\Services\SoloBattleService;
@@ -241,12 +240,8 @@ class ReportController extends Controller
 
             // Gamifikasi
             'xp_diperoleh',
-            'xp_total_sebelum',
-            'xp_total_sesudah',
             'badge_diperoleh',
             'jumlah_badge_total',
-            'peringkat_leaderboard_sebelum',
-            'peringkat_leaderboard_sesudah',
 
             // NASA-TLX placeholder
             'TLX_MD',
@@ -308,8 +303,6 @@ class ReportController extends Controller
         $waktuTersisa = $isSolo ? $this->resolveSoloTimeRemaining($session) : null;
 
         $xpDiperoleh = (int) ($session->xp_diperoleh ?? 0);
-        $xpBefore    = $this->cumulativeXpBefore($user->id, $session->waktu_selesai, $session);
-        $xpAfter     = $xpBefore + $xpDiperoleh;
 
         $badgesInSession = $this->badgesUnlockedInWindow(
             $user->id,
@@ -319,9 +312,6 @@ class ReportController extends Controller
         $totalBadges = UserBadge::where('user_id', $user->id)
             ->where('unlock_date', '<=', $session->waktu_selesai)
             ->count();
-
-        $rankBefore = $this->rankAt($user, $xpBefore);
-        $rankAfter  = $this->rankAt($user, $xpAfter);
 
         // level_adaptif diturunkan dari pretest_score — stabil walau current_section
         // sudah naik karena menang boss. Untuk responden tanpa pretest_score,
@@ -357,12 +347,8 @@ class ReportController extends Controller
             $status,
 
             $xpDiperoleh,
-            $xpBefore,
-            $xpAfter,
             $badgesInSession === '' ? '-' : $badgesInSession,
             $totalBadges,
-            $rankBefore ?? '-',
-            $rankAfter ?? '-',
 
             // NASA-TLX placeholders
             '', '', '', '', '', '', '',
@@ -475,44 +461,6 @@ class ReportController extends Controller
         $deadline  = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
         $remaining = $deadline->getTimestamp() - $session->waktu_selesai->getTimestamp();
         return max(0, (int) $remaining);
-    }
-
-    /**
-     * Total XP yang sudah dikumpulkan user sebelum sesi ini selesai.
-     * Tidak termasuk pre-test (XP-nya 0) dan tidak termasuk sesi current itu sendiri.
-     */
-    private function cumulativeXpBefore(int $userId, $beforeTime, $current): int
-    {
-        if (!$beforeTime) {
-            return 0;
-        }
-
-        $soloXp = SessionSolo::where('user_id', $userId)
-            ->whereNotNull('waktu_selesai')
-            ->where('waktu_selesai', '<', $beforeTime)
-            ->where(function ($q) {
-                $q->whereNull('is_pretest')->orWhere('is_pretest', false);
-            })
-            ->when($current instanceof SessionSolo, fn ($q) => $q->where('id', '!=', $current->id))
-            ->sum('xp_diperoleh');
-
-        return (int) $soloXp;
-    }
-
-    private function rankAt(User $user, int $xpSnapshot): ?int
-    {
-        if (!$user->kelas) {
-            return null;
-        }
-
-        $higher = User::whereRoleName('student')
-            ->where('kelas', $user->kelas)
-            ->whereNotIn('email', $this->excludedEmails)
-            ->where('id', '!=', $user->id)
-            ->where('total_xp', '>', $xpSnapshot)
-            ->count();
-
-        return $higher + 1;
     }
 
     private function badgesUnlockedInWindow(int $userId, $start, $end): string

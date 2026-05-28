@@ -36,7 +36,7 @@
                             <span class="material-symbols-outlined" style="font-size:14px">menu_book</span> Materi Event
                         </span>
                     @endif
-                    <span class="text-xs text-text-muted">Section: {{ $soloRaid->section }} · Order #{{ $soloRaid->section_order }}</span>
+                    <span class="text-xs text-text-muted">Section: {{ $soloRaid->section }}</span>
                 </div>
                 <h1 class="text-3xl font-black text-text-primary">{{ $soloRaid->nama }}</h1>
                 <p class="text-text-muted mt-1">Configure event details{{ $soloRaid->type === 'learning' ? ', nodes,' : '' }} and settings.</p>
@@ -48,6 +48,22 @@
                 @csrf
                 @method('PATCH')
 
+                @if($errors->any())
+                    <div class="mb-6 rounded-md bg-error/10 border border-error/30 p-4">
+                        <div class="flex items-start gap-2 mb-2">
+                            <span class="material-symbols-outlined text-error">error</span>
+                            <div>
+                                <p class="text-sm font-bold text-error">Form belum bisa disimpan:</p>
+                            </div>
+                        </div>
+                        <ul class="text-sm text-error space-y-1 ml-8 list-disc">
+                            @foreach($errors->all() as $msg)
+                                <li>{{ $msg }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <!-- Basic Info -->
                 <div class="mb-6">
                     <h3 class="text-lg font-medium text-text-primary mb-4">📋 Basic Information</h3>
@@ -56,7 +72,10 @@
                             <label for="nama" class="block text-sm font-medium text-text-muted">Raid Name</label>
                             <input type="text" name="nama" id="nama" value="{{ $soloRaid->nama }}" class="mt-1 block w-full rounded-md bg-background-dark border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary" required>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="rounded-md bg-primary/5 border border-primary/20 px-3 py-2 text-xs text-text-muted">
+                            <strong class="text-primary">Aturan slot section:</strong> setiap section hanya boleh berisi 1 event Materi dan 1 event Boss Battle. Mengubah Section/Tipe akan ditolak bila kombinasi tujuan sudah dipakai event lain.
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="type" class="block text-sm font-medium text-text-muted">Event Type</label>
                                 <select name="type" id="type" x-model="eventType" class="mt-1 block w-full rounded-md bg-background-dark border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary">
@@ -71,11 +90,6 @@
                                     <option value="Medium" {{ $soloRaid->section === 'Medium' ? 'selected' : '' }}>Medium</option>
                                     <option value="Hard" {{ $soloRaid->section === 'Hard' ? 'selected' : '' }}>Hard</option>
                                 </select>
-                            </div>
-                            <div>
-                                <label for="section_order" class="block text-sm font-medium text-text-muted">Order in Section</label>
-                                <input type="number" name="section_order" id="section_order" value="{{ $soloRaid->section_order }}" min="1" max="6" class="mt-1 block w-full rounded-md bg-background-dark border-border text-text-primary shadow-sm focus:border-primary focus:ring-primary" required>
-                                <p class="text-xs text-text-muted mt-1">Urutan di dalam section. Konvensi: <strong>1</strong> = Materi, <strong>2</strong> = Boss.</p>
                             </div>
                             <div>
                                 <label for="status" class="block text-sm font-medium text-text-muted">Status</label>

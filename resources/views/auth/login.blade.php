@@ -273,7 +273,7 @@
 
                         <p class="font-body mt-8 text-center text-sm text-soft">
                             Belum punya akun?
-                            <span class="font-headline font-medium text-cyan-glow">Hubungi Admin</span>
+                            <a href="{{ route('register') }}" class="font-headline font-medium text-cyan-glow hover:underline">Daftar</a>
                         </p>
                     </div>
                 </div>

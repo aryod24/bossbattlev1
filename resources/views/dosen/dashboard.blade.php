@@ -99,7 +99,7 @@
                                     <div>
                                         <h4 class="font-bold text-text-primary">{{ $event->nama }}</h4>
                                         <p class="text-xs text-text-muted">
-                                            Section {{ $event->section }} · #{{ $event->section_order }}
+                                            Section {{ $event->section }} · {{ $event->type === 'boss' ? 'Boss' : 'Materi' }}
                                             · {{ $event->tanggal_mulai ? \Carbon\Carbon::parse($event->tanggal_mulai)->format('d M Y') : '-' }}
                                             @if($event->creator)
                                                 · oleh {{ $event->creator->nama }}

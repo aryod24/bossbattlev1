@@ -87,98 +87,120 @@
                             Belum ada event di section {{ $section }}. Klik <strong>Buat Event Baru</strong> untuk menambahkan.
                         </div>
                     @else
+                        @php
+                            // Inline grid template — ditulis sekali, dipakai di header & setiap baris.
+                            // Identik di semua section ⇒ kolom otomatis sejajar antar tabel section.
+                            $gridTemplate = 'grid-template-columns: minmax(0,1fr) 130px 200px 110px 220px;';
+                        @endphp
                         <div class="overflow-x-auto">
-                            <table class="w-full min-w-[900px] text-left">
-                                <thead class="bg-surface-dark/50 border-b border-border">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-bold text-text-muted uppercase tracking-wider w-20">Urutan</th>
-                                        <th class="px-4 py-3 text-xs font-bold text-text-muted uppercase tracking-wider">Nama Event</th>
-                                        <th class="px-4 py-3 text-xs font-bold text-text-muted uppercase tracking-wider">Tipe</th>
-                                        <th class="px-4 py-3 text-xs font-bold text-text-muted uppercase tracking-wider">Tanggal</th>
-                                        <th class="px-4 py-3 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
-                                        <th class="px-4 py-3 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($sectionRaids as $raid)
-                                        <tr class="border-b border-border last:border-b-0 hover:bg-primary/10 event-row"
-                                            data-nama="{{ strtolower($raid->nama) }}"
-                                            data-type="{{ $raid->type }}"
-                                            data-status="{{ $raid->status }}">
-                                            <td class="px-6 py-4">
-                                                <div class="flex items-center justify-center size-9 rounded-md bg-{{ $sectionColor }}-500/10 text-{{ $sectionColor }}-400 font-mono font-bold">
-                                                    #{{ $raid->section_order }}
-                                                </div>
-                                            </td>
-                                            <td class="px-4 py-4 text-sm font-medium">
-                                                {{ $raid->nama }}
-                                                <p class="text-xs text-text-muted font-normal mt-0.5">
-                                                    Bank: {{ $banksByGroup[$raid->question_bank_id] ?? ('Bank #' . $raid->question_bank_id) }}
-                                                </p>
-                                            </td>
-                                            <td class="px-4 py-4 text-sm">
-                                                @if($raid->type === 'boss')
-                                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
-                                                        <span class="material-symbols-outlined" style="font-size:13px">skull</span> Boss
+                            <div class="min-w-[1000px]">
+                                {{-- Grid header --}}
+                                <div class="grid items-center gap-4 px-4 py-3 bg-surface-dark/50 border-b border-border text-xs font-bold text-text-muted uppercase tracking-wider"
+                                     style="{{ $gridTemplate }}">
+                                    <div>Nama Event</div>
+                                    <div>Tipe</div>
+                                    <div>Tanggal</div>
+                                    <div>Status</div>
+                                    <div class="text-right">Aksi</div>
+                                </div>
+
+                                {{-- Grid rows --}}
+                                @foreach($sectionRaids as $raid)
+                                    <div class="grid items-center gap-4 px-4 py-4 border-b border-border last:border-b-0 hover:bg-primary/10 event-row text-sm"
+                                         data-nama="{{ strtolower($raid->nama) }}"
+                                         data-type="{{ $raid->type }}"
+                                         data-status="{{ $raid->status }}"
+                                         style="{{ $gridTemplate }}">
+                                        {{-- Nama Event (truncate-friendly) --}}
+                                        <div class="min-w-0">
+                                            <div class="font-medium truncate" title="{{ $raid->nama }}">{{ $raid->nama }}</div>
+                                            <p class="text-xs text-text-muted truncate"
+                                               title="{{ $banksByGroup[$raid->question_bank_id] ?? ('Bank #' . $raid->question_bank_id) }}">
+                                                Bank: {{ $banksByGroup[$raid->question_bank_id] ?? ('Bank #' . $raid->question_bank_id) }}
+                                            </p>
+                                        </div>
+
+                                        {{-- Tipe --}}
+                                        <div>
+                                            @if($raid->type === 'boss')
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                                                    <span class="material-symbols-outlined" style="font-size:13px">skull</span> Boss
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                                    <span class="material-symbols-outlined" style="font-size:13px">menu_book</span> Materi
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        {{-- Tanggal --}}
+                                        <div class="text-text-muted">
+                                            <div class="whitespace-nowrap">{{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y') }}</div>
+                                            <div class="text-xs whitespace-nowrap">→ {{ \Carbon\Carbon::parse($raid->tanggal_selesai)->format('d M Y') }}</div>
+                                        </div>
+
+                                        {{-- Status --}}
+                                        <div>
+                                            @if($raid->status === 'active')
+                                                <span class="relative inline-flex items-center rounded-md bg-status-red-bg px-2 py-1 text-xs font-medium text-status-red-text ring-1 ring-inset ring-red-500/20">
+                                                    <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                                     </span>
-                                                @else
-                                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                                                        <span class="material-symbols-outlined" style="font-size:13px">menu_book</span> Materi
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="px-4 py-4 text-sm text-text-muted">
-                                                {{ \Carbon\Carbon::parse($raid->tanggal_mulai)->format('d M Y') }}
-                                                <span class="text-xs">→ {{ \Carbon\Carbon::parse($raid->tanggal_selesai)->format('d M Y') }}</span>
-                                            </td>
-                                            <td class="px-4 py-4 text-sm">
-                                                @if($raid->status === 'active')
-                                                    <span class="relative inline-flex items-center rounded-md bg-status-red-bg px-2 py-1 text-xs font-medium text-status-red-text ring-1 ring-inset ring-red-500/20">
-                                                        <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                                                        </span>
-                                                        Active
-                                                    </span>
-                                                @elseif($raid->status === 'selesai')
-                                                    <span class="inline-flex items-center rounded-md bg-status-green-bg px-2 py-1 text-xs font-medium text-status-green-text ring-1 ring-inset ring-green-600/20">Selesai</span>
-                                                @else
-                                                    <span class="inline-flex items-center rounded-md bg-status-gray-bg px-2 py-1 text-xs font-medium text-status-gray-text ring-1 ring-inset ring-gray-500/20">Draft</span>
-                                                @endif
-                                            </td>
-                                            <td class="px-4 py-4 text-sm">
-                                                <div class="flex items-center justify-end gap-2">
-                                                    <a href="{{ route('admin.solo-raids.monitoring', $raid) }}" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20 text-primary" title="Monitoring">
-                                                        <span class="material-symbols-outlined text-base">monitoring</span>
-                                                    </a>
-                                                    <a href="{{ route('admin.solo-raids.edit', $raid) }}"
-                                                       class="flex items-center justify-center gap-1.5 h-8 px-3 rounded-md hover:bg-primary/20 text-xs font-semibold
-                                                              {{ $raid->type === 'boss' ? 'text-red-400 hover:text-red-300' : 'text-primary hover:text-primary' }}"
-                                                       title="{{ $raid->type === 'boss' ? 'Edit Boss Battle' : 'Edit Materi' }}">
-                                                        <span class="material-symbols-outlined text-sm">edit</span>
-                                                        Edit
-                                                    </a>
-                                                    <form action="{{ route('admin.solo-raids.duplicate', $raid) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        <button type="submit" class="flex items-center justify-center size-8 rounded-md hover:bg-primary/20" title="Duplicate" onclick="return confirm('Duplicate this raid?')">
-                                                            <span class="material-symbols-outlined text-base">content_copy</span>
-                                                        </button>
-                                                    </form>
-                                                    @if($raid->status !== 'active')
-                                                        <form action="{{ route('admin.solo-raids.destroy', $raid) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="flex items-center justify-center size-8 rounded-md hover:bg-error/20 text-error" title="Delete" onclick="return confirm('Are you sure?')">
-                                                                <span class="material-symbols-outlined text-base">delete</span>
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                                    Active
+                                                </span>
+                                            @elseif($raid->status === 'selesai')
+                                                <span class="inline-flex items-center rounded-md bg-status-green-bg px-2 py-1 text-xs font-medium text-status-green-text ring-1 ring-inset ring-green-600/20">Selesai</span>
+                                            @else
+                                                <span class="inline-flex items-center rounded-md bg-status-gray-bg px-2 py-1 text-xs font-medium text-status-gray-text ring-1 ring-inset ring-gray-500/20">Draft</span>
+                                            @endif
+                                        </div>
+
+                                        {{-- Aksi --}}
+                                        <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('admin.solo-raids.monitoring', $raid) }}"
+                                               class="flex items-center justify-center size-10 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
+                                               title="Monitoring">
+                                                <span class="material-symbols-outlined" style="font-size:22px">monitoring</span>
+                                            </a>
+                                            <a href="{{ route('admin.solo-raids.edit', $raid) }}"
+                                               class="flex items-center justify-center size-10 rounded-lg transition-colors
+                                                      {{ $raid->type === 'boss'
+                                                          ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400'
+                                                          : 'bg-primary/10 hover:bg-primary/20 text-primary' }}"
+                                               title="{{ $raid->type === 'boss' ? 'Edit Boss Battle' : 'Edit Materi' }}">
+                                                <span class="material-symbols-outlined" style="font-size:22px">edit</span>
+                                            </a>
+                                            <form action="{{ route('admin.solo-raids.duplicate', $raid) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="flex items-center justify-center size-10 rounded-lg bg-border/40 hover:bg-primary/20 hover:text-primary text-text-muted transition-colors"
+                                                        title="Duplicate ke section lain"
+                                                        onclick="return confirm('Duplicate event ini ke section lain yang masih kosong?')">
+                                                    <span class="material-symbols-outlined" style="font-size:22px">content_copy</span>
+                                                </button>
+                                            </form>
+                                            @if($raid->status !== 'active')
+                                                <form action="{{ route('admin.solo-raids.destroy', $raid) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            class="flex items-center justify-center size-10 rounded-lg bg-error/10 hover:bg-error/20 text-error transition-colors"
+                                                            title="Hapus event"
+                                                            onclick="return confirm('Yakin ingin menghapus event ini?')">
+                                                        <span class="material-symbols-outlined" style="font-size:22px">delete</span>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="flex items-center justify-center size-10 rounded-lg bg-border/20 text-border cursor-not-allowed"
+                                                      title="Event aktif tidak dapat dihapus. Ubah status ke Draft/Selesai dulu.">
+                                                    <span class="material-symbols-outlined opacity-40" style="font-size:22px">delete</span>
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>

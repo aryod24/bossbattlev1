@@ -52,7 +52,6 @@ class EventController extends Controller
             'question_bank_id' => 'required|integer',
             'type' => 'required|in:learning,boss',
             'section' => 'required|in:Easy,Medium,Hard',
-            'section_order' => 'required|integer|min:1|max:6',
             'status' => 'required|in:draft,active,selesai',
             // Dynamic nodes
             'nodes' => 'nullable|array|exclude_if:type,boss',
@@ -62,16 +61,21 @@ class EventController extends Controller
             'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
+        // Aturan slot section: setiap section hanya boleh berisi 1 Materi
+        // (type=learning) dan 1 Boss Battle (type=boss). section_order
+        // diturunkan dari type — TIDAK di-input user.
         $clash = SoloRaid::where('section', $validated['section'])
-            ->where('section_order', $validated['section_order'])
+            ->where('type', $validated['type'])
             ->first(['id', 'nama']);
         if ($clash) {
+            $typeLabel = $validated['type'] === 'boss' ? 'Boss Battle' : 'Materi';
             return back()->withInput()->withErrors([
-                'section_order' => "Slot Section {$validated['section']} urutan #{$validated['section_order']} sudah dipakai event \"{$clash->nama}\". Pilih urutan lain.",
+                'type' => "Section {$validated['section']} sudah memiliki event {$typeLabel} (\"{$clash->nama}\"). Hapus atau ubah event tersebut terlebih dahulu sebelum membuat baru.",
             ]);
         }
 
-        $validated['created_by'] = auth()->id();
+        $validated['created_by']    = auth()->id();
+        $validated['section_order'] = $validated['type'] === 'learning' ? 1 : 2;
 
         DB::transaction(function () use ($validated) {
             $nodes = $validated['nodes'] ?? [];
@@ -130,7 +134,6 @@ class EventController extends Controller
             'question_bank_id' => 'required|integer',
             'type' => 'required|in:learning,boss',
             'section' => 'required|in:Easy,Medium,Hard',
-            'section_order' => 'required|integer|min:1|max:6',
             'status' => 'required|in:draft,active,selesai',
             // Dynamic nodes
             'nodes' => 'nullable|array|exclude_if:type,boss',
@@ -141,15 +144,22 @@ class EventController extends Controller
             'nodes.*.order' => 'required_with:nodes|integer|min:1|max:6|exclude_if:type,boss',
         ]);
 
+        // Aturan slot section: setiap section hanya boleh berisi 1 Materi
+        // dan 1 Boss Battle. Cek (section + type), kecualikan raid ini sendiri.
         $clash = SoloRaid::where('section', $validated['section'])
-            ->where('section_order', $validated['section_order'])
+            ->where('type', $validated['type'])
             ->where('id', '!=', $soloRaid->id)
             ->first(['id', 'nama']);
         if ($clash) {
+            $typeLabel = $validated['type'] === 'boss' ? 'Boss Battle' : 'Materi';
             return back()->withInput()->withErrors([
-                'section_order' => "Slot Section {$validated['section']} urutan #{$validated['section_order']} sudah dipakai event \"{$clash->nama}\". Pilih urutan lain, atau ubah/hapus event tersebut dulu.",
+                'type' => "Section {$validated['section']} sudah memiliki event {$typeLabel} (\"{$clash->nama}\"). Pilih kombinasi Section/Tipe lain, atau ubah event yang bentrok terlebih dahulu.",
             ]);
         }
+
+        // section_order selalu derived dari type — bahkan kalau dosen
+        // mengubah type di form edit (learning ↔ boss).
+        $validated['section_order'] = $validated['type'] === 'learning' ? 1 : 2;
 
         DB::transaction(function () use ($validated, $soloRaid) {
             $nodes = $validated['nodes'] ?? [];
@@ -214,40 +224,42 @@ class EventController extends Controller
      */
     public function duplicate(SoloRaid $soloRaid)
     {
-        $newRaid = $soloRaid->replicate();
-        $newRaid->nama = $newRaid->nama . ' (Copy)';
-        $newRaid->status = 'draft';
-        $newRaid->created_by = auth()->id();
-
-        $used = SoloRaid::where('section', $newRaid->section)
-            ->pluck('section_order')
-            ->all();
-
-        $nextFree = null;
-        for ($i = 1; $i <= 6; $i++) {
-            if (!in_array($i, $used, true)) {
-                $nextFree = $i;
+        // Cari section LAIN (Easy/Medium/Hard) yang belum punya event dengan
+        // type yang sama. Aturan slot: 1 section = 1 Materi + 1 Boss.
+        $targetSection = null;
+        foreach (['Easy', 'Medium', 'Hard'] as $section) {
+            $taken = SoloRaid::where('section', $section)
+                ->where('type', $soloRaid->type)
+                ->exists();
+            if (!$taken) {
+                $targetSection = $section;
                 break;
             }
         }
 
-        if ($nextFree !== null) {
-            $newRaid->section_order = $nextFree;
-            $newRaid->save();
-
-            foreach ($soloRaid->nodes as $node) {
-                $newNode = $node->replicate();
-                $newNode->solo_raid_id = $newRaid->id;
-                $newNode->save();
-            }
-
-            return redirect()->route('dosen.events.edit', $newRaid->id)
-                ->with('success', "Event diduplikat ke Section {$newRaid->section} urutan #{$newRaid->section_order}. Sesuaikan detailnya bila perlu.");
+        if ($targetSection === null) {
+            $typeLabel = $soloRaid->type === 'boss' ? 'Boss Battle' : 'Materi';
+            return back()->with('error',
+                "Tidak ada section yang tersedia untuk duplicate. Setiap section sudah memiliki event {$typeLabel}."
+            );
         }
 
-        return back()->with('error',
-            "Section {$newRaid->section} sudah penuh (slot 1–6 terpakai). Hapus atau pindahkan salah satu event di section tersebut sebelum melakukan duplicate."
-        );
+        $newRaid = $soloRaid->replicate();
+        $newRaid->nama          = $newRaid->nama . ' (Copy)';
+        $newRaid->status        = 'draft';
+        $newRaid->created_by    = auth()->id();
+        $newRaid->section       = $targetSection;
+        $newRaid->section_order = $soloRaid->type === 'learning' ? 1 : 2;
+        $newRaid->save();
+
+        foreach ($soloRaid->nodes as $node) {
+            $newNode = $node->replicate();
+            $newNode->solo_raid_id = $newRaid->id;
+            $newNode->save();
+        }
+
+        return redirect()->route('dosen.events.edit', $newRaid->id)
+            ->with('success', "Event diduplikat ke Section {$targetSection}. Sesuaikan detailnya bila perlu.");
     }
 
     /**

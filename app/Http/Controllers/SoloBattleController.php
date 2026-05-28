@@ -51,6 +51,8 @@ class SoloBattleController extends Controller
             return redirect()->route('solo.index')->with('error', 'No active battle found. Please start a level.');
         }
 
+        // Catatan: kunci jawaban (`jawaban_benar`) TIDAK boleh dikirim ke
+        // client. Validasi jawaban dilakukan server-side di SoloBattleService.
         $questions = $session->answers()->with('question')->orderBy('urutan_soal')->get()->map(function($answer) {
             return [
                 'id' => $answer->question->id,
@@ -62,22 +64,21 @@ class SoloBattleController extends Controller
                 'pilihan_d' => $answer->question->pilihan_d,
                 'urutan' => $answer->urutan_soal,
                 'is_answered' => $answer->jawaban_user !== null,
-                'jawaban_benar' => $answer->question->jawaban_benar, // For testing purposes
             ];
         });
 
         $config = \App\Services\SoloBattleService::LEVEL_CONFIG[$session->level] ?? \App\Services\SoloBattleService::LEVEL_CONFIG['Easy'];
         $durationSeconds = $config['timer_minutes'] * 60;
-        
-        // Calculate absolute deadline
+
+        // Calculate absolute deadline. Auto-finalisasi sesi expired sudah
+        // ditangani oleh middleware `finish.expired` + cron — di sini
+        // cukup cek hasilnya: kalau session sudah ditutup, redirect.
         $deadline = $session->waktu_mulai->addSeconds($durationSeconds);
-        
-        // Check if expired
-        if (now()->greaterThan($deadline)) {
-            $result = $this->service->finishSession($session->id, $deadline);
-            return redirect()->route('solo.result', ['session' => $session->id])->with('battle_result', $result);
+
+        if ($session->waktu_selesai) {
+            return redirect()->route('solo.result', ['session' => $session->id]);
         }
-        
+
         // For fallback/initial display (optional, but good for SSR)
         $timeRemaining = max(0, now()->diffInSeconds($deadline, false));
 
@@ -113,23 +114,31 @@ class SoloBattleController extends Controller
         if ($session->user_id !== auth()->id()) {
             abort(403);
         }
-        
+
         $battleResult = session('battle_result');
-        
-        // Force finish if not already finished (e.g. user manually navigated here)
+
+        // Sesi yang masih aktif (belum di-finish oleh middleware/cron/endpoint
+        // finish) berarti user belum waktunya melihat halaman result. Daripada
+        // diam-diam memfinalisasi di GET, balikkan ke battle dan biarkan flow
+        // normal yang menutup sesi.
         if (!$session->waktu_selesai) {
-            $battleResult = $this->service->finishSession($session->id);
-            $session->refresh();
+            return redirect()->route('solo.battle', [
+                'soloRaid' => $session->solo_raid_id,
+                'session'  => $session->id,
+            ]);
         }
-        
+
         $session->load('soloRaid');
-        $bossName = $session->soloRaid->{'boss_'.strtolower($session->level).'_name'};
-        
+
+        // Gunakan helper bossName() — kolom `boss_<level>_name` sudah di-drop
+        // dari skema, akses langsung akan mengembalikan null.
+        $bossName = $session->soloRaid?->bossName($session->level) ?? 'Boss';
+
         // Cache badges untuk 1 jam
         $allBadges = \Illuminate\Support\Facades\Cache::remember('badges_all_keyed', 3600, function () {
             return \App\Models\Badge::all()->keyBy('id');
         });
-        
+
         return view('solo.result', compact('session', 'bossName', 'allBadges', 'battleResult'));
     }
 

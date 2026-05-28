@@ -290,102 +290,108 @@ class SoloBattleService
 
     public function finishSession($sessionId, $forcedEndTime = null)
     {
-        $session = SessionSolo::with('user', 'soloRaid')->findOrFail($sessionId);
-        
-        if ($session->waktu_selesai) {
-            return $session; // Already finished
-        }
+        // Bungkus dalam transaction + row lock supaya cron, middleware
+        // FinishExpiredUserSessions, dan endpoint `finish` tidak saling
+        // melakukan finalisasi ganda untuk session yang sama.
+        return DB::transaction(function () use ($sessionId, $forcedEndTime) {
+            $session = SessionSolo::with('user', 'soloRaid')
+                ->lockForUpdate()
+                ->findOrFail($sessionId);
 
-        // Skip normal flow for pre-test sessions
-        if ($session->is_pretest) {
-            return $session;
-        }
-
-        // 1. Calculate duration & Validate End Time
-        $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
-        $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
-        
-        $endTime = $forcedEndTime ?? now();
-        
-        // Cap at deadline if exceeded
-        if ($endTime->greaterThan($deadline)) {
-            $endTime = $deadline;
-        }
-
-        $session->waktu_selesai = $endTime;
-        $session->durasi_detik = $session->waktu_mulai->diffInSeconds($session->waktu_selesai);
-
-        // Recalculate jumlah_benar from answers (in case it wasn't incremented properly)
-        $correctCount = SessionAnswer::where('session_id', $session->id)
-            ->where('session_type', 'solo')
-            ->where('is_correct', true)
-            ->count();
-        
-        if ($correctCount > 0 && $session->jumlah_benar === 0) {
-            $session->jumlah_benar = $correctCount;
-        }
-
-        // 2. Calculate final score (percentage)
-        $session->skor_akhir = $session->jumlah_soal > 0 
-            ? ($session->jumlah_benar / $session->jumlah_soal) * 100 
-            : 0;
-
-        // 3. Determine if boss defeated / quiz passed
-        $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
-        $minDamage = $config['min_correct'];
-
-        $isLearning = $session->soloRaid && $session->soloRaid->type === 'learning';
-
-        // WIN condition:
-        //  - Boss mode: jawaban benar >= threshold (atau perfect score) DAN player masih hidup.
-        //  - Learning mode: jawaban benar >= threshold (atau perfect score). Tidak ada HP player.
-        if ($isLearning) {
-            $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100);
-        } else {
-            $isPlayerAlive = $session->player_hp_akhir > 0;
-            $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100) && $isPlayerAlive;
-        }
-
-        // 4. Calculate XP using XpService
-        $finalXP = $this->xpService->calculateSessionXP($session);
-        $session->xp_diperoleh = $finalXP;
-
-        $session->save();
-
-        // 5. Update user XP & Check Level Up (only if XP earned)
-        $levelUpResult = $finalXP > 0 
-            ? $this->xpService->addXP($session->user, $finalXP)
-            : ['leveled_up' => false];
-
-        // 6. Check badges (only for boss-type raids, not latihan soal)
-        $newBadges = [];
-        if ($session->soloRaid && $session->soloRaid->type === 'boss') {
-            $newBadges = $this->badgeService->checkAll($session->user, $session);
-        }
-
-        // 7. Track event progress (Adaptive Learning)
-        $sectionUpgrade = null;
-        if ($session->soloRaid && $session->boss_kalah) {
-            $this->trackEventProgress($session);
-            
-            // If boss battle won, upgrade section
-            if ($session->soloRaid->isBoss()) {
-                $sectionUpgrade = $this->upgradeSectionIfBossDefeated($session);
+            if ($session->waktu_selesai) {
+                return $session; // Already finished
             }
-        }
 
-        return [
-            'pemenang' => $session->boss_kalah ? 'Player' : 'Boss',
-            'boss_kalah' => $session->boss_kalah,
-            'skor_akhir' => $session->skor_akhir,
-            'jumlah_benar' => $session->jumlah_benar,
-            'jumlah_soal' => $session->jumlah_soal,
-            'xp_diperoleh' => $finalXP,
-            'durasi' => gmdate("H:i:s", $session->durasi_detik),
-            'level_up' => $levelUpResult,
-            'new_badges' => $newBadges,
-            'section_upgrade' => $sectionUpgrade,
-        ];
+            // Skip normal flow for pre-test sessions
+            if ($session->is_pretest) {
+                return $session;
+            }
+
+            // 1. Calculate duration & Validate End Time
+            $config = self::LEVEL_CONFIG[$session->level] ?? self::LEVEL_CONFIG['Easy'];
+            $deadline = $session->waktu_mulai->copy()->addMinutes($config['timer_minutes']);
+
+            $endTime = $forcedEndTime ?? now();
+
+            // Cap at deadline if exceeded
+            if ($endTime->greaterThan($deadline)) {
+                $endTime = $deadline;
+            }
+
+            $session->waktu_selesai = $endTime;
+            $session->durasi_detik = $session->waktu_mulai->diffInSeconds($session->waktu_selesai);
+
+            // Recalculate jumlah_benar from answers (in case it wasn't incremented properly)
+            $correctCount = SessionAnswer::where('session_id', $session->id)
+                ->where('session_type', 'solo')
+                ->where('is_correct', true)
+                ->count();
+
+            if ($correctCount > 0 && $session->jumlah_benar === 0) {
+                $session->jumlah_benar = $correctCount;
+            }
+
+            // 2. Calculate final score (percentage)
+            $session->skor_akhir = $session->jumlah_soal > 0
+                ? ($session->jumlah_benar / $session->jumlah_soal) * 100
+                : 0;
+
+            // 3. Determine if boss defeated / quiz passed
+            $minDamage = $config['min_correct'];
+
+            $isLearning = $session->soloRaid && $session->soloRaid->type === 'learning';
+
+            // WIN condition:
+            //  - Boss mode: jawaban benar >= threshold (atau perfect score) DAN player masih hidup.
+            //  - Learning mode: jawaban benar >= threshold (atau perfect score). Tidak ada HP player.
+            if ($isLearning) {
+                $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100);
+            } else {
+                $isPlayerAlive = $session->player_hp_akhir > 0;
+                $session->boss_kalah = ($session->jumlah_benar >= $minDamage || $session->skor_akhir >= 100) && $isPlayerAlive;
+            }
+
+            // 4. Calculate XP using XpService
+            $finalXP = $this->xpService->calculateSessionXP($session);
+            $session->xp_diperoleh = $finalXP;
+
+            $session->save();
+
+            // 5. Update user XP & Check Level Up (only if XP earned)
+            $levelUpResult = $finalXP > 0
+                ? $this->xpService->addXP($session->user, $finalXP)
+                : ['leveled_up' => false];
+
+            // 6. Check badges (only for boss-type raids, not latihan soal)
+            $newBadges = [];
+            if ($session->soloRaid && $session->soloRaid->type === 'boss') {
+                $newBadges = $this->badgeService->checkAll($session->user, $session);
+            }
+
+            // 7. Track event progress (Adaptive Learning)
+            $sectionUpgrade = null;
+            if ($session->soloRaid && $session->boss_kalah) {
+                $this->trackEventProgress($session);
+
+                // If boss battle won, upgrade section
+                if ($session->soloRaid->isBoss()) {
+                    $sectionUpgrade = $this->upgradeSectionIfBossDefeated($session);
+                }
+            }
+
+            return [
+                'pemenang' => $session->boss_kalah ? 'Player' : 'Boss',
+                'boss_kalah' => $session->boss_kalah,
+                'skor_akhir' => $session->skor_akhir,
+                'jumlah_benar' => $session->jumlah_benar,
+                'jumlah_soal' => $session->jumlah_soal,
+                'xp_diperoleh' => $finalXP,
+                'durasi' => gmdate("H:i:s", $session->durasi_detik),
+                'level_up' => $levelUpResult,
+                'new_badges' => $newBadges,
+                'section_upgrade' => $sectionUpgrade,
+            ];
+        });
     }
 
     /**

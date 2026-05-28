@@ -111,12 +111,6 @@
                 <div class="font-mono text-vscode-muted mb-2 text-sm">// Pertanyaan:</div>
                 <div class="font-medium text-lg lg:text-xl leading-relaxed text-[#d4d4d4] prose prose-invert max-w-none"
                      x-html="currentQuestion.soal_text"></div>
-                
-                {{-- KUNCI JAWABAN DISABLED untuk testing/production --}}
-                {{-- <div class="mt-3 p-3 bg-green-900/20 border border-green-500/30 rounded-sm">
-                    <div class="font-mono text-green-400 text-xs mb-1">🔑 KUNCI JAWABAN (Testing Mode):</div>
-                    <div class="font-mono text-green-300 text-sm font-bold" x-text="currentQuestion.jawaban_benar"></div>
-                </div> --}}
             </div>
 
             <!-- Answer Grid -->

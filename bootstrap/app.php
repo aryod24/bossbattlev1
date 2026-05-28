@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'finish.expired' => \App\Http\Middleware\FinishExpiredUserSessions::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule): void {

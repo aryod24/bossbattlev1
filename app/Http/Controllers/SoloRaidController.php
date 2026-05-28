@@ -77,7 +77,7 @@ class SoloRaidController extends Controller
 
     // ─── MAP ──────────────────────────────────────────────────────────────────
 
-    public function map(SoloRaid $soloRaid, SoloBattleService $battleService, \App\Services\BadgeService $badgeService)
+    public function map(SoloRaid $soloRaid, \App\Services\BadgeService $badgeService)
     {
         // Boss-type raids don't need the dungeon map — go straight to boss intro
         if ($soloRaid->type === 'boss') {
@@ -94,20 +94,13 @@ class SoloRaidController extends Controller
         // Check for badges (sync completion status)
         $badgeService->checkAll($user);
 
-        // Check for active session (handle expired)
+        // Auto-finalisasi sesi expired sudah ditangani middleware
+        // `finish.expired` + cron `sessions:finish-expired`. Di sini cukup
+        // baca state untuk ditampilkan ke user.
         $activeSession = \App\Models\SessionSolo::where('user_id', $user->id)
             ->whereNull('waktu_selesai')
             ->with('soloRaid')
             ->first();
-
-        if ($activeSession) {
-            $config   = SoloBattleService::LEVEL_CONFIG[$activeSession->level] ?? SoloBattleService::LEVEL_CONFIG['Easy'];
-            $deadline = $activeSession->waktu_mulai->addMinutes($config['timer_minutes']);
-            if (now()->greaterThan($deadline)) {
-                $battleService->finishSession($activeSession->id, $deadline);
-                return redirect()->route('solo.result', $activeSession->id);
-            }
-        }
 
         // Load nodes ordered
         $nodes = $soloRaid->nodes()->get();

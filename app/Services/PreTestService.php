@@ -154,46 +154,52 @@ class PreTestService
      */
     public function finishPreTest(SessionSolo $session): array
     {
-        if ($session->waktu_selesai) {
+        // Bungkus dalam transaction + row lock supaya cron, middleware,
+        // dan endpoint `pretest.finish` tidak menulis dua kali.
+        return DB::transaction(function () use ($session) {
+            $session = SessionSolo::lockForUpdate()->findOrFail($session->id);
+
+            if ($session->waktu_selesai) {
+                return [
+                    'already_finished' => true,
+                    'score' => $session->skor_akhir,
+                    'section' => $session->user->current_section,
+                ];
+            }
+
+            $session->waktu_selesai = now();
+            $session->durasi_detik = $session->waktu_mulai->diffInSeconds($session->waktu_selesai);
+
+            // Calculate score as percentage
+            $score = $session->jumlah_soal > 0
+                ? round(($session->jumlah_benar / $session->jumlah_soal) * 100, 2)
+                : 0;
+            $session->skor_akhir = $score;
+
+            // Pre-test: no boss defeat, no XP
+            $session->boss_kalah = false;
+            $session->xp_diperoleh = 0;
+
+            $session->save();
+
+            // Determine section placement
+            $section = $this->determineSection($score);
+
+            // Update user profile
+            $user = $session->user;
+            $user->update([
+                'pretest_score' => (int) $score,
+                'current_section' => $section,
+            ]);
+
             return [
-                'already_finished' => true,
-                'score' => $session->skor_akhir,
-                'section' => $session->user->current_section,
+                'score' => $score,
+                'jumlah_benar' => $session->jumlah_benar,
+                'jumlah_soal' => $session->jumlah_soal,
+                'section' => $section,
+                'durasi' => gmdate("H:i:s", $session->durasi_detik),
             ];
-        }
-
-        $session->waktu_selesai = now();
-        $session->durasi_detik = $session->waktu_mulai->diffInSeconds($session->waktu_selesai);
-
-        // Calculate score as percentage
-        $score = $session->jumlah_soal > 0 
-            ? round(($session->jumlah_benar / $session->jumlah_soal) * 100, 2) 
-            : 0;
-        $session->skor_akhir = $score;
-
-        // Pre-test: no boss defeat, no XP
-        $session->boss_kalah = false;
-        $session->xp_diperoleh = 0;
-
-        $session->save();
-
-        // Determine section placement
-        $section = $this->determineSection($score);
-
-        // Update user profile
-        $user = $session->user;
-        $user->update([
-            'pretest_score' => (int) $score,
-            'current_section' => $section,
-        ]);
-
-        return [
-            'score' => $score,
-            'jumlah_benar' => $session->jumlah_benar,
-            'jumlah_soal' => $session->jumlah_soal,
-            'section' => $section,
-            'durasi' => gmdate("H:i:s", $session->durasi_detik),
-        ];
+        });
     }
 
     /**

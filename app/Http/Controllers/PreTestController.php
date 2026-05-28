@@ -77,6 +77,8 @@ class PreTestController extends Controller
             return redirect()->route('pretest.result', ['session' => $session->id]);
         }
 
+        // Catatan: kunci jawaban (`jawaban_benar`) TIDAK boleh dikirim ke
+        // client. Validasi jawaban dilakukan server-side di SoloBattleService.
         $questions = $session->answers()->with('question')->orderBy('urutan_soal')->get()->map(function($answer) {
             return [
                 'id' => $answer->question->id,
@@ -86,20 +88,19 @@ class PreTestController extends Controller
                 'pilihan_b' => $answer->question->pilihan_b,
                 'pilihan_c' => $answer->question->pilihan_c,
                 'pilihan_d' => $answer->question->pilihan_d,
-                'jawaban_benar' => $answer->question->jawaban_benar, // For debugging
                 'urutan' => $answer->urutan_soal,
                 'is_answered' => $answer->jawaban_user !== null,
                 'level' => $answer->question->level,
             ];
         });
 
-        // Pre-test timer: 30 minutes for 30 questions
+        // Pre-test timer: 30 minutes for 30 questions. Auto-finalisasi
+        // sesi expired sudah ditangani middleware `finish.expired` + cron;
+        // di sini cukup cek apakah sesi sudah ditutup, lalu redirect.
         $durationSeconds = 30 * 60;
         $deadline = $session->waktu_mulai->addSeconds($durationSeconds);
 
-        // Check if expired
-        if (now()->greaterThan($deadline)) {
-            $result = $this->preTestService->finishPreTest($session);
+        if ($session->waktu_selesai) {
             return redirect()->route('pretest.result', ['session' => $session->id]);
         }
 
@@ -158,10 +159,11 @@ class PreTestController extends Controller
             abort(403);
         }
 
-        // Force finish if not already finished
+        // Auto-finalisasi sudah ditangani middleware `finish.expired` + cron.
+        // Kalau session masih aktif berarti user terlalu cepat sampai sini —
+        // kembalikan ke halaman play, jangan finalisasi diam-diam di GET.
         if (!$session->waktu_selesai) {
-            $result = $this->preTestService->finishPreTest($session);
-            $session->refresh();
+            return redirect()->route('pretest.play', ['session' => $session->id]);
         }
 
         $pretestResult = session('pretest_result') ?? [

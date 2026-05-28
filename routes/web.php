@@ -51,32 +51,42 @@ Route::middleware('auth')->group(function () {
     // Pre-test Routes
     Route::get('/pretest', [PreTestController::class, 'index'])->name('pretest.index');
     Route::post('/pretest/start', [PreTestController::class, 'start'])->name('pretest.start');
-    Route::get('/pretest/play/{session}', [PreTestController::class, 'play'])->name('pretest.play');
+    Route::get('/pretest/play/{session}', [PreTestController::class, 'play'])
+        ->middleware('finish.expired')
+        ->name('pretest.play');
     Route::post('/pretest/action', [PreTestController::class, 'action'])
         ->middleware('throttle:60,1') // Max 60 requests per minute per user
         ->name('pretest.action');
     Route::post('/pretest/finish/{session}', [PreTestController::class, 'finish'])->name('pretest.finish');
-    Route::get('/pretest/result/{session}', [PreTestController::class, 'result'])->name('pretest.result');
+    Route::get('/pretest/result/{session}', [PreTestController::class, 'result'])
+        ->middleware('finish.expired')
+        ->name('pretest.result');
 
     // Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 
     // Player Routes
     Route::get('/solo', [SoloRaidController::class, 'index'])->name('solo.index');
-    Route::get('/solo/{soloRaid}/map', [SoloRaidController::class, 'map'])->name('solo.map');
+    Route::get('/solo/{soloRaid}/map', [SoloRaidController::class, 'map'])
+        ->middleware('finish.expired')
+        ->name('solo.map');
     Route::get('/solo/{soloRaid}/boss', [SoloRaidController::class, 'boss'])->name('solo.boss');
     Route::get('/solo/{soloRaid}/materi/{nodeId}', [SoloRaidController::class, 'materi'])->name('solo.materi');
     Route::post('/solo/node/{node}/complete', [SoloRaidController::class, 'completeNode'])->name('solo.node.complete');
     Route::get('/solo/{soloRaid}/level-select', [SoloRaidController::class, 'levelSelect'])->name('solo.level-select');
-    
+
     // Battle Routes
     Route::get('/solo/{soloRaid}/battle/init/{level}', [\App\Http\Controllers\SoloBattleController::class, 'init'])->name('solo.battle.init');
-    Route::get('/solo/{soloRaid}/battle/{session?}', [\App\Http\Controllers\SoloBattleController::class, 'index'])->name('solo.battle');
+    Route::get('/solo/{soloRaid}/battle/{session?}', [\App\Http\Controllers\SoloBattleController::class, 'index'])
+        ->middleware('finish.expired')
+        ->name('solo.battle');
     Route::post('/solo/{soloRaid}/battle/action', [\App\Http\Controllers\SoloBattleController::class, 'action'])
         ->middleware('throttle:60,1') // Max 60 requests per minute per user
         ->name('solo.battle.action');
     Route::post('/solo/{soloRaid}/battle/finish/{session}', [\App\Http\Controllers\SoloBattleController::class, 'finish'])->name('solo.battle.finish');
-    Route::get('/solo/result/{session}', [\App\Http\Controllers\SoloBattleController::class, 'result'])->name('solo.result');
+    Route::get('/solo/result/{session}', [\App\Http\Controllers\SoloBattleController::class, 'result'])
+        ->middleware('finish.expired')
+        ->name('solo.result');
 
     Route::post('/solo/check-expired', [\App\Http\Controllers\SoloBattleController::class, 'checkExpired'])->name('solo.check-expired');
 });

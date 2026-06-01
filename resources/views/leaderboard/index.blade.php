@@ -10,13 +10,27 @@
                     </div>
                     <div>
                         <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-cyan-glow leading-tight">
-                            Leaderboard Global
+                            Leaderboard {{ $leaderboardClass === 'global' ? 'Global' : $leaderboardClass }}
                         </h1>
                         <p class="font-body text-sm text-soft mt-1">
-                            Lihat posisi Anda di antara semua mahasiswa.
+                            {{ $leaderboardClass === 'global' ? 'Lihat posisi Anda di antara semua mahasiswa.' : 'Lihat posisi Anda di kelas ' . $leaderboardClass . '.' }}
                         </p>
                     </div>
                 </div>
+                <form method="GET" action="{{ route('leaderboard.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-3 py-2"
+                    style="background: linear-gradient(135deg, rgba(0,242,255,0.08), rgba(206,93,255,0.08)); border: 1px solid rgba(0,242,255,0.25);">
+                    <div class="flex flex-col leading-none">
+                        <span class="font-mono-label text-[10px] uppercase tracking-[0.2em] text-soft">Filter Kelas</span>
+                    </div>
+                    <div class="h-8 w-px" style="background: rgba(0,242,255,0.2);"></div>
+                    <select id="kelas" name="kelas" onchange="this.form.submit()"
+                        class="rounded-lg px-3 py-2 text-sm text-soft bg-transparent border border-cyan-soft focus:outline-none focus:ring-2 focus:ring-cyan-soft">
+                        <option value="global" {{ $leaderboardClass === 'global' ? 'selected' : '' }}>Global</option>
+                        <option value="TI-2D" {{ $leaderboardClass === 'TI-2D' ? 'selected' : '' }}>TI-2D</option>
+                        <option value="TI-2E" {{ $leaderboardClass === 'TI-2E' ? 'selected' : '' }}>TI-2E</option>
+                    </select>
+                </form>
             </div>
         </div>
 

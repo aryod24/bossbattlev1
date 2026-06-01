@@ -1,5 +1,5 @@
 <x-admin-layout>
-    <div x-data="{ activeTab: 'overview' }">
+    <div x-data="{ activeTab: (new URLSearchParams(window.location.search)).get('tab') || 'overview' }">
         <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card p-6 rounded-2xl shadow-sm border border-border">
             <div>
                 <h1 class="text-4xl font-black text-text-primary tracking-tight">Session Monitor</h1>
@@ -110,7 +110,7 @@
                             <tr class="hover:bg-background-light/50 dark:hover:bg-background-dark/50 transition-colors">
                                 <td class="px-6 py-4 font-mono text-text-muted">#{{ $session->id }}</td>
                                 <td class="px-6 py-4">
-                                    <div class="font-bold text-text-primary">{{ $session->user->nama ?? 'Unknown' }}</div>
+                                    <div class="font-bold text-text-primary">{{ $session->user->nama ?? '-' }}</div>
                                     <div class="text-xs text-text-muted">
                                         @if($session->user?->nim)
                                             <span class="font-semibold">{{ $session->user->nim }}</span>
@@ -120,13 +120,16 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-text-primary">{{ $session->soloRaid->name ?? 'Unknown Raid' }}</div>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                                        {{ $session->level }}
-                                    </span>
+                                    @if($session->soloRaid?->name)
+                                        <div class="text-text-primary">{{ $session->soloRaid->name }}</div>
+                                    @endif
                                     @if($session->is_pretest || (int) ($session->jumlah_soal ?? 0) === 30)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200 ml-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
                                             Pre-Test
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                                            {{ $session->level }}
                                         </span>
                                     @endif
                                 </td>
@@ -175,7 +178,7 @@
                     </table>
                 </div>
                 <div class="px-6 py-4 border-t border-border-light dark:border-border-dark">
-                    {{ $soloSessions->links() }}
+                    {{ $soloSessions->appends(['tab' => 'solo'])->links() }}
                 </div>
             </div>
         </div>

@@ -17,7 +17,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
                 <div class="text-sm text-text-muted mb-1">User</div>
-                <div class="font-bold text-lg text-text-primary">{{ $session->user->nama ?? 'Unknown' }}</div>
+                <div class="font-bold text-lg text-text-primary">{{ $session->user->nama ?? '-' }}</div>
                 @if($session->user?->nim)
                     <div class="text-xs text-text-muted">NIM: {{ $session->user->nim }}</div>
                 @endif
@@ -25,7 +25,7 @@
             </div>
             <div>
                 <div class="text-sm text-text-muted mb-1">Raid / Level</div>
-                <div class="font-bold text-lg text-text-primary">{{ $session->soloRaid->name ?? 'Unknown' }}</div>
+                <div class="font-bold text-lg text-text-primary">{{ $session->soloRaid->name ?? '-' }}</div>
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                     {{ $session->level }} (Attempt {{ $session->attempt_number }})
                 </span>

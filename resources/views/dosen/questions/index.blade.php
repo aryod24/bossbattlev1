@@ -5,21 +5,21 @@
             <h1 class="text-4xl font-black text-text-primary tracking-tight">Bank Soal</h1>
             <p class="text-text-muted mt-2 font-medium">Manage master data of questions and quizzes.</p>
         </div>
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('dosen.questions.template') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-success hover:brightness-110 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
-                <span class="material-symbols-outlined">download</span>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('dosen.questions.template') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-surface-dark border-2 border-border hover:border-text-primary hover:bg-surface-light text-text-primary text-sm font-bold transition-all shadow-sm">
+                <span class="material-symbols-outlined text-lg">download</span>
                 <span class="truncate">Download Template</span>
             </a>
-            <button type="button" onclick="toggleBulkUpload()" id="btnBulkUpload" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-info hover:brightness-110 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
-                <span class="material-symbols-outlined">upload_file</span>
+            <button type="button" onclick="toggleBulkUpload()" id="btnBulkUpload" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-surface-dark border-2 border-border hover:border-text-primary hover:bg-surface-light text-text-primary text-sm font-bold transition-all shadow-sm">
+                <span class="material-symbols-outlined text-lg">upload_file</span>
                 <span class="truncate">Import Excel/CSV</span>
             </button>
-            <a href="{{ route('dosen.questions.banks.create') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-warning hover:brightness-110 text-white text-sm font-bold leading-normal tracking-wide shadow-sm">
-                <span class="material-symbols-outlined">library_add</span>
+            <a href="{{ route('dosen.questions.banks.create') }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-surface-dark border-2 border-border hover:border-text-primary hover:bg-surface-light text-text-primary text-sm font-bold transition-all shadow-sm">
+                <span class="material-symbols-outlined text-lg">library_add</span>
                 <span class="truncate">Buat Bank Soal Baru</span>
             </a>
-            <a href="{{ route('dosen.questions.create', ['bank' => $currentBank]) }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-accent-hover">
-                <span class="material-symbols-outlined">add_circle</span>
+            <a href="{{ route('dosen.questions.create', ['bank' => $currentBank]) }}" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-surface-dark border-2 border-text-primary text-text-primary hover:bg-text-primary hover:text-surface-dark text-sm font-bold transition-all shadow-sm">
+                <span class="material-symbols-outlined text-lg">add_circle</span>
                 <span class="truncate">Tambah Soal</span>
             </a>
         </div>
@@ -128,7 +128,7 @@
                     <div>
                         <label class="block text-sm font-medium text-text-muted mb-1">File CSV</label>
                         <input type="file" name="file" accept=".csv,.txt" required
-                               class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-accent-hover bg-background-dark border border-border rounded-lg p-1">
+                               class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-surface-light file:text-text-primary hover:file:bg-border bg-background-dark border border-border rounded-lg p-1">
                     </div>
                 </div>
 
@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="submit" class="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-info hover:brightness-110 text-white text-sm font-bold transition-colors">
+                    <button type="submit" class="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-surface-dark border-2 border-text-primary text-text-primary hover:bg-text-primary hover:text-surface-dark text-sm font-bold transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-base">upload_file</span>
                         Upload Soal
                     </button>

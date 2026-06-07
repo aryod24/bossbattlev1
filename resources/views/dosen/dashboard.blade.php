@@ -1,76 +1,67 @@
 <x-dosen-layout>
     <div class="space-y-6">
-        <!-- Page Header -->
+        <!-- Page Header & Stats -->
         <div class="bg-card rounded-2xl shadow-sm border border-border p-6">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border-2 border-primary">
-                    <span class="material-symbols-outlined text-3xl text-primary">school</span>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <!-- Welcome Section -->
+                <div class="flex items-center gap-4 min-w-0">
+                    <div class="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 border-2 border-primary shrink-0">
+                        <span class="material-symbols-outlined text-2xl md:text-3xl text-primary">school</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="text-2xl md:text-3xl font-black text-text-primary tracking-tight truncate">Dashboard Dosen</h1>
+                        <p class="text-xs md:text-sm text-text-muted mt-1 font-medium truncate">Selamat datang, {{ auth()->user()->nama }}</p>
+                    </div>
                 </div>
+                
+                <!-- Quick Stats -->
+                <div class="flex items-center gap-2 sm:gap-4 shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-border">
+                    <!-- Events Stat -->
+                    <a href="{{ route('dosen.events.index') }}" class="flex items-center gap-3 p-2 md:p-3 rounded-xl hover:bg-surface-light border border-transparent hover:border-border transition-all">
+                        <div class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 shrink-0">
+                            <span class="material-symbols-outlined text-xl md:text-2xl text-primary">calendar_month</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-0.5">Event</p>
+                            <div class="flex items-baseline gap-1">
+                                <h3 class="text-xl md:text-2xl font-black text-text-primary leading-none">{{ $totalEvents }}</h3>
+                                <span class="text-[10px] md:text-xs text-primary font-medium hidden sm:inline">({{ $myEvents }} milik Anda)</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <div class="w-px h-8 md:h-10 bg-border"></div>
+                    
+                    <!-- Banks Stat -->
+                    <a href="{{ route('dosen.questions.index') }}" class="flex items-center gap-3 p-2 md:p-3 rounded-xl hover:bg-surface-light border border-transparent hover:border-border transition-all">
+                        <div class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-success/10 shrink-0">
+                            <span class="material-symbols-outlined text-xl md:text-2xl text-success">quiz</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-0.5">Bank Soal</p>
+                            <div class="flex items-baseline gap-1">
+                                <h3 class="text-xl md:text-2xl font-black text-text-primary leading-none">{{ $totalBanks }}</h3>
+                                <span class="text-[10px] md:text-xs text-success font-medium hidden sm:inline">({{ $totalQuestions }} soal)</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout Grid for Recent Events & Talent Scout -->
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            
+            <!-- Recent Events (40%) -->
+            <div class="lg:col-span-2 bg-card rounded-2xl shadow-sm border border-border overflow-hidden flex flex-col">
+            <div class="bg-surface-dark border-b border-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-4xl font-black text-text-primary tracking-tight">Dashboard Dosen</h1>
-                    <p class="text-text-muted mt-1 font-medium">Selamat datang kembali, {{ auth()->user()->nama }}</p>
+                    <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+                        <span class="material-symbols-outlined text-info">history</span>
+                        Event Terbaru
+                    </h2>
+                    <p class="text-xs text-text-muted mt-1">5 event terakhir di sistem.</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Events Card -->
-            <div class="bg-card rounded-2xl shadow-sm border border-border p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-text-muted text-sm font-medium">Total Event</p>
-                        <h3 class="text-4xl font-black text-text-primary mt-2">{{ $totalEvents }}</h3>
-                        <p class="text-xs text-text-muted mt-1">
-                            <span class="font-semibold text-primary">{{ $myEvents }}</span> dibuat oleh Anda
-                        </p>
-                    </div>
-                    <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10">
-                        <span class="material-symbols-outlined text-3xl text-primary">calendar_month</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-border">
-                    <a href="{{ route('dosen.events.index') }}" class="text-sm text-info hover:text-info/80 font-medium flex items-center gap-1">
-                        Lihat Semua Event
-                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Question Banks Card -->
-            <div class="bg-card rounded-2xl shadow-sm border border-border p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-text-muted text-sm font-medium">Bank Soal</p>
-                        <h3 class="text-4xl font-black text-text-primary mt-2">{{ $totalBanks }}</h3>
-                        <p class="text-xs text-text-muted mt-1">
-                            <span class="font-semibold text-success">{{ $totalQuestions }}</span> total soal
-                            @if($myBanks > 0)
-                                · <span class="font-semibold text-primary">{{ $myBanks }}</span> bank Anda
-                            @endif
-                        </p>
-                    </div>
-                    <div class="flex items-center justify-center w-14 h-14 rounded-xl bg-success/10">
-                        <span class="material-symbols-outlined text-3xl text-success">quiz</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-border">
-                    <a href="{{ route('dosen.questions.index') }}" class="text-sm text-info hover:text-info/80 font-medium flex items-center gap-1">
-                        Lihat Bank Soal
-                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Events -->
-        <div class="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
-            <div class="bg-surface-dark border-b border-border px-6 py-4 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
-                    <span class="material-symbols-outlined text-info">history</span>
-                    Event Terbaru
-                </h2>
-                <span class="text-xs text-text-muted font-medium">5 event terakhir di sistem</span>
             </div>
             <div class="p-6">
                 @if($recentEvents->isEmpty())
@@ -124,11 +115,10 @@
                     </div>
                 @endif
             </div>
-        </div>
-        </div>
+        </div> <!-- End Recent Events Card -->
 
-        <!-- Talent Scout Section -->
-        <div id="talent-scout" class="bg-card rounded-2xl shadow-sm border border-border overflow-hidden mt-6 scroll-mt-6">
+        <!-- Talent Scout Section (60%) -->
+        <div id="talent-scout" class="lg:col-span-3 bg-card rounded-2xl shadow-sm border border-border overflow-hidden scroll-mt-6">
             <div class="bg-surface-dark border-b border-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
@@ -168,7 +158,7 @@
                                         <span class="text-lg font-bold text-primary">{{ substr($std->nama, 0, 1) }}</span>
                                     </div>
                                     <div class="min-w-0 flex-1">
-                                        <h4 class="font-bold text-text-primary text-base truncate" title="{{ $std->nama }}">{{ $std->nama }}</h4>
+                                        <h4 class="font-semibold text-text-primary text-sm truncate" title="{{ $std->nama }}">{{ $std->nama }}</h4>
                                         <p class="text-xs text-text-muted">{{ $std->kelas ?? '-' }} · Level {{ $std->level ?? 1 }}</p>
                                     </div>
                                 </div>
@@ -212,6 +202,8 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </div> <!-- End Talent Scout Card -->
+
+        </div> <!-- End Layout Grid -->
     </div>
 </x-dosen-layout>

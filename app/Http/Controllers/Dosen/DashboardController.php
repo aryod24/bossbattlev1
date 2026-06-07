@@ -73,7 +73,7 @@ class DashboardController extends Controller
         }
 
         $page = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
-        $perPage = 10;
+        $perPage = 5;
         $topStudents = new \Illuminate\Pagination\LengthAwarePaginator(
             $allStudents->forPage($page, $perPage)->values(),
             $allStudents->count(),

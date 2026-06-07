@@ -1,4 +1,24 @@
 <x-app-layout>
+    <style>
+        @keyframes highlight-learning {
+            0% { box-shadow: 0 0 0px rgba(99, 102, 241, 0.5); transform: scale(1); }
+            50% { box-shadow: 0 0 40px 15px rgba(99, 102, 241, 0.8); transform: scale(1.02); border-color: rgba(99, 102, 241, 1); }
+            100% { box-shadow: 0 0 0px rgba(99, 102, 241, 0.5); transform: scale(1); }
+        }
+        @keyframes highlight-boss {
+            0% { box-shadow: 0 0 0px rgba(59, 130, 246, 0.5); transform: scale(1); }
+            50% { box-shadow: 0 0 40px 15px rgba(59, 130, 246, 0.8); transform: scale(1.02); border-color: rgba(59, 130, 246, 1); }
+            100% { box-shadow: 0 0 0px rgba(59, 130, 246, 0.5); transform: scale(1); }
+        }
+        .highlight-learning-card {
+            animation: highlight-learning 1.5s ease-in-out 2;
+            z-index: 20;
+        }
+        .highlight-boss-card {
+            animation: highlight-boss 1.5s ease-in-out 2;
+            z-index: 20;
+        }
+    </style>
     <div class="flex flex-col gap-6">
 
         {{-- Page Heading --}}
@@ -131,9 +151,16 @@
                                         ? '0 0 30px rgba(0, 212, 255, 0.3), 0 0 15px rgba(0, 212, 255, 0.2)'
                                         : '0 0 25px rgba(0, 212, 255, 0.25), 0 0 15px rgba(0, 212, 255, 0.15)';
                                 }
+
+                                $highlightClass = '';
+                                if (request('type') === 'boss' && $isBoss) {
+                                    $highlightClass = 'highlight-boss-card';
+                                } elseif (request('type') === 'learning' && !$isBoss) {
+                                    $highlightClass = 'highlight-learning-card';
+                                }
                             @endphp
 
-                            <div class="rounded-xl p-8 relative overflow-hidden group transition-all duration-300 {{ !$isUnlocked ? 'opacity-50' : 'hover:-translate-y-1' }}"
+                            <div class="rounded-xl p-8 relative overflow-hidden group transition-all duration-300 {{ !$isUnlocked ? 'opacity-50' : 'hover:-translate-y-1' }} {{ $highlightClass }}"
                                  style="background: rgba(19, 19, 20, 0.8);
                                         border: 1px solid {{ $cardBorder }};
                                         box-shadow: {{ $cardShadow }};">

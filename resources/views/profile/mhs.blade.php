@@ -124,9 +124,23 @@
                         'Easy' => ['label' => 'Easy', 'color' => '#86efac', 'bg' => 'rgba(34,197,94,0.15)', 'border' => 'rgba(34,197,94,0.3)'],
                         default => ['label' => 'Belum Pre-test', 'color' => '#849495', 'bg' => 'rgba(132,148,149,0.15)', 'border' => 'rgba(132,148,149,0.3)'],
                     };
+
+                    $initialSection = null;
+                    if ($pretestScore !== null) {
+                        if ($pretestScore >= 71) $initialSection = 'Hard';
+                        elseif ($pretestScore >= 41) $initialSection = 'Medium';
+                        else $initialSection = 'Easy';
+                    }
+
+                    $initialSectionMeta = match($initialSection) {
+                        'Hard' => ['label' => 'Hard', 'color' => '#ffb4ab'],
+                        'Medium' => ['label' => 'Medium', 'color' => '#fde68a'],
+                        'Easy' => ['label' => 'Easy', 'color' => '#86efac'],
+                        default => ['label' => '-', 'color' => '#849495'],
+                    };
                 @endphp
 
-                <div class="grid grid-cols-2 gap-4 pt-4 mt-4" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 mt-4" style="border-top: 1px solid rgba(58, 73, 75, 0.5);">
                     <div class="flex flex-col gap-1 p-3 rounded-lg" style="background-color: rgba(32, 31, 32, 0.4); border: 1px solid rgba(58, 73, 75, 0.3);">
                         <span class="font-mono-label text-[10px] uppercase tracking-wider text-soft flex items-center gap-1">
                             <span class="material-symbols-outlined" style="font-size: 12px;">school</span>
@@ -138,10 +152,22 @@
                     <div class="flex flex-col gap-1 p-3 rounded-lg" style="background-color: rgba(32, 31, 32, 0.4); border: 1px solid rgba(58, 73, 75, 0.3);">
                         <span class="font-mono-label text-[10px] uppercase tracking-wider text-soft flex items-center gap-1">
                             <span class="material-symbols-outlined" style="font-size: 12px;">tune</span>
-                            Adaptive Level
+                            Level Sekarang
                         </span>
                         <span class="font-headline text-lg font-bold" style="color: {{ $sectionMeta['color'] }};">
                             {{ $sectionMeta['label'] }}
+                        </span>
+                        <span class="font-mono-label text-[10px] text-faint">
+                            Saat Ini
+                        </span>
+                    </div>
+                    <div class="flex flex-col gap-1 p-3 rounded-lg" style="background-color: rgba(32, 31, 32, 0.4); border: 1px solid rgba(58, 73, 75, 0.3);">
+                        <span class="font-mono-label text-[10px] uppercase tracking-wider text-soft flex items-center gap-1">
+                            <span class="material-symbols-outlined" style="font-size: 12px;">history</span>
+                            Level Awal
+                        </span>
+                        <span class="font-headline text-lg font-bold" style="color: {{ $initialSectionMeta['color'] }};">
+                            {{ $initialSectionMeta['label'] }}
                         </span>
                         <span class="font-mono-label text-[10px] text-faint">
                             @if($pretestScore !== null)

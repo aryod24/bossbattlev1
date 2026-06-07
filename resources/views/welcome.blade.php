@@ -253,9 +253,6 @@
                                 <div>
                                     <div class="flex items-center justify-between">
                                         <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="password">Password</label>
-                                        @if (Route::has('password.request'))
-                                            <a class="font-headline text-xs text-cyan-glow hover:underline opacity-50 cursor-not-allowed pointer-events-none" href="javascript:void(0)">Lupa Password?</a>
-                                        @endif
                                     </div>
                                     <div class="mt-2" style="position: relative;">
                                         <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"
@@ -280,7 +277,7 @@
 
                             <p class="font-body mt-8 text-center text-sm text-soft">
                                 Belum punya akun?
-                                <span class="font-headline font-medium text-cyan-glow">Hubungi Admin</span>
+                                <a href="https://wa.me/6282142226943" target="_blank" class="font-headline font-medium text-cyan-glow hover:underline">Hubungi Admin</a>
                             </p>
                         @endauth
                     </div>

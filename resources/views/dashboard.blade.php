@@ -109,7 +109,7 @@
                     <p class="font-body text-base md:text-lg mb-8 max-w-md" style="color: rgba(255,255,255,0.95);">
                         Pelajari materi programming dan asah kemampuan dengan latihan soal terstruktur.
                     </p>
-                    <a href="#" class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:bg-gray-100 hover:scale-105" style="color: #4f46e5;">
+                    <a href="{{ route('solo.index', ['type' => 'learning']) }}" class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:bg-gray-100 hover:scale-105" style="color: #4f46e5;">
                         Mulai Belajar
                     </a>
                 </div>
@@ -134,7 +134,7 @@
                     <p class="font-body text-base md:text-lg mb-8 max-w-md" style="color: rgba(255,255,255,0.95);">
                         Tantang Boss & Kuasai Materi. Pilih Level Kesulitan dan raih XP maksimal!
                     </p>
-                    <a href="{{ route('solo.index') }}" class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:bg-gray-100 hover:scale-105" style="color: #1d4ed8;">
+                    <a href="{{ route('solo.index', ['type' => 'boss']) }}" class="font-headline inline-flex items-center bg-white px-8 py-3 rounded-lg font-bold transition-all duration-300 hover:bg-gray-100 hover:scale-105" style="color: #1d4ed8;">
                         Mulai Battle
                     </a>
                 </div>

@@ -5,8 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
+use App\Models\User;
+use App\Mail\OtpMail;
 
 class PasswordResetLinkController extends Controller
 {
@@ -29,16 +34,31 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withInput($request->only('email'))
+                         ->withErrors(['email' => __('passwords.user')]);
+        }
+
+        // Generate 6-digit OTP
+        $otp = sprintf("%06d", mt_rand(1, 999999));
+
+        // Save OTP to password_reset_tokens
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => Hash::make($otp),
+                'created_at' => now()
+            ]
         );
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        // Send OTP via email
+        Mail::to($request->email)->send(new OtpMail($otp));
+
+        // Store email in session to use in verify page
+        session(['reset_email' => $request->email]);
+
+        return redirect()->route('password.verify')->with('status', 'Kode OTP telah dikirim ke email Anda.');
     }
 }

@@ -232,16 +232,21 @@
                                                 <span>Terkunci</span>
                                             </div>
                                         @elseif($isBoss)
-                                            <a href="{{ route('solo.boss', $event) }}"
-                                               class="font-headline inline-flex items-center bg-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-gray-100 hover:scale-105"
-                                               style="color: {{ $btnTextColor }};">
-                                                <span class="material-symbols-outlined text-sm mr-1">swords</span>
-                                                {{ $isCompleted ? 'Ulangi' : 'Mulai Battle' }}
-                                            </a>
+                                            @if($isCompleted)
+                                                <a href="{{ route('solo.boss', $event) }}"
+                                                   class="font-headline inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-blue-500 hover:scale-105">
+                                                    <span class="material-symbols-outlined text-sm mr-1">restart_alt</span>Ulangi
+                                                </a>
+                                            @else
+                                                <a href="{{ route('solo.boss', $event) }}"
+                                                   class="font-headline inline-flex items-center bg-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-gray-100 hover:scale-105"
+                                                   style="color: {{ $btnTextColor }};">
+                                                    <span class="material-symbols-outlined text-sm mr-1">swords</span>Mulai Battle
+                                                </a>
+                                            @endif
                                         @elseif($isCompleted)
                                             <a href="{{ route('solo.map', $event) }}"
-                                               class="font-headline inline-flex items-center bg-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-gray-100 hover:scale-105"
-                                               style="color: {{ $btnTextColor }};">
+                                               class="font-headline inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-lg font-bold text-xs transition-all duration-300 hover:bg-blue-500 hover:scale-105">
                                                 <span class="material-symbols-outlined text-sm mr-1">replay</span>Ulangi
                                             </a>
                                         @else

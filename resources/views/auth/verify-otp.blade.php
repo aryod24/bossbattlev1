@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>CodeBossArena — Login</title>
+    <title>CodeBossArena — Verifikasi OTP</title>
     <link rel="icon" href="{{ asset('assets/logo.png') }}" type="image/png"/>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +42,6 @@
         .hero-title {
             font-family: 'Sora', sans-serif;
             font-weight: 500;
-            /* Larger size for better visibility on 1920x1080 */
             font-size: clamp(3rem, 5vw, 6rem);
             line-height: 1.05;
             letter-spacing: -0.02em;
@@ -215,83 +214,98 @@
                 {{-- Right Section (Login Form) --}}
                 <div class="auth-panel w-full md:w-2/5 flex items-center justify-center p-6 lg:p-8 min-h-screen">
                     <div class="w-full max-w-sm">
-                        @auth
-                            <div class="text-center">
-                                <div class="flex flex-col items-center justify-center mb-8 gap-3">
-                                    <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain">
-                                    <h2 class="font-headline text-2xl font-bold tracking-wide text-cyan-glow">CodeBossArena</h2>
-                                </div>
-                                <h3 class="font-headline text-3xl font-extrabold text-cyan-glow mb-3">Welcome Back!</h3>
-                                <p class="font-body text-soft mb-8">Kamu sudah masuk. Lanjut ke dashboard?</p>
-                                <a href="{{ route('dashboard') }}" class="btn-cyber-primary font-headline flex w-full items-center justify-center rounded-lg h-11 px-4 text-base font-bold tracking-wide">
-                                    Go to Dashboard
-                                </a>
-                            </div>
-                        @else
-                            <div class="flex flex-col items-center justify-center mb-8 gap-3">
-                                <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain drop-shadow-[0_0_18px_rgba(0,242,255,0.4)]">
-                            </div>
-                            <h3 class="font-headline text-3xl font-extrabold text-center mb-2" style="color: #e5e2e3;">Masuk</h3>
-                            <p class="font-body text-center text-sm text-soft mb-8">Akses arena dan lanjutkan progres kamu.</p>
+                        <div class="flex flex-col items-center justify-center mb-8 gap-3">
+                            <img src="{{ asset('assets/logo.png') }}" alt="CodeBossArena Logo" class="h-16 w-16 object-contain drop-shadow-[0_0_18px_rgba(0,242,255,0.4)]">
+                        </div>
+                        <h3 class="font-headline text-3xl font-extrabold text-center mb-2" style="color: #e5e2e3;">Verifikasi OTP</h3>
+                        <p class="font-body text-center text-sm text-soft mb-8">Masukkan kode 6 digit OTP yang telah dikirim ke email Anda beserta password baru.</p>
 
-                            <form class="space-y-6" method="POST" action="{{ route('login') }}">
-                                @csrf
-                                <div>
-                                    <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="email">Email</label>
-                                    <div class="mt-2">
-                                        <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"
-                                               id="email" name="email"
-                                               placeholder="kamu@email.com"
-                                               required type="email"
-                                               value="{{ old('email') }}"
-                                               autofocus autocomplete="username"/>
-                                        @error('email')
-                                            <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                        {{-- Session Status --}}
+                        <x-auth-session-status class="mb-4" :status="session('status')" />
+
+                        <form class="space-y-6" method="POST" action="{{ route('password.store') }}">
+                            @csrf
+                            
+                            {{-- Email --}}
+                            <input type="hidden" name="email" value="{{ session('reset_email') ?? old('email') }}" />
+                            <div class="mb-4">
+                                <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="email">Email</label>
+                                <div class="mt-2 text-sm text-cyan-glow font-medium">{{ session('reset_email') ?? old('email') }}</div>
+                                @error('email')
+                                    <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            {{-- OTP --}}
+                            <div>
+                                <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="otp">Kode OTP (6 Digit)</label>
+                                <div class="mt-2">
+                                    <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm font-mono-label text-center tracking-widest text-lg"
+                                           id="otp" name="otp"
+                                           placeholder="------"
+                                           required type="text" maxlength="6"
+                                           autofocus autocomplete="off"/>
+                                    @error('otp')
+                                        <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                <div>
-                                    <div class="flex items-center justify-between">
-                                        <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="password">Password</label>
-                                        @if (Route::has('password.request'))
-                                            <a class="font-headline text-xs text-cyan-glow hover:underline transition-colors" href="{{ route('password.request') }}">Lupa Password?</a>
-                                        @endif
-                                    </div>
-                                    <div class="mt-2" style="position: relative;">
-                                        <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"
-                                               style="padding-right: 2.5rem;"
-                                               id="password" name="password"
-                                               required type="password"
-                                               autocomplete="current-password"/>
-                                        <button type="button" onclick="togglePassword()" style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #849495; padding: 0; display: flex; align-items: center;" aria-label="Toggle password visibility">
-                                            <span id="eye-icon" class="material-symbols-outlined" style="font-size: 20px;">visibility_off</span>
-                                        </button>
-                                        @error('password')
-                                            <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="pt-2">
-                                    <button class="btn-cyber-primary font-headline flex w-full items-center justify-center rounded-lg h-11 px-4 text-base font-bold tracking-wide" type="submit">
-                                        <span class="truncate">Masuk</span>
+                            </div>
+
+                            {{-- New Password --}}
+                            <div>
+                                <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="password">Password Baru</label>
+                                <div class="mt-2" style="position: relative;">
+                                    <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"
+                                           style="padding-right: 2.5rem;"
+                                           id="password" name="password"
+                                           required type="password"
+                                           autocomplete="new-password"/>
+                                    <button type="button" onclick="togglePassword('password', 'eye-icon')" style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #849495; padding: 0; display: flex; align-items: center;" aria-label="Toggle password visibility">
+                                        <span id="eye-icon" class="material-symbols-outlined" style="font-size: 20px;">visibility_off</span>
                                     </button>
+                                    @error('password')
+                                        <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                            </form>
+                            </div>
 
-                            <p class="font-body mt-8 text-center text-sm text-soft">
-                                Belum punya akun?
-                                <a href="https://wa.me/6282142226943" target="_blank" class="font-headline font-medium text-cyan-glow hover:underline">Hubungi Admin</a>
-                            </p>
-                        @endauth
+                            {{-- Confirm Password --}}
+                            <div>
+                                <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="password_confirmation">Konfirmasi Password</label>
+                                <div class="mt-2" style="position: relative;">
+                                    <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"
+                                           style="padding-right: 2.5rem;"
+                                           id="password_confirmation" name="password_confirmation"
+                                           required type="password"
+                                           autocomplete="new-password"/>
+                                    <button type="button" onclick="togglePassword('password_confirmation', 'eye-icon-confirm')" style="position: absolute; top: 50%; right: 0.75rem; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #849495; padding: 0; display: flex; align-items: center;" aria-label="Toggle password visibility">
+                                        <span id="eye-icon-confirm" class="material-symbols-outlined" style="font-size: 20px;">visibility_off</span>
+                                    </button>
+                                    @error('password_confirmation')
+                                        <span class="font-body text-xs mt-1 block" style="color: #ffb4ab;">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <button class="btn-cyber-primary font-headline flex w-full items-center justify-center rounded-lg h-11 px-4 text-base font-bold tracking-wide" type="submit">
+                                    <span class="truncate">Reset Password</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <p class="font-body mt-8 text-center text-sm text-soft">
+                            <a href="{{ route('login') }}" class="font-headline font-medium text-cyan-glow hover:underline">Batal dan kembali ke Login</a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        function togglePassword() {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('eye-icon');
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.textContent = 'visibility';

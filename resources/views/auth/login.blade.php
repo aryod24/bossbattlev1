@@ -245,6 +245,9 @@
                             <div>
                                 <div class="flex items-center justify-between">
                                     <label class="font-mono-label text-xs uppercase tracking-wider text-soft" for="password">Password</label>
+                                    @if (Route::has('password.request'))
+                                        <a class="font-headline text-xs text-cyan-glow hover:underline transition-colors" href="{{ route('password.request') }}">Lupa Password?</a>
+                                    @endif
                                 </div>
                                 <div class="mt-2" style="position: relative;">
                                     <input class="cyber-input block w-full rounded-lg px-3 py-2.5 text-sm"

@@ -125,5 +125,93 @@
                 @endif
             </div>
         </div>
+        </div>
+
+        <!-- Talent Scout Section -->
+        <div id="talent-scout" class="bg-card rounded-2xl shadow-sm border border-border overflow-hidden mt-6 scroll-mt-6">
+            <div class="bg-surface-dark border-b border-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
+                        <span class="material-symbols-outlined text-warning">military_tech</span>
+                        Talent Scout
+                    </h2>
+                    <p class="text-xs text-text-muted mt-1">Cari mahasiswa berprestasi berdasarkan performa Boss Battle.</p>
+                </div>
+                
+                <form action="{{ route('dosen.dashboard') }}#talent-scout" method="GET" class="flex items-center gap-2" id="sortForm">
+                    <label for="sort" class="text-sm font-medium text-text-muted whitespace-nowrap">Urutkan:</label>
+                    <select name="sort" id="sort" onchange="document.getElementById('sortForm').submit()" 
+                            class="bg-surface-light border border-border text-text-primary text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5">
+                        <option value="avg_score" {{ $sort === 'avg_score' ? 'selected' : '' }}>Rata-rata Skor Tertinggi</option>
+                        <option value="win_rate" {{ $sort === 'win_rate' ? 'selected' : '' }}>Win Rate Tertinggi</option>
+                        <option value="pretest_score" {{ $sort === 'pretest_score' ? 'selected' : '' }}>Skor Pre-test Tertinggi</option>
+                        <option value="total_xp" {{ $sort === 'total_xp' ? 'selected' : '' }}>Total XP Terbanyak</option>
+                    </select>
+                </form>
+            </div>
+            
+            <div class="p-6">
+                @if($topStudents->isEmpty())
+                    <div class="text-center py-8">
+                        <p class="text-text-muted">Belum ada data mahasiswa.</p>
+                    </div>
+                @else
+                    <div class="space-y-3">
+                        @foreach($topStudents as $std)
+                            <div class="bg-surface-light border border-border rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:border-primary hover:shadow-md">
+                                
+                                <div class="flex items-center gap-4 flex-1 min-w-0 w-full md:w-auto">
+                                    <div class="w-8 h-8 rounded-full bg-surface-dark flex items-center justify-center border border-border shrink-0 shadow-inner">
+                                        <span class="font-bold text-text-muted text-sm">{{ $std->rank }}</span>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                                        <span class="text-lg font-bold text-primary">{{ substr($std->nama, 0, 1) }}</span>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-text-primary text-base truncate" title="{{ $std->nama }}">{{ $std->nama }}</h4>
+                                        <p class="text-xs text-text-muted">{{ $std->kelas ?? '-' }} · Level {{ $std->level ?? 1 }}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-6 w-full md:w-auto mt-2 md:mt-0 px-2 md:px-0 shrink-0">
+                                    <div class="text-center md:text-right">
+                                        <p class="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">Rata-rata</p>
+                                        <p class="font-black text-primary text-xl">{{ $std->avg_score_val }}</p>
+                                    </div>
+                                    
+                                    <div class="w-px h-8 bg-border hidden sm:block"></div>
+                                    
+                                    <div class="text-center md:text-right">
+                                        <p class="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">Win Rate</p>
+                                        <p class="font-black {{ $std->win_rate >= 70 ? 'text-success' : ($std->win_rate >= 50 ? 'text-warning' : 'text-danger') }} text-xl">
+                                            {{ $std->win_rate }}%
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="w-px h-8 bg-border hidden sm:block"></div>
+                                    
+                                    <div class="text-center md:text-right">
+                                        <p class="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">Pre-test</p>
+                                        <p class="font-black text-info text-xl">{{ $std->pretest_score ?? '-' }}</p>
+                                    </div>
+                                    
+                                    <div class="w-px h-8 bg-border hidden sm:block"></div>
+                                    
+                                    <div class="text-center md:text-right">
+                                        <p class="text-[10px] text-text-muted uppercase tracking-wider mb-0.5">Total XP</p>
+                                        <p class="font-black text-text-primary text-xl">{{ number_format($std->total_xp) }}</p>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                    <div class="mt-6">
+                        {{ $topStudents->fragment('talent-scout')->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 </x-dosen-layout>
